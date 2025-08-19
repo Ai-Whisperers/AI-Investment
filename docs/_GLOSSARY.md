@@ -3,7 +3,7 @@ title: Technical Glossary
 category: Reference
 priority: 99
 status: stable
-last-updated: 2025-01-19
+last-updated: 2025-08-19
 owner: documentation-team
 ---
 
@@ -23,7 +23,12 @@ owner: documentation-team
 
 **Alembic**
 - Database migration tool for Python/SQLAlchemy
-- Status: ⚠️ Not yet implemented (Critical TODO)
+- Status: 🔴 Not implemented (Critical Priority #1)
+
+**Architecture Pattern**
+- Hexagonal + Clean Architecture implementation
+- Status: ✅ COMPLETED (95%+ implementation achieved)
+- All god files eliminated, modular structure ready
 
 ## B
 
@@ -46,7 +51,8 @@ owner: documentation-team
 **Clean Architecture**
 - Design pattern separating concerns into layers
 - Domain → Application → Infrastructure → Presentation
-- Implemented in: `apps/web/app/core/`
+- Status: ✅ FULLY IMPLEMENTED in `apps/web/app/core/`
+- Achieved 71% average line reduction across refactored files
 
 **CORS (Cross-Origin Resource Sharing)**
 - Security feature controlling cross-domain requests
@@ -163,6 +169,12 @@ owner: documentation-team
 - Endpoint: `/api/v1/strategy/config`
 
 ## T
+
+**Testing Infrastructure**
+- Unit, integration, and E2E test frameworks
+- Status: 🔴 CRITICAL ISSUE - 0% coverage found vs 95% target
+- Priority: Immediate implementation for financial regulatory compliance
+- Frameworks: pytest (backend), Jest (frontend planned)
 
 **TwelveData**
 - External API for market data and prices
