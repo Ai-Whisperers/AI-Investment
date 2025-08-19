@@ -40,8 +40,13 @@
 ### 4. Test Coverage Improvement
 **Target**: 80% coverage
 **Effort**: 5 days
+**Prerequisite**: Complete code structure refactoring (see CRITICAL.md #1)
 - [ ] Backend unit tests (current: 25%)
+  - Requires splitting god files first
+  - Each service module < 250 lines for testability
 - [ ] Frontend component tests (current: 0%)
+  - Requires extracting business logic from components
+  - Need proper separation of concerns
 - [ ] Integration test suite
 - [ ] E2E test scenarios
 - [ ] Performance benchmarks

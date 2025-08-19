@@ -56,24 +56,22 @@ Coverage Requirements:
 **Impact**: Testing becomes impossible with god files, violates clean architecture
 **Priority**: MUST complete before comprehensive testing
 **Effort**: 3-4 days
+**Status**: ⚠️ PARTIALLY COMPLETE (20% done - 4 of 20 files refactored)
 
 ### Frontend Structure Issues
-- [ ] **Dashboard God File** (797 lines): `apps/web/app/dashboard/page.tsx`
-  - Extract chart components into separate files
-  - Move state management to custom hooks
-  - Separate business logic from presentation
-  - Create dashboard-specific services
-  - Split into: DashboardLayout, DashboardProvider, DashboardMetrics
+- [x] ✅ **Dashboard God File** (797 → 173 lines): `apps/web/app/dashboard/page.tsx` - **COMPLETED**
+  - Extracted: DashboardMetrics, PortfolioChart, AllocationChart, ChartControls, SimulationPanel
+  - Created hooks: useDashboardData, useSimulation, useChartControls
+  - Added DashboardProvider for context management
 
-- [ ] **PerformanceChart Component** (547 lines): Too many responsibilities
-  - Extract chart configuration
-  - Separate data transformation logic
-  - Create reusable chart hooks
+- [x] ✅ **PerformanceChart Component** (547 → 281 lines): **COMPLETED**
+  - Extracted: ChartTooltip, ChartControlsPanel, AssetSelector
+  - Created utilities: chartConfig, chartDataProcessor
+  - Modularized into PerformanceChart/ directory structure
 
-- [ ] **Diagnostics Page** (524 lines): Mixed concerns
-  - Extract diagnostic components
-  - Move API calls to services
-  - Separate health checks into modules
+- [x] ✅ **Diagnostics Page** (524 → 90 lines): **COMPLETED**
+  - Extracted: SystemSummaryCard, DatabaseStatusCard, CacheStatusCard, RefreshStatusCard
+  - Created hook: useDiagnosticsData for state management
 
 - [ ] **StrategyConfig Component** (488 lines): Multiple responsibilities
   - Split into smaller strategy components
@@ -81,11 +79,9 @@ Coverage Requirements:
   - Move calculations to domain layer
 
 ### Backend Structure Issues  
-- [ ] **Strategy Service** (633 lines): `app/services/strategy.py`
-  - Extract DataValidator to separate module
-  - Split portfolio optimization into dedicated service
-  - Separate risk calculations
-  - Move rebalancing logic to own module
+- [x] ✅ **Strategy Service** (633 → 284 lines): `app/services/strategy.py` - **COMPLETED**
+  - Extracted: DataValidator, WeightCalculator, RiskCalculator, PortfolioOptimizer
+  - Created modular strategy/ directory with single-responsibility modules
 
 - [ ] **News Service** (564 lines): Too many responsibilities
   - Extract sentiment analysis
@@ -97,10 +93,24 @@ Coverage Requirements:
   - Extract data transformation
   - Move caching logic to decorator
 
+- [ ] **TwelveData Provider** (513 lines): Duplicate implementation
+  - Consolidate with service refactoring
+
+- [ ] **Performance Service** (498 lines): Mixed calculations
+  - Extract return calculations
+  - Separate risk metrics
+  - Split benchmark comparison
+
 - [ ] **Diagnostics Router** (444 lines): Too many endpoints
   - Split into health, metrics, and status routers
   - Extract diagnostic services
   - Separate concerns
+
+- [ ] **Background Tasks** (370 lines): All task types in one file
+  - Split into task-specific modules
+
+- [ ] **MarketAux Provider** (357 lines): Mixed concerns
+  - Extract API client from processing logic
 
 ### Clean Architecture Compliance
 - [ ] Frontend: Complete migration to core/ clean architecture pattern
@@ -143,7 +153,7 @@ Coverage Requirements:
 
 ---
 
-## 2. CI/CD Pipeline Test Failures
+## 3. CI/CD Pipeline Test Failures
 **Impact**: Can't detect breaking changes
 **Location**: `.github/workflows/`
 **Effort**: 4-6 hours
@@ -167,7 +177,7 @@ npm test
 
 ---
 
-## 3. Database Migration System
+## 4. Database Migration System
 **Impact**: Cannot safely update schema
 **Effort**: 1-2 days
 
@@ -189,7 +199,7 @@ alembic upgrade head
 
 ---
 
-## 4. Data Loss Prevention
+## 5. Data Loss Prevention
 **Impact**: Potential data loss on updates
 **Location**: `apps/api/app/services/`
 **Effort**: 1 day
@@ -204,7 +214,7 @@ alembic upgrade head
 
 ---
 
-## 5. API Integration Optimization
+## 6. API Integration Optimization
 **Impact**: Rate limits, incomplete data
 **Effort**: 2 days
 

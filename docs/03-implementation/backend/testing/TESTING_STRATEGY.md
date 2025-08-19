@@ -31,6 +31,32 @@ Minimum Coverage Targets:
     Integration Tests: 95%
 ```
 
+## Prerequisites: Code Structure Requirements
+
+### ⚠️ CRITICAL: Refactoring Required Before Testing
+
+Current god files and mixed responsibilities make comprehensive testing impossible. The following refactoring MUST be completed first:
+
+#### Frontend Prerequisites
+- **Dashboard page (797 lines)** → Split into 5+ components (max 150 lines each)
+- **PerformanceChart (547 lines)** → Extract into 3+ modules
+- **Diagnostics page (524 lines)** → Separate into health, metrics, status components
+- **StrategyConfig (488 lines)** → Break into validation, UI, and logic modules
+
+#### Backend Prerequisites  
+- **Strategy service (633 lines)** → Split into validator, optimizer, risk modules
+- **News service (564 lines)** → Separate sentiment, extraction, aggregation
+- **TwelveData service (535 lines)** → Divide client, transformer, cache layers
+- **Diagnostics router (444 lines)** → Split into health, metrics, status routers
+
+#### Clean Architecture Compliance
+- All business logic must be in domain/use case layers (not in UI components)
+- API calls must go through repository interfaces
+- Services must follow single responsibility principle
+- Dependencies must be injected, not hardcoded
+
+**See [CRITICAL TODOs](../../../05-roadmap/CRITICAL.md#1-code-structure-refactoring-pre-testing-requirement) for detailed refactoring plan**
+
 ## Testing Architecture
 
 ```mermaid
