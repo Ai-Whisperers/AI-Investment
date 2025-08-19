@@ -2,6 +2,56 @@
 
 [← Back to TODO](README.md)
 
+## 0. URGENT: Comprehensive Testing Suite Implementation
+**Impact**: Financial data integrity, regulatory compliance, production stability
+**Coverage Target**: 95%+ (Financial industry standard)
+**Effort**: 1-2 weeks
+
+### Why This Is Now Priority #0
+- **Financial Risk**: Untested portfolio calculations could cause significant financial losses
+- **Regulatory**: Financial systems require auditable testing for compliance
+- **Current Coverage**: ~25% is unacceptable for production financial systems
+- **TDD Approach**: Write tests BEFORE fixing other critical issues
+
+### Core Testing Requirements
+```yaml
+Coverage Requirements:
+  - Portfolio Calculations: 100% (CRITICAL)
+  - Risk Models: 100% (CRITICAL)
+  - Performance Metrics: 100% (CRITICAL)
+  - API Endpoints: 95%+
+  - Frontend Components: 90%+
+  - Integration: 95%+
+```
+
+### Implementation Plan
+- [ ] Set up test infrastructure (pytest-cov, React Testing Library, Playwright)
+- [ ] Write unit tests for ALL financial calculations
+- [ ] Implement contract testing between frontend/backend
+- [ ] Create E2E tests for critical user journeys
+- [ ] Add performance tests (100k events/sec requirement)
+- [ ] Configure CI/CD with coverage gates
+
+### Test Categories
+1. **Fast Tests** (< 1s each)
+   - Unit tests for business logic
+   - Component tests without API calls
+   - Mocked external services
+
+2. **Slow Tests** (> 1s each)
+   - Integration tests with database
+   - Real Celery task tests
+   - E2E browser tests
+
+### Blocking Issues Until Complete
+- ❌ Cannot migrate calculations without tests
+- ❌ Cannot deploy to production without 95% coverage
+- ❌ Cannot guarantee data integrity without test suite
+
+**See detailed specification**: [Testing Strategy](../../03-implementation/backend/testing/TESTING_STRATEGY.md)
+
+---
+
 ## 1. Frontend Calculations Migration
 **Impact**: Performance, scalability, data consistency
 **Location**: `apps/web/app/lib/calculations/`

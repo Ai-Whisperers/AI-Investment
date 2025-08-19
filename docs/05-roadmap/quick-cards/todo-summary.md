@@ -12,9 +12,10 @@ owner: development-team
 ## 🔴 Critical Issues (This Week)
 | Task | Impact | Effort | Owner |
 |------|--------|--------|-------|
-| Frontend calculations → Backend | Performance, scalability | 2-3 days | Unassigned |
-| Fix CI/CD test suppression | Can't detect failures | 4-6 hours | Unassigned |
-| Implement Alembic migrations | Schema management | 1-2 days | Unassigned |
+| **Testing Suite (95%+ coverage)** | **Financial integrity, compliance** | **1-2 weeks** | **URGENT** |
+| Frontend calculations → Backend | Performance, scalability | 2-3 days | Blocked by tests |
+| Fix CI/CD test suppression | Can't detect failures | 4-6 hours | Part of testing |
+| Implement Alembic migrations | Schema management | 1-2 days | After tests |
 
 ## 🟡 High Priority (Next 2 Weeks)
 | Task | Value | Effort | Status |
