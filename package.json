@@ -15,7 +15,11 @@
     "test:api:coverage": "cd apps/api && python -m pytest --cov=app --cov-report=html",
     "test:api:unit": "cd apps/api && python -m pytest -m unit",
     "test:api:integration": "cd apps/api && python -m pytest -m integration",
-    "test": "npm run test:api"
+    "test": "npm run test:api",
+    "docs:generate": "node scripts/generate-docs.js",
+    "docs:api": "node scripts/generate-docs.js",
+    "docs:search": "node scripts/generate-docs.js",
+    "docs:check": "echo 'Checking documentation health...' && ls -la docs/"
   },
   "engines": {
     "node": ">=20.0.0"

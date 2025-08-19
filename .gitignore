@@ -92,6 +92,8 @@ docs/*_INTERNAL.md
 API_REFACTOR_CONTEXT.md
 .claude-context.md
 .claude/
+claude/
+ai-context-optimization/
 
 # CLI Tools
 tools/

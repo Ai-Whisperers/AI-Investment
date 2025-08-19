@@ -1,3 +1,12 @@
+---
+title: Waardhaven AutoIndex Current Status
+category: Project Status
+priority: 1
+status: stable
+last-updated: 2025-01-19
+owner: project-management
+---
+
 # Waardhaven AutoIndex - Complete Current Status
 *Last Updated: 2025-01-19*
 

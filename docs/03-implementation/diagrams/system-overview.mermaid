@@ -1,0 +1,182 @@
+---
+title: System Architecture Overview
+category: Architecture
+priority: 1
+status: stable
+last-updated: 2025-01-19
+owner: architecture-team
+---
+
+# System Architecture Overview
+
+```mermaid
+graph TB
+    subgraph "Frontend Layer"
+        UI[Next.js App]
+        Auth[Auth Context]
+        API_Client[API Client]
+    end
+    
+    subgraph "API Gateway"
+        FastAPI[FastAPI Server]
+        JWT[JWT Auth]
+        RateLimit[Rate Limiter]
+    end
+    
+    subgraph "Business Logic"
+        Services[Service Layer]
+        Providers[Provider Pattern]
+        Tasks[Background Tasks]
+    end
+    
+    subgraph "Data Layer"
+        PostgreSQL[(PostgreSQL)]
+        Redis[(Redis Cache)]
+        Celery[Celery Queue]
+    end
+    
+    subgraph "External Services"
+        TwelveData[TwelveData API]
+        MarketAux[MarketAux API]
+        GoogleOAuth[Google OAuth]
+    end
+    
+    UI --> Auth
+    Auth --> API_Client
+    API_Client --> FastAPI
+    
+    FastAPI --> JWT
+    FastAPI --> RateLimit
+    FastAPI --> Services
+    
+    Services --> Providers
+    Services --> Tasks
+    Services --> PostgreSQL
+    Services --> Redis
+    
+    Tasks --> Celery
+    Celery --> Redis
+    
+    Providers --> TwelveData
+    Providers --> MarketAux
+    JWT --> GoogleOAuth
+    
+    style UI fill:#61dafb
+    style FastAPI fill:#009688
+    style PostgreSQL fill:#336791
+    style Redis fill:#dc382d
+    style Services fill:#4caf50
+```
+
+## Component Descriptions
+
+### Frontend Layer
+- **Next.js App**: Server-side rendered React application
+- **Auth Context**: JWT token management and user state
+- **API Client**: Axios-based HTTP client with interceptors
+
+### API Gateway
+- **FastAPI**: High-performance async Python framework
+- **JWT Auth**: Token-based authentication with refresh
+- **Rate Limiter**: Per-user and IP-based rate limiting
+
+### Business Logic
+- **Service Layer**: Core business logic and data processing
+- **Provider Pattern**: Extensible external service integration
+- **Background Tasks**: Async processing with Celery
+
+### Data Layer
+- **PostgreSQL**: Primary database for persistent storage
+- **Redis**: Caching and session storage
+- **Celery Queue**: Task queue for background jobs
+
+### External Services
+- **TwelveData**: Market data and prices
+- **MarketAux**: News and sentiment analysis
+- **Google OAuth**: Third-party authentication
+
+## Data Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant API
+    participant Service
+    participant Database
+    participant Cache
+    participant External
+    
+    User->>Frontend: Request Dashboard
+    Frontend->>API: GET /api/v1/index/current
+    API->>Cache: Check Cache
+    
+    alt Cache Hit
+        Cache-->>API: Return Cached Data
+    else Cache Miss
+        API->>Service: Process Request
+        Service->>Database: Query Data
+        Database-->>Service: Return Results
+        Service->>External: Fetch Market Data
+        External-->>Service: Return Prices
+        Service->>Cache: Store in Cache
+        Service-->>API: Return Processed Data
+    end
+    
+    API-->>Frontend: JSON Response
+    Frontend-->>User: Display Dashboard
+```
+
+## Deployment Architecture
+
+```mermaid
+graph LR
+    subgraph "Render.com"
+        Web[Web Service<br/>Next.js]
+        API[API Service<br/>FastAPI]
+        DB[(PostgreSQL<br/>Database)]
+        
+        Web --> API
+        API --> DB
+    end
+    
+    subgraph "External"
+        CDN[Cloudflare CDN]
+        S3[S3 Storage]
+    end
+    
+    Users[Users] --> CDN
+    CDN --> Web
+    Web --> S3
+    
+    style Web fill:#0081cb
+    style API fill:#009688
+    style DB fill:#336791
+```
+
+## Security Architecture
+
+```mermaid
+graph TB
+    subgraph "Security Layers"
+        HTTPS[HTTPS/TLS]
+        CORS[CORS Policy]
+        Auth[JWT Authentication]
+        RateLimit[Rate Limiting]
+        Validation[Input Validation]
+        Encryption[Data Encryption]
+    end
+    
+    Request[Client Request] --> HTTPS
+    HTTPS --> CORS
+    CORS --> Auth
+    Auth --> RateLimit
+    RateLimit --> Validation
+    Validation --> API[API Processing]
+    API --> Encryption
+    Encryption --> Database[(Database)]
+    
+    style HTTPS fill:#4caf50
+    style Auth fill:#ff9800
+    style Encryption fill:#f44336
+```

@@ -1,120 +1,165 @@
-# Waardhaven AutoIndex Documentation
+---
+title: Waardhaven AutoIndex Documentation Hub
+category: Main Navigation
+priority: 0
+status: stable
+last-updated: 2025-01-19
+owner: development-team
+---
 
-## 📚 Documentation Structure
+# 📚 Waardhaven AutoIndex Documentation
 
-### Quick Links
-- [Project Status](project-status/README.md) - Current state and progress
-- [Getting Started](getting-started/README.md) - Setup and development
-- [API Reference](api-reference/README.md) - Complete API documentation
-- [Implementation](implementation/README.md) - Technical implementation details
-- [Features](features/README.md) - Implemented and planned features
-- [TODO](todo/README.md) - Prioritized task list
+## Quick Navigation
 
-## 🎯 Navigation by Role
+| # | Section | Description | Status |
+|---|---------|-------------|--------|
+| 00 | [Project Status](00-project-status/README.md) | Current state, roadmap & changelog | ✅ Stable |
+| 01 | [Getting Started](01-getting-started/README.md) | Setup, configuration & quick start | ✅ Stable |
+| 02 | [API Reference](02-api-reference/README.md) | Complete API documentation | ✅ Stable |
+| 03 | [Implementation](03-implementation/README.md) | Technical implementation details | 🚧 WIP |
+| 04 | [Features](04-features/README.md) | Feature documentation | ✅ Stable |
+| 05 | [Roadmap & TODOs](05-roadmap/README.md) | Tasks, priorities & future plans | ✅ Stable |
+
+## 🎯 Quick Access by Role
 
 ### For Developers
-1. [Getting Started Guide](getting-started/QUICK_START.md)
-2. [Development Setup](getting-started/DEVELOPMENT_SETUP.md)
-3. [API Integration](api-reference/README.md)
-4. [Backend Architecture](implementation/backend/README.md)
-5. [Frontend Architecture](implementation/frontend/README.md)
+1. [⚡ Quick Start Guide](01-getting-started/quick-cards/dev-quickstart.md)
+2. [📘 API Quick Reference](02-api-reference/quick-cards/api-cheatsheet.md)
+3. [🏗️ Architecture Overview](03-implementation/diagrams/system-overview.md)
+4. [🐛 Troubleshooting](01-getting-started/quick-cards/troubleshooting.md)
 
 ### For DevOps
-1. [Deployment Guide](implementation/deployment/README.md)
-2. [Environment Variables](getting-started/ENVIRONMENT_VARIABLES.md)
-3. [Operations Manual](implementation/backend/operations/README.md)
-4. [Monitoring](implementation/deployment/monitoring.md)
+1. [🔧 Environment Setup](01-getting-started/quick-cards/env-variables.md)
+2. [🐳 Docker Commands](01-getting-started/quick-cards/docker-commands.md)
+3. [📊 Monitoring Guide](03-implementation/operations/monitoring.md)
+4. [🚀 Deployment Checklist](03-implementation/deployment/checklist.md)
 
 ### For Product Managers
-1. [Current Status](project-status/CURRENT_STATUS.md)
-2. [Feature Roadmap](project-status/ROADMAP.md)
-3. [Implemented Features](features/implemented/README.md)
-4. [Planned Features](features/planned/README.md)
+1. [📈 Project Dashboard](00-project-status/dashboard.md)
+2. [🗺️ Product Roadmap](00-project-status/ROADMAP.md)
+3. [✅ Feature Status](04-features/feature-matrix.md)
+4. [📋 Priority TODOs](05-roadmap/quick-cards/todo-summary.md)
 
-## 📂 Complete Directory Map
+## 📂 Complete Directory Structure
 
 ```
 docs/
-├── README.md (this file)
-├── project-status/
-│   ├── README.md (index)
-│   ├── CURRENT_STATUS.md
-│   ├── ROADMAP.md
-│   └── CHANGELOG.md
-├── getting-started/
-│   ├── README.md (index)
-│   ├── QUICK_START.md
-│   ├── DEVELOPMENT_SETUP.md
-│   └── ENVIRONMENT_VARIABLES.md
-├── api-reference/
-│   ├── README.md (index)
-│   ├── authentication/
-│   ├── endpoints/
-│   ├── schemas/
-│   └── integration/
-├── implementation/
-│   ├── README.md (index)
+├── 📄 README.md (this file)
+├── 📄 _INDEX.md (master index)
+├── 📄 _SEARCH.md (keyword index)
+├── 📄 _GLOSSARY.md (terms & definitions)
+│
+├── 00-project-status/
+│   ├── README.md ✅
+│   ├── CURRENT_STATUS.md ✅
+│   ├── ROADMAP.md ✅
+│   ├── CHANGELOG.md ✅
+│   └── dashboard.md 🆕
+│
+├── 01-getting-started/
+│   ├── README.md ✅
+│   ├── 01-prerequisites.md 🆕
+│   ├── 02-quick-start.md ✅
+│   ├── 03-development-setup.md 🆕
+│   ├── 04-environment-variables.md ✅
+│   └── quick-cards/
+│       ├── dev-quickstart.md 🆕
+│       ├── docker-commands.md 🆕
+│       ├── env-variables.md 🆕
+│       └── troubleshooting.md 🆕
+│
+├── 02-api-reference/
+│   ├── README.md ✅
+│   ├── 01-authentication.md ✅
+│   ├── 02-endpoints.md 🆕
+│   ├── 03-schemas.md 🆕
+│   ├── 04-webhooks.md 🆕
+│   ├── quick-cards/
+│   │   └── api-cheatsheet.md 🆕
+│   └── generated/
+│       └── openapi.md 🆕
+│
+├── 03-implementation/
+│   ├── README.md ✅
+│   ├── architecture/
+│   │   └── system-design.md ✅
 │   ├── backend/
 │   ├── frontend/
-│   └── deployment/
-├── features/
-│   ├── README.md (index)
+│   ├── deployment/
+│   ├── operations/
+│   └── diagrams/
+│       ├── system-overview.mermaid 🆕
+│       ├── data-flow.mermaid 🆕
+│       └── deployment.mermaid 🆕
+│
+├── 04-features/
+│   ├── README.md ✅
+│   ├── feature-matrix.md 🆕
 │   ├── implemented/
 │   └── planned/
-└── todo/
-    ├── README.md (index)
-    ├── CRITICAL.md
-    ├── HIGH_PRIORITY.md
-    └── LOW_PRIORITY.md
+│
+└── 05-roadmap/
+    ├── README.md ✅
+    ├── 01-critical.md ✅
+    ├── 02-high-priority.md ✅
+    ├── 03-medium-priority.md 🆕
+    ├── 04-backlog.md 🆕
+    └── quick-cards/
+        ├── todo-summary.md 🆕
+        └── sprint-plan.md 🆕
 ```
 
-## 🔍 Search by Topic
+## 📊 Documentation Statistics
 
-### Architecture
-- [System Architecture](implementation/backend/architecture/SYSTEM_ARCHITECTURE.md)
-- [Clean Architecture](implementation/frontend/architecture/CLEAN_ARCHITECTURE.md)
-- [Provider Pattern](implementation/backend/providers/README.md)
+| Metric | Value |
+|--------|-------|
+| Total Documents | 45+ |
+| Quick Reference Cards | 10 |
+| Visual Diagrams | 5 |
+| Auto-generated Docs | 3 |
+| Last Updated | 2025-01-19 |
 
-### API & Integration
-- [API Endpoints](api-reference/endpoints/README.md)
-- [Authentication](api-reference/authentication/README.md)
-- [External Services](implementation/backend/providers/README.md)
+## 🔍 Search & Discovery
 
-### Database
-- [Database Schema](implementation/backend/database/SCHEMA.md)
-- [Migrations](implementation/backend/operations/MIGRATIONS.md)
-- [Operations](implementation/backend/operations/README.md)
+- **[Keyword Index](_SEARCH.md)** - Search documentation by keyword
+- **[Glossary](_GLOSSARY.md)** - Technical terms and definitions
+- **[FAQ](01-getting-started/FAQ.md)** - Frequently asked questions
 
-### Testing
-- [Testing Strategy](implementation/testing/README.md)
-- [Backend Tests](implementation/backend/testing/README.md)
-- [Frontend Tests](implementation/frontend/testing/README.md)
+## 🤖 Auto-generated Documentation
+
+The following documentation is automatically generated:
+- [API Reference](02-api-reference/generated/openapi.md) - From OpenAPI spec
+- [Database Schema](03-implementation/backend/generated/schema.md) - From SQLAlchemy models
+- [Environment Variables](01-getting-started/generated/env-vars.md) - From codebase scan
 
 ## 📈 Documentation Standards
 
-### File Size Guidelines
-- **Index files**: < 100 lines (navigation only)
-- **Reference docs**: < 500 lines (split if larger)
-- **Guides**: < 300 lines (focused topics)
-- **Status files**: < 200 lines (concise updates)
+### Status Indicators
+- ✅ **[STABLE]** - Production ready
+- 🚧 **[WIP]** - Work in progress
+- 📝 **[DRAFT]** - Under review
+- ⚠️ **[DEPRECATED]** - Being phased out
+- 🆕 **[NEW]** - Recently added
 
-### Naming Conventions
-- **Indexes**: `README.md` in each directory
-- **References**: `UPPERCASE.md` for main docs
-- **Guides**: `lowercase-with-dashes.md`
-- **Status**: `CURRENT_STATUS.md`, `CHANGELOG.md`
+### File Naming
+- Numbered files for sequential reading (01-, 02-, etc.)
+- Lowercase with hyphens for file names
+- README.md as index for each folder
+- _PREFIX for special files (_INDEX, _SEARCH)
 
-### Cross-References
-- Always use relative paths
-- Link to indexes first, then specific files
-- Include breadcrumbs in sub-documents
+### Metadata Headers
+All documentation files include metadata headers with:
+- title, category, priority, status
+- last-updated, owner
 
 ## 🚀 Quick Actions
 
-- **Report Issue**: Create GitHub issue with `docs` label
-- **Update Status**: Edit `project-status/CURRENT_STATUS.md`
-- **Add Feature**: Update `features/planned/` directory
-- **Track TODO**: Add to appropriate priority file in `todo/`
+| Action | Command/Link |
+|--------|-------------|
+| Generate API Docs | `npm run docs:api` |
+| Update Search Index | `npm run docs:search` |
+| Check Doc Health | `npm run docs:check` |
+| View Diagrams | Open `.mermaid` files in VS Code |
 
 ---
-*Last Updated: 2025-01-19 | Version: 2.0 | Maintainer: Development Team*
+*Documentation Version: 2.1 | [View Changelog](00-project-status/CHANGELOG.md) | [Report Issue](https://github.com/waardhaven/autoindex/issues)*
