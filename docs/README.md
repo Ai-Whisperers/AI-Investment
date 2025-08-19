@@ -9,6 +9,9 @@ owner: development-team
 
 # 📚 Waardhaven AutoIndex Documentation
 
+## 🔴 URGENT: Testing Priority #0
+**[Comprehensive Testing Strategy Required](03-implementation/backend/testing/TESTING_STRATEGY.md)** - 95%+ coverage needed before ANY other development. See [Critical TODOs](05-roadmap/CRITICAL.md).
+
 ## Quick Navigation
 
 | # | Section | Description | Status |
@@ -23,10 +26,12 @@ owner: development-team
 ## 🎯 Quick Access by Role
 
 ### For Developers
-1. [⚡ Quick Start Guide](01-getting-started/quick-cards/dev-quickstart.md)
-2. [📘 API Quick Reference](02-api-reference/quick-cards/api-cheatsheet.md)
-3. [🏗️ Architecture Overview](03-implementation/diagrams/system-overview.md)
-4. [🐛 Troubleshooting](01-getting-started/quick-cards/troubleshooting.md)
+1. **[🧪 Backend Testing Strategy](03-implementation/backend/testing/README.md)** 🔴 URGENT
+2. **[🎨 Frontend Testing Spec](03-implementation/frontend/testing/README.md)** 🔴 URGENT
+3. [⚡ Quick Start Guide](01-getting-started/quick-cards/dev-quickstart.md)
+4. [📘 API Quick Reference](02-api-reference/quick-cards/api-cheatsheet.md)
+5. [🏗️ Architecture Overview](03-implementation/diagrams/system-overview.md)
+6. [🐛 Troubleshooting](01-getting-started/quick-cards/troubleshooting.md)
 
 ### For DevOps
 1. [🔧 Environment Setup](01-getting-started/quick-cards/env-variables.md)

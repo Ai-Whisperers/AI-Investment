@@ -6,6 +6,9 @@
 
 This documentation has been completely reorganized for better navigation and reduced duplication.
 
+### 🔴 CRITICAL PRIORITY
+**[Testing Documentation](03-implementation/backend/testing/TESTING_STRATEGY.md)** - 95%+ coverage required BEFORE any other development work
+
 ### Primary Navigation
 - **[Main Documentation Hub](README.md)** - Start here for navigation
 - **[Project Status](project-status/README.md)** - Current state and progress

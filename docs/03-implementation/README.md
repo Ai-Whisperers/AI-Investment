@@ -35,17 +35,24 @@ Infrastructure and deployment configuration
 - [API Services](backend/services/README.md)
 - [Providers](backend/providers/README.md)
 - [Operations](backend/operations/README.md)
+- **[🧪 Testing Strategy](backend/testing/TESTING_STRATEGY.md)** ✅ 95%+ Coverage Required
 
 ### Frontend
 - [Clean Architecture](frontend/architecture/README.md)
 - [Components](frontend/components/README.md)
 - [Pages](frontend/pages/README.md)
 - [Services](frontend/services/README.md)
+- **[🎨 Testing Specification](frontend/testing/FRONTEND_TESTING.md)** ✅ 90%+ Coverage Required
 
 ### DevOps
 - [Docker Config](deployment/docker/README.md)
 - [CI/CD](deployment/ci-cd/README.md)
 - [Monitoring](deployment/monitoring/README.md)
+
+### 🔴 Testing (Priority #0)
+- **[Backend Testing Strategy](backend/testing/TESTING_STRATEGY.md)** - TDD, 95%+ coverage, financial calculations
+- **[Frontend Testing Spec](frontend/testing/FRONTEND_TESTING.md)** - React Testing Library, Playwright, MSW
+- **[Critical TODO](../05-roadmap/CRITICAL.md#0-urgent-comprehensive-testing-suite-implementation)** - Testing is blocking all other work
 
 ## Technology Stack
 

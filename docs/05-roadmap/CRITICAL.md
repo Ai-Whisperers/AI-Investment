@@ -52,7 +52,78 @@ Coverage Requirements:
 
 ---
 
-## 1. Frontend Calculations Migration
+## 1. Code Structure Refactoring (Pre-Testing Requirement)
+**Impact**: Testing becomes impossible with god files, violates clean architecture
+**Priority**: MUST complete before comprehensive testing
+**Effort**: 3-4 days
+
+### Frontend Structure Issues
+- [ ] **Dashboard God File** (797 lines): `apps/web/app/dashboard/page.tsx`
+  - Extract chart components into separate files
+  - Move state management to custom hooks
+  - Separate business logic from presentation
+  - Create dashboard-specific services
+  - Split into: DashboardLayout, DashboardProvider, DashboardMetrics
+
+- [ ] **PerformanceChart Component** (547 lines): Too many responsibilities
+  - Extract chart configuration
+  - Separate data transformation logic
+  - Create reusable chart hooks
+
+- [ ] **Diagnostics Page** (524 lines): Mixed concerns
+  - Extract diagnostic components
+  - Move API calls to services
+  - Separate health checks into modules
+
+- [ ] **StrategyConfig Component** (488 lines): Multiple responsibilities
+  - Split into smaller strategy components
+  - Extract validation logic
+  - Move calculations to domain layer
+
+### Backend Structure Issues  
+- [ ] **Strategy Service** (633 lines): `app/services/strategy.py`
+  - Extract DataValidator to separate module
+  - Split portfolio optimization into dedicated service
+  - Separate risk calculations
+  - Move rebalancing logic to own module
+
+- [ ] **News Service** (564 lines): Too many responsibilities
+  - Extract sentiment analysis
+  - Separate entity extraction
+  - Move aggregation logic
+
+- [ ] **TwelveData Service** (535 lines): Mixed provider and service logic
+  - Separate API client from business logic
+  - Extract data transformation
+  - Move caching logic to decorator
+
+- [ ] **Diagnostics Router** (444 lines): Too many endpoints
+  - Split into health, metrics, and status routers
+  - Extract diagnostic services
+  - Separate concerns
+
+### Clean Architecture Compliance
+- [ ] Frontend: Complete migration to core/ clean architecture pattern
+  - Move remaining business logic from components to use cases
+  - Ensure all API calls go through repositories
+  - Separate presentation from domain logic
+
+- [ ] Backend: Implement proper layering
+  - Create domain layer with business entities
+  - Implement repository pattern for data access
+  - Use dependency injection consistently
+  - Separate infrastructure from business logic
+
+### Benefits After Refactoring
+- ✅ Each file under 250 lines (testable size)
+- ✅ Single responsibility per module
+- ✅ 95%+ test coverage becomes achievable
+- ✅ Easier to maintain and extend
+- ✅ Clear separation of concerns
+
+---
+
+## 2. Frontend Calculations Migration
 **Impact**: Performance, scalability, data consistency
 **Location**: `apps/web/app/lib/calculations/`
 **Effort**: 2-3 days
