@@ -14,11 +14,11 @@ owner: engineering
 Major refactoring initiative to eliminate god files and implement clean architecture across the codebase. This is a prerequisite for achieving the 95%+ test coverage required for financial systems.
 
 ## Progress Summary
-- **Overall Progress**: 20% Complete (4 of 20 files refactored)
+- **Overall Progress**: 30% Complete (6 of 20 files refactored)
 - **Frontend Progress**: 75% Complete (3 of 4 files)
-- **Backend Progress**: 12.5% Complete (1 of 8 critical files)
+- **Backend Progress**: 19% Complete (3 of 16 critical files)
 
-## ✅ Completed Refactoring (2025-01-19)
+## ✅ Completed Refactoring (2025-01-19 - 2025-01-20)
 
 ### Frontend Refactoring
 
@@ -76,32 +76,33 @@ Major refactoring initiative to eliminate god files and implement clean architec
   - `portfolio_optimizer.py` - Portfolio optimization logic (290 lines)
   - `__init__.py` - Module exports
 
+#### 2. News Service (2025-01-20)
+- **File**: `apps/api/app/services/news.py`
+- **Before**: 564 lines (mixed sentiment, entity extraction, aggregation)
+- **After**: 332 lines (41% reduction)
+- **Extracted Modules** (`apps/api/app/services/news/`):
+  - `sentiment_analyzer.py` - Sentiment scoring engine (250 lines)
+  - `entity_extractor.py` - Named entity recognition (280 lines)
+  - `news_aggregator.py` - News aggregation pipeline (420 lines)
+  - `news_processor.py` - Main processing orchestrator (320 lines)
+  - `__init__.py` - Module exports
+
+#### 3. TwelveData Service (2025-01-20)
+- **File**: `apps/api/app/services/twelvedata.py`
+- **Before**: 535 lines (API client mixed with business logic)
+- **After**: 380 lines (29% reduction)
+- **Extracted Modules** (`apps/api/app/services/market_data/`):
+  - `rate_limiter.py` - Rate limiting with Redis support (180 lines)
+  - `market_cache.py` - Caching layer for market data (290 lines)
+  - `twelvedata_client.py` - Pure API client (240 lines)
+  - `data_transformer.py` - Data transformation utilities (350 lines)
+  - `__init__.py` - Module exports
+
 ## 🔴 Pending Refactoring Tasks
 
 ### Critical Backend Services (>400 lines)
 
-#### 1. News Service (564 lines)
-- **File**: `apps/api/app/services/news.py`
-- **Plan**: Extract into `services/news/` module:
-  - `sentiment_analyzer.py` - Sentiment scoring engine
-  - `entity_extractor.py` - Named entity recognition
-  - `news_aggregator.py` - News aggregation pipeline
-  - `news_processor.py` - Main processing orchestrator
-
-#### 2. TwelveData Service (535 lines)
-- **File**: `apps/api/app/services/twelvedata.py`
-- **Plan**: Extract into `services/market_data/` module:
-  - `twelvedata_client.py` - Pure API client
-  - `data_transformer.py` - Data transformation logic
-  - `market_cache.py` - Caching layer
-  - `rate_limiter.py` - Rate limiting logic
-
-#### 3. TwelveData Provider (513 lines)
-- **File**: `apps/api/app/providers/market_data/twelvedata.py`
-- **Issue**: Duplicate of service, unclear separation
-- **Plan**: Consolidate with service refactoring
-
-#### 4. Performance Service (498 lines)
+#### 1. Performance Service (498 lines)
 - **File**: `apps/api/app/services/performance.py`
 - **Plan**: Extract into `services/performance/` module:
   - `return_calculator.py` - Return calculations
@@ -109,14 +110,19 @@ Major refactoring initiative to eliminate god files and implement clean architec
   - `benchmark_comparison.py` - Benchmark analysis
   - `performance_tracker.py` - Performance tracking
 
-#### 5. Diagnostics Router (444 lines)
+#### 2. Diagnostics Router (444 lines)
 - **File**: `apps/api/app/routers/diagnostics.py`
 - **Plan**: Split into separate routers:
   - `routers/health.py` - Health check endpoints
   - `routers/metrics.py` - Metrics endpoints
   - `routers/system_status.py` - System status endpoints
 
-#### 6. Background Tasks (370 lines)
+#### 3. TwelveData Provider (513 lines)
+- **File**: `apps/api/app/providers/market_data/twelvedata.py`
+- **Issue**: Duplicate of service, unclear separation
+- **Plan**: Consolidate with service refactoring
+
+#### 4. Background Tasks (370 lines)
 - **File**: `apps/api/app/tasks/background_tasks.py`
 - **Plan**: Split into `tasks/` modules:
   - `tasks/market_refresh.py` - Market data refresh tasks
@@ -124,7 +130,7 @@ Major refactoring initiative to eliminate god files and implement clean architec
   - `tasks/report_generation.py` - Report generation tasks
   - `tasks/cleanup.py` - Data cleanup tasks
 
-#### 7. MarketAux Provider (357 lines)
+#### 5. MarketAux Provider (357 lines)
 - **File**: `apps/api/app/providers/news/marketaux.py`
 - **Plan**: Extract client from processing logic
 

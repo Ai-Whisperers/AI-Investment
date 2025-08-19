@@ -267,7 +267,7 @@ NEXT_PUBLIC_API_URL=<production-api-url>
 - 6 workflow files (could consolidate to 2-3)
 - Excessive pytest marks without clear purpose
 
-## Code Refactoring Status (2025-01-19)
+## Code Refactoring Status (2025-01-20)
 
 ### ✅ Completed Refactoring (Following docs/05-roadmap/CRITICAL.md)
 
@@ -321,33 +321,28 @@ NEXT_PUBLIC_API_URL=<production-api-url>
      - `portfolio_optimizer.py` - Portfolio optimization logic (290 lines)
      - `__init__.py` - Module exports
 
+2. **News Service** (`apps/api/app/services/news.py`)
+   - **Before**: 564 lines (mixed sentiment analysis, entity extraction)
+   - **After**: 332 lines (41% reduction)
+   - **Extracted Modules** (`apps/api/app/services/news/`):
+     - `sentiment_analyzer.py` - Sentiment scoring engine (250 lines)
+     - `entity_extractor.py` - Named entity recognition (280 lines)
+     - `news_aggregator.py` - News aggregation pipeline (420 lines)
+     - `news_processor.py` - Main processing orchestrator (320 lines)
+
+3. **TwelveData Service** (`apps/api/app/services/twelvedata.py`)
+   - **Before**: 535 lines (API client mixed with business logic)
+   - **After**: 380 lines (29% reduction)
+   - **Extracted Modules** (`apps/api/app/services/market_data/`):
+     - `rate_limiter.py` - Rate limiting with Redis support (180 lines)
+     - `market_cache.py` - Caching layer for market data (290 lines)
+     - `twelvedata_client.py` - Pure API client (240 lines)
+     - `data_transformer.py` - Data transformation utilities (350 lines)
+
 ### 🔴 Pending Refactoring Tasks (Priority Order)
 
 #### Critical Backend Services to Refactor (>400 lines):
-1. **News Service** (`apps/api/app/services/news.py`)
-   - **Current**: 564 lines
-   - **Issues**: Mixed sentiment analysis, entity extraction, aggregation
-   - **Plan**: Extract into `services/news/` module:
-     - `sentiment_analyzer.py` - Sentiment scoring engine
-     - `entity_extractor.py` - Named entity recognition
-     - `news_aggregator.py` - News aggregation pipeline
-     - `news_processor.py` - Main processing orchestrator
-
-2. **TwelveData Service** (`apps/api/app/services/twelvedata.py`)
-   - **Current**: 535 lines
-   - **Issues**: API client mixed with business logic and caching
-   - **Plan**: Extract into `services/market_data/` module:
-     - `twelvedata_client.py` - Pure API client
-     - `data_transformer.py` - Data transformation logic
-     - `market_cache.py` - Caching layer
-     - `rate_limiter.py` - Rate limiting logic
-
-3. **TwelveData Provider** (`apps/api/app/providers/market_data/twelvedata.py`)
-   - **Current**: 513 lines
-   - **Issues**: Duplicate of service, unclear separation
-   - **Plan**: Consolidate with service refactoring or remove duplication
-
-4. **Performance Service** (`apps/api/app/services/performance.py`)
+1. **Performance Service** (`apps/api/app/services/performance.py`)
    - **Current**: 498 lines
    - **Issues**: Mixed calculations, metrics, and analysis
    - **Plan**: Extract into `services/performance/` module:
@@ -356,7 +351,7 @@ NEXT_PUBLIC_API_URL=<production-api-url>
      - `benchmark_comparison.py` - Benchmark analysis
      - `performance_tracker.py` - Performance tracking
 
-5. **Diagnostics Router** (`apps/api/app/routers/diagnostics.py`)
+2. **Diagnostics Router** (`apps/api/app/routers/diagnostics.py`)
    - **Current**: 444 lines
    - **Issues**: Too many endpoints in single file
    - **Plan**: Split into separate routers:
@@ -364,7 +359,12 @@ NEXT_PUBLIC_API_URL=<production-api-url>
      - `routers/metrics.py` - Metrics endpoints
      - `routers/system_status.py` - System status endpoints
 
-6. **Background Tasks** (`apps/api/app/tasks/background_tasks.py`)
+3. **TwelveData Provider** (`apps/api/app/providers/market_data/twelvedata.py`)
+   - **Current**: 513 lines
+   - **Issues**: Duplicate of service, unclear separation
+   - **Plan**: Consolidate with service refactoring or remove duplication
+
+4. **Background Tasks** (`apps/api/app/tasks/background_tasks.py`)
    - **Current**: 370 lines
    - **Issues**: All task types in one file
    - **Plan**: Split into `tasks/` modules:
@@ -373,13 +373,13 @@ NEXT_PUBLIC_API_URL=<production-api-url>
      - `tasks/report_generation.py` - Report generation tasks
      - `tasks/cleanup.py` - Data cleanup tasks
 
-7. **MarketAux Provider** (`apps/api/app/providers/news/marketaux.py`)
+5. **MarketAux Provider** (`apps/api/app/providers/news/marketaux.py`)
    - **Current**: 357 lines
    - **Issues**: Mixed API client and processing logic
    - **Plan**: Extract client from processing logic
 
 #### Frontend Components to Refactor:
-8. **StrategyConfig Component** (`apps/web/app/components/StrategyConfig.tsx`)
+1. **StrategyConfig Component** (`apps/web/app/components/StrategyConfig.tsx`)
    - **Current**: 488 lines
    - **Issues**: Multiple responsibilities, mixed validation and UI
    - **Plan**: Split into components:
@@ -389,15 +389,15 @@ NEXT_PUBLIC_API_URL=<production-api-url>
      - `StrategyConfig/WeightAllocation.tsx` - Weight allocation UI
      - `StrategyConfig/BacktestResults.tsx` - Backtest display
 
-#### Other Backend Files Approaching Threshold (>250 lines):
-9. **Refresh Service** (`apps/api/app/services/refresh.py`) - 265 lines
-10. **Manual Refresh Router** (`apps/api/app/routers/manual_refresh.py`) - 248 lines
-11. **Strategy Router** (`apps/api/app/routers/strategy.py`) - 246 lines
-12. **News Interface** (`apps/api/app/providers/news/interface.py`) - 246 lines
-13. **News Models** (`apps/api/app/models/news.py`) - 239 lines
-14. **Main Application** (`apps/api/app/main.py`) - 237 lines (may need middleware extraction)
-15. **Cache Utils** (`apps/api/app/utils/cache_utils.py`) - 233 lines
-16. **Validation Schemas** (`apps/api/app/schemas/validation.py`) - 228 lines
+#### Other Backend Files Approaching Threshold (>230 lines):
+- **Refresh Service** (`apps/api/app/services/refresh.py`) - 265 lines
+- **Manual Refresh Router** (`apps/api/app/routers/manual_refresh.py`) - 248 lines
+- **Strategy Router** (`apps/api/app/routers/strategy.py`) - 246 lines
+- **News Interface** (`apps/api/app/providers/news/interface.py`) - 246 lines
+- **News Models** (`apps/api/app/models/news.py`) - 239 lines
+- **Main Application** (`apps/api/app/main.py`) - 237 lines
+- **Cache Utils** (`apps/api/app/utils/cache_utils.py`) - 233 lines
+- **Validation Schemas** (`apps/api/app/schemas/validation.py`) - 228 lines
 
 ### Testing Requirements (After Refactoring)
 Per docs/05-roadmap/CRITICAL.md - Comprehensive testing suite needed:
