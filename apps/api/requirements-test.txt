@@ -1,4 +1,7 @@
 # Testing dependencies
+pip-tools==7.4.1  # For dependency compilation and management
+
+# Testing frameworks
 pytest==7.4.2
 pytest-asyncio==0.21.1
 pytest-cov==4.1.0

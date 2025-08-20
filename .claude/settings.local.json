@@ -50,7 +50,9 @@
       "Bash(git pull:*)",
       "Bash(touch:*)",
       "Bash(npm run lint)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(gh workflow:*)",
+      "Bash(gh run view:*)"
     ],
     "deny": [],
     "ask": [],

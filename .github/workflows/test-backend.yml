@@ -63,12 +63,26 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: Install dependencies
+      - name: Check for dependency conflicts
         working-directory: ${{ env.WORKING_DIR }}
         run: |
+          python -m pip install --upgrade pip pip-tools
+          pip check || true  # Check for conflicts but don't fail yet
+
+      - name: Install dependencies with retry
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          # First attempt with standard install
           python -m pip install --upgrade pip
+          
+          # Try to install with conflict resolution
+          pip install -r requirements.txt --use-deprecated=legacy-resolver || \
           pip install -r requirements.txt
+          
           pip install -r requirements-test.txt
+          
+          # Verify no conflicts after install
+          pip check
 
       - name: Verify installation
         working-directory: ${{ env.WORKING_DIR }}

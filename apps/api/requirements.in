@@ -1,0 +1,45 @@
+# Production dependencies - pin major versions only
+# Use pip-compile to generate requirements.txt from this file
+# pip-compile --upgrade --resolver=backtracking requirements.in
+
+# Core Framework
+fastapi>=0.112.0,<1.0.0
+uvicorn>=0.30.0,<1.0.0
+
+# Database
+SQLAlchemy>=2.0.0,<3.0.0
+psycopg2-binary>=2.9.0,<3.0.0
+
+# Validation & Settings
+pydantic>=2.0.0,<3.0.0
+pydantic-settings>=2.0.0,<3.0.0
+
+# Authentication
+passlib[bcrypt]>=1.7.0,<2.0.0
+python-jose>=3.3.0,<4.0.0
+python-multipart>=0.0.9,<1.0.0
+
+# Market Data
+twelvedata[pandas,websocket-client]>=1.2.0,<2.0.0
+
+# Data Analysis - Use compatible versions
+pandas>=2.0.0,<3.0.0
+numpy>=1.23.2,<1.28.0  # Compatible with scipy 1.11.x
+scipy>=1.11.0,<2.0.0
+
+# HTTP & API
+requests>=2.31.0,<3.0.0
+httpx>=0.27.0,<1.0.0
+email-validator>=2.0.0,<3.0.0
+
+# Caching & Background Tasks
+redis>=5.0.0,<6.0.0
+hiredis>=2.3.0,<3.0.0
+celery>=5.3.0,<6.0.0
+flower>=2.0.0,<3.0.0
+
+# Utilities
+tenacity>=8.0.0,<9.0.0
+
+# Development Tools
+black>=24.0.0,<25.0.0

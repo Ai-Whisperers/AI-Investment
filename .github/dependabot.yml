@@ -1,0 +1,113 @@
+# Dependabot configuration for automatic dependency updates
+# This helps prevent version conflicts and security vulnerabilities
+
+version: 2
+updates:
+  # Python dependencies for API backend
+  - package-ecosystem: "pip"
+    directory: "/apps/api"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "Gestalt"
+    labels:
+      - "dependencies"
+      - "backend"
+      - "python"
+    groups:
+      production-dependencies:
+        patterns:
+          - "fastapi*"
+          - "uvicorn*"
+          - "sqlalchemy*"
+          - "pydantic*"
+          - "redis*"
+          - "celery*"
+        update-types:
+          - "minor"
+          - "patch"
+      scientific-dependencies:
+        patterns:
+          - "numpy*"
+          - "scipy*"
+          - "pandas*"
+        update-types:
+          - "patch"  # Only patch updates for scientific libs to avoid breaking changes
+    ignore:
+      # Don't auto-update major versions that might break compatibility
+      - dependency-name: "numpy"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "scipy"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "pandas"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "sqlalchemy"
+        update-types: ["version-update:semver-major"]
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+
+  # JavaScript dependencies for frontend
+  - package-ecosystem: "npm"
+    directory: "/apps/web"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "Gestalt"
+    labels:
+      - "dependencies"
+      - "frontend"
+      - "javascript"
+    groups:
+      next-dependencies:
+        patterns:
+          - "next*"
+          - "react*"
+          - "@types/react*"
+        update-types:
+          - "minor"
+          - "patch"
+      development-dependencies:
+        patterns:
+          - "eslint*"
+          - "prettier*"
+          - "typescript*"
+          - "@types/*"
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      # Don't auto-update major versions of critical frameworks
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+    reviewers:
+      - "Gestalt"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
