@@ -96,6 +96,7 @@ jobs:
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/test_db
           REDIS_URL: redis://localhost:6379/0
+          SECRET_KEY: test-secret-key-for-jwt-signing
           JWT_SECRET_KEY: test-secret-key
           JWT_ALGORITHM: HS256
           TWELVEDATA_API_KEY: test-key
@@ -114,6 +115,7 @@ jobs:
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/test_db
           REDIS_URL: redis://localhost:6379/0
+          SECRET_KEY: test-secret-key-for-jwt-signing
           JWT_SECRET_KEY: test-secret-key
           JWT_ALGORITHM: HS256
           TWELVEDATA_API_KEY: test-key
@@ -128,6 +130,7 @@ jobs:
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/test_db
           REDIS_URL: redis://localhost:6379/0
+          SECRET_KEY: test-secret-key-for-jwt-signing
           JWT_SECRET_KEY: test-secret-key
           JWT_ALGORITHM: HS256
           ENVIRONMENT: test
