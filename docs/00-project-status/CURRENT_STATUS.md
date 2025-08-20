@@ -84,10 +84,11 @@ waardhaven-autoindex/
 **Infrastructure Created**:
 1. ✅ Modular test factories (avoiding god objects)
 2. ✅ Test helpers and adapters for type conversions
-3. ✅ Backend: 78 tests collected, 47 passing in services, 18/19 auth tests passing (pytest configured)
+3. ✅ Backend: 78+ tests collected, 47 passing in services, 18/19 auth tests, 25/30 portfolio tests (pytest configured)
 4. ✅ Frontend: Jest + React Testing Library configured
 5. ✅ Authentication Tests: Comprehensive unit, integration, and security tests
-6. ⚠️ CI/CD pipeline needs test gates implementation
+6. ✅ Portfolio Tests: Model validation, schema testing, integration workflows
+7. ⚠️ CI/CD pipeline needs test gates implementation
 
 **Financial Calculations Implemented (2025-01-20)**:
 - ✅ **Time-Weighted Returns (TWR)**: Proper implementation with cash flow segmentation

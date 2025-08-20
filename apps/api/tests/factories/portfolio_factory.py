@@ -17,16 +17,30 @@ class PortfolioFactory(BaseFactory):
     def create_portfolio_data(
         name: Optional[str] = None,
         total_value: float = 100000.0,
-        user_id: int = 1
+        user_id: int = 1,
+        include_strategy: bool = True
     ) -> Dict[str, Any]:
         """Create portfolio data for testing."""
-        return {
+        base_data = {
             "name": name or f"Test Portfolio {PortfolioFactory.random_string(4)}",
             "description": "Test portfolio for unit testing",
             "total_value": total_value,
             "user_id": user_id,
             "returns": 0.0
         }
+        
+        if include_strategy:
+            base_data["strategy_config"] = {
+                "strategy_type": "balanced",
+                "risk_tolerance": "moderate",
+                "rebalance_frequency": "monthly",
+                "constraints": {
+                    "max_weight": 0.25,
+                    "min_weight": 0.01
+                }
+            }
+        
+        return base_data
     
     @staticmethod
     def create_allocations(
