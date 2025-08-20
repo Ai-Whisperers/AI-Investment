@@ -1,0 +1,212 @@
+name: Backend Tests
+
+on:
+  push:
+    branches: [main, develop]
+    paths: ['apps/api/**', '.github/workflows/test-backend.yml']
+  pull_request:
+    branches: [main, develop]
+    paths: ['apps/api/**']
+  workflow_call:
+
+env:
+  PYTHON_VERSION: '3.11'
+  WORKING_DIR: './apps/api'
+
+jobs:
+  test-api:
+    name: Backend Test Suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: '${{ env.WORKING_DIR }}/requirements*.txt'
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('apps/api/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-test.txt
+
+      - name: Verify installation
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          python --version
+          pip --version
+          python -m pytest --version
+
+      - name: Run fast unit tests
+        working-directory: ${{ env.WORKING_DIR }}
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test_db
+          REDIS_URL: redis://localhost:6379/0
+          JWT_SECRET_KEY: test-secret-key
+          JWT_ALGORITHM: HS256
+          TWELVEDATA_API_KEY: test-key
+          ENVIRONMENT: test
+        run: |
+          python -m pytest tests/unit -v \
+            --tb=short \
+            --maxfail=5 \
+            --cov=app \
+            --cov-report=term-missing \
+            --cov-report=xml \
+            --cov-fail-under=50
+
+      - name: Run integration tests
+        working-directory: ${{ env.WORKING_DIR }}
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test_db
+          REDIS_URL: redis://localhost:6379/0
+          JWT_SECRET_KEY: test-secret-key
+          JWT_ALGORITHM: HS256
+          TWELVEDATA_API_KEY: test-key
+          ENVIRONMENT: test
+        run: |
+          python -m pytest tests/integration -v \
+            --tb=short \
+            --maxfail=3
+
+      - name: Run financial calculation tests (100% coverage required)
+        working-directory: ${{ env.WORKING_DIR }}
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test_db
+          REDIS_URL: redis://localhost:6379/0
+          JWT_SECRET_KEY: test-secret-key
+          JWT_ALGORITHM: HS256
+          ENVIRONMENT: test
+        run: |
+          python -m pytest -m "financial" -v \
+            --tb=short \
+            --cov=app/services/performance_modules \
+            --cov=app/services/strategy_modules \
+            --cov-report=term-missing \
+            --cov-fail-under=95
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ${{ env.WORKING_DIR }}/coverage.xml
+          flags: backend
+          name: backend-coverage
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Generate test report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: Backend Test Results
+          path: '${{ env.WORKING_DIR }}/test-results.xml'
+          reporter: java-junit
+
+  lint-backend:
+    name: Backend Code Quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install linting tools
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff black mypy
+
+      - name: Run ruff (linting)
+        working-directory: ${{ env.WORKING_DIR }}
+        run: ruff check . --output-format=github
+
+      - name: Run black (formatting)
+        working-directory: ${{ env.WORKING_DIR }}
+        run: black --check --diff .
+
+      - name: Run mypy (type checking)
+        working-directory: ${{ env.WORKING_DIR }}
+        run: mypy app --ignore-missing-imports --show-error-codes
+
+  security-backend:
+    name: Backend Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install security tools
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          pip install safety bandit
+
+      - name: Run safety (vulnerability scan)
+        working-directory: ${{ env.WORKING_DIR }}
+        run: safety check -r requirements.txt --json --output safety-report.json
+        continue-on-error: true
+
+      - name: Run bandit (security linting)
+        working-directory: ${{ env.WORKING_DIR }}
+        run: bandit -r app/ -f json -o bandit-report.json
+
+      - name: Upload security reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-security-reports
+          path: |
+            ${{ env.WORKING_DIR }}/safety-report.json
+            ${{ env.WORKING_DIR }}/bandit-report.json
