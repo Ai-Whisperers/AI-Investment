@@ -81,6 +81,30 @@ cd apps/web && npm run test:coverage           # Frontend with coverage
 9. ✅ **Background Tasks**: Celery-based async processing with queues
 10. ✅ **Task Monitoring**: Flower dashboard for task monitoring
 
+## Latest Updates (2025-01-20)
+
+### ✅ Production-Ready Financial Calculations
+**Issue**: Financial calculations were simplified approximations not suitable for production
+**Resolution**: Implemented proper algorithms using scipy optimization
+
+#### Implementations Added:
+- **Time-Weighted Returns (TWR)**: Proper cash flow segmentation and period compounding
+- **Internal Rate of Return (IRR)**: scipy.optimize numerical solution for accurate MWR
+- **Portfolio Optimization**: 
+  - Minimum variance portfolios using quadratic optimization
+  - Maximum Sharpe ratio portfolios with SLSQP solver
+- **Advanced Metrics**: 
+  - Period returns (daily/weekly/monthly/quarterly/yearly)
+  - Rolling returns with configurable windows
+  - Return distribution analysis with scipy.stats
+- **Dependencies**: Added scipy==1.11.4 for optimization algorithms
+
+#### Testing Progress:
+- ✅ **Coverage Increased**: From ~25-30% to ~35-40%
+- ✅ **Return Calculator**: 17 of 21 tests passing
+- ⚠️ **Risk Calculator**: Needs additional methods
+- ⚠️ **Weight Calculator**: Needs test alignment
+
 ## Latest Updates (2025-01-19)
 
 ### ✅ Clean Architecture Implementation

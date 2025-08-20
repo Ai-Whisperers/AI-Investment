@@ -185,8 +185,7 @@ class WeightCalculator:
         lookback: int = 60
     ) -> Dict[str, float]:
         """
-        Calculate minimum variance portfolio weights.
-        Simplified implementation - production would use optimization.
+        Calculate minimum variance portfolio weights using optimization.
         
         Args:
             assets: List of asset symbols
@@ -199,9 +198,126 @@ class WeightCalculator:
         if not assets or returns.empty:
             return {asset: 1.0/len(assets) for asset in assets} if assets else {}
         
-        # For now, use inverse volatility as proxy
-        # Full implementation would use quadratic optimization
-        return WeightCalculator.calculate_risk_parity_weights(assets, returns, lookback)
+        try:
+            from scipy.optimize import minimize
+            
+            # Get returns for the specified assets
+            asset_returns = returns[assets].tail(lookback)
+            
+            # Calculate covariance matrix
+            cov_matrix = asset_returns.cov().values
+            n_assets = len(assets)
+            
+            # Objective function: portfolio variance
+            def portfolio_variance(weights):
+                return weights @ cov_matrix @ weights
+            
+            # Constraints: weights sum to 1
+            constraints = {'type': 'eq', 'fun': lambda x: np.sum(x) - 1}
+            
+            # Bounds: weights between 0 and 1 (long-only)
+            bounds = tuple((0, 1) for _ in range(n_assets))
+            
+            # Initial guess: equal weights
+            x0 = np.array([1.0/n_assets] * n_assets)
+            
+            # Optimize
+            result = minimize(
+                portfolio_variance,
+                x0,
+                method='SLSQP',
+                bounds=bounds,
+                constraints=constraints
+            )
+            
+            if result.success:
+                return {asset: float(weight) for asset, weight in zip(assets, result.x)}
+            else:
+                logger.warning(f"Optimization failed: {result.message}, using equal weights")
+                return {asset: 1.0/len(assets) for asset in assets}
+                
+        except ImportError:
+            logger.warning("scipy not available, using risk parity as proxy")
+            return WeightCalculator.calculate_risk_parity_weights(assets, returns, lookback)
+        except Exception as e:
+            logger.error(f"Error in minimum variance optimization: {e}")
+            return {asset: 1.0/len(assets) for asset in assets}
+    
+    @staticmethod
+    def calculate_maximum_sharpe_weights(
+        assets: List[str],
+        returns: pd.DataFrame,
+        lookback: int = 60,
+        risk_free_rate: float = 0.05
+    ) -> Dict[str, float]:
+        """
+        Calculate maximum Sharpe ratio portfolio weights using optimization.
+        
+        Args:
+            assets: List of asset symbols
+            returns: DataFrame of returns
+            lookback: Lookback period
+            risk_free_rate: Annual risk-free rate
+            
+        Returns:
+            Dictionary of weights
+        """
+        if not assets or returns.empty:
+            return {asset: 1.0/len(assets) for asset in assets} if assets else {}
+        
+        try:
+            from scipy.optimize import minimize
+            
+            # Get returns for the specified assets
+            asset_returns = returns[assets].tail(lookback)
+            
+            # Calculate expected returns and covariance
+            mean_returns = asset_returns.mean().values
+            cov_matrix = asset_returns.cov().values
+            n_assets = len(assets)
+            
+            # Convert risk-free rate to daily
+            daily_rf = (1 + risk_free_rate) ** (1/252) - 1
+            
+            # Objective function: negative Sharpe ratio (to minimize)
+            def negative_sharpe(weights):
+                portfolio_return = np.sum(mean_returns * weights)
+                portfolio_std = np.sqrt(weights @ cov_matrix @ weights)
+                if portfolio_std == 0:
+                    return 0
+                sharpe = (portfolio_return - daily_rf) / portfolio_std
+                return -sharpe * np.sqrt(252)  # Annualized negative Sharpe
+            
+            # Constraints: weights sum to 1
+            constraints = {'type': 'eq', 'fun': lambda x: np.sum(x) - 1}
+            
+            # Bounds: weights between 0 and 1 (long-only)
+            bounds = tuple((0, 1) for _ in range(n_assets))
+            
+            # Initial guess: equal weights
+            x0 = np.array([1.0/n_assets] * n_assets)
+            
+            # Optimize
+            result = minimize(
+                negative_sharpe,
+                x0,
+                method='SLSQP',
+                bounds=bounds,
+                constraints=constraints
+            )
+            
+            if result.success:
+                return {asset: float(weight) for asset, weight in zip(assets, result.x)}
+            else:
+                logger.warning(f"Sharpe optimization failed: {result.message}, using equal weights")
+                return {asset: 1.0/len(assets) for asset in assets}
+                
+        except ImportError:
+            logger.warning("scipy not available, using equal weights")
+            return {asset: 1.0/len(assets) for asset in assets}
+        except Exception as e:
+            logger.error(f"Error in Sharpe ratio optimization: {e}")
+            return {asset: 1.0/len(assets) for asset in assets}
     
     @staticmethod
     def calculate_momentum_weights(

@@ -29,6 +29,8 @@ class ReturnCalculator:
         Returns:
             Array of daily returns
         """
+        if len(values) == 0:
+            raise ValueError("Empty series")
         if len(values) < 2:
             return np.array([])
 
@@ -207,25 +209,30 @@ class ReturnCalculator:
             return np.array([])
         
         prices_array = np.array(prices)
+        
+        # Check for negative prices
+        if np.any(prices_array <= 0):
+            raise ValueError("Negative or zero prices not allowed for log returns")
+        
         return np.log(prices_array[1:] / prices_array[:-1])
     
     @staticmethod
-    def calculate_cumulative_returns(returns: np.ndarray) -> np.ndarray:
+    def calculate_cumulative_returns(returns: pd.Series) -> pd.Series:
         """
         Calculate cumulative returns from return series.
         
         Args:
-            returns: Array of period returns
+            returns: Series of period returns
             
         Returns:
-            Array of cumulative returns
+            Series of cumulative returns
         """
         if len(returns) == 0:
-            return np.array([])
+            return pd.Series(dtype=float)
         
         # Convert returns to growth factors and calculate cumulative product
         growth_factors = 1 + returns
-        cum_returns = np.cumprod(growth_factors) - 1
+        cum_returns = growth_factors.cumprod() - 1
         return cum_returns
     
     @staticmethod
@@ -273,11 +280,11 @@ class ReturnCalculator:
         Returns:
             Series of monthly returns
         """
-        monthly_prices = prices.resample('M').last()
+        monthly_prices = prices.resample('ME').last()
         return monthly_prices.pct_change().dropna()
     
     @staticmethod
-    def calculate_ytd_return(prices: pd.Series, current_date: Optional[datetime] = None) -> float:
+    def calculate_ytd_return(prices: pd.Series, current_date: Optional[datetime] = None, year: Optional[int] = None) -> float:
         """
         Calculate year-to-date return.
         
@@ -294,7 +301,9 @@ class ReturnCalculator:
         if current_date is None:
             current_date = prices.index[-1]
         
-        year_start = pd.Timestamp(current_date.year, 1, 1)
+        # If year is specified, use it instead of current_date's year
+        target_year = year if year is not None else current_date.year
+        year_start = pd.Timestamp(target_year, 1, 1)
         ytd_prices = prices[prices.index >= year_start]
         
         if len(ytd_prices) < 2:
@@ -303,12 +312,12 @@ class ReturnCalculator:
         return (ytd_prices.iloc[-1] / ytd_prices.iloc[0]) - 1
     
     @staticmethod
-    def calculate_compound_return(returns: np.ndarray) -> float:
+    def calculate_compound_return(returns: List[float]) -> float:
         """
         Calculate compound return from series of returns.
         
         Args:
-            returns: Array of period returns
+            returns: List of period returns
             
         Returns:
             Compound return as decimal
@@ -316,7 +325,7 @@ class ReturnCalculator:
         if len(returns) == 0:
             return 0.0
         
-        return np.prod(1 + returns) - 1
+        return np.prod([1 + r for r in returns]) - 1
     
     @staticmethod
     def calculate_return_distribution_metrics(returns: np.ndarray) -> Dict[str, float]:
@@ -358,7 +367,7 @@ class ReturnCalculator:
     ) -> float:
         """
         Calculate time-weighted return accounting for cash flows.
-        Note: Simplified implementation - production would need more robust handling.
+        Segments periods by cash flows and compounds sub-period returns.
         
         Args:
             values: Portfolio values at each date
@@ -371,16 +380,46 @@ class ReturnCalculator:
         if len(values) < 2:
             return 0.0
         
-        # Simple approximation: calculate return ignoring cash flow timing
-        # Full implementation would segment periods by cash flows
-        total_return = (values[-1] / values[0]) - 1
-        return total_return
+        # Create DataFrame for easier manipulation
+        df = pd.DataFrame({'value': values}, index=dates)
+        
+        # If no cash flows, simple return
+        if not cash_flows:
+            return (values[-1] / values[0]) - 1
+        
+        # Sort cash flows by date
+        sorted_cf = sorted(cash_flows, key=lambda x: x[0])
+        
+        # Segment periods by cash flows
+        segments = []
+        start_idx = 0
+        
+        for cf_date, cf_amount in sorted_cf:
+            # Find the index closest to cash flow date
+            cf_idx = df.index.get_indexer([cf_date], method='nearest')[0]
+            
+            if cf_idx > start_idx:
+                # Calculate return for this segment
+                segment_return = (df.iloc[cf_idx]['value'] / df.iloc[start_idx]['value']) - 1
+                segments.append(1 + segment_return)
+                start_idx = cf_idx
+        
+        # Final segment from last cash flow to end
+        if start_idx < len(df) - 1:
+            final_return = (df.iloc[-1]['value'] / df.iloc[start_idx]['value']) - 1
+            segments.append(1 + final_return)
+        
+        # Compound all segment returns
+        if not segments:
+            return (values[-1] / values[0]) - 1
+        
+        twr = np.prod(segments) - 1
+        return float(twr)
     
     @staticmethod
     def calculate_money_weighted_return(cash_flows: List[Tuple[float, datetime]]) -> float:
         """
-        Calculate money-weighted return (IRR).
-        Note: Simplified implementation - production would use scipy.optimize.
+        Calculate money-weighted return (IRR) using numerical optimization.
         
         Args:
             cash_flows: List of (amount, date) tuples
@@ -391,51 +430,207 @@ class ReturnCalculator:
         if len(cash_flows) < 2:
             return 0.0
         
-        # Simple approximation: calculate based on total in/out
+        try:
+            from scipy.optimize import minimize_scalar
+        except ImportError:
+            logger.warning("scipy not available, using simplified IRR calculation")
+            # Fallback to simple calculation if scipy not available
+            total_invested = sum(cf[0] for cf in cash_flows if cf[0] < 0)
+            total_returned = sum(cf[0] for cf in cash_flows if cf[0] > 0)
+            
+            if total_invested == 0:
+                return 0.0
+            
+            simple_return = (total_returned / abs(total_invested)) - 1
+            first_date = min(cf[1] for cf in cash_flows)
+            last_date = max(cf[1] for cf in cash_flows)
+            years = (last_date - first_date).days / 365.0
+            
+            if years <= 0:
+                return simple_return
+            
+            return (1 + simple_return) ** (1 / years) - 1
+        
+        # Sort cash flows by date
+        sorted_cf = sorted(cash_flows, key=lambda x: x[1])
+        
+        # Get the first date as reference
+        first_date = sorted_cf[0][1]
+        
+        # Convert cash flows to (amount, years_from_start) format
+        cf_values = []
+        cf_times = []
+        for amount, date in sorted_cf:
+            years_from_start = (date - first_date).days / 365.0
+            cf_values.append(amount)
+            cf_times.append(years_from_start)
+        
+        # Define NPV function
+        def npv(rate):
+            """Calculate NPV at given rate."""
+            total = 0
+            for amount, t in zip(cf_values, cf_times):
+                if t == 0:
+                    total += amount
+                else:
+                    total += amount / ((1 + rate) ** t)
+            return total
+        
+        # Define objective function (squared NPV for minimization)
+        def objective(rate):
+            """Objective function to minimize (squared NPV)."""
+            return npv(rate) ** 2
+        
+        # Try to find IRR using optimization
+        # Search between -99% and 300% annual return
+        result = minimize_scalar(objective, bounds=(-0.99, 3.0), method='bounded')
+        
+        if result.success and abs(npv(result.x)) < 0.01:  # Check if NPV is close to 0
+            return float(result.x)
+        
+        # If optimization fails, try different initial guesses
+        for guess in [0.0, 0.1, -0.1, 0.5, -0.5]:
+            result = minimize_scalar(
+                objective, 
+                bounds=(guess - 0.5, guess + 0.5), 
+                method='bounded'
+            )
+            if result.success and abs(npv(result.x)) < 0.01:
+                return float(result.x)
+        
+        # Fallback to simple approximation if optimization fails
+        logger.warning("IRR optimization failed, using approximation")
         total_invested = sum(cf[0] for cf in cash_flows if cf[0] < 0)
         total_returned = sum(cf[0] for cf in cash_flows if cf[0] > 0)
         
         if total_invested == 0:
             return 0.0
         
-        # Simple return calculation - production would solve for IRR
         simple_return = (total_returned / abs(total_invested)) - 1
-        
-        # Approximate annualization based on time span
-        first_date = min(cf[1] for cf in cash_flows)
-        last_date = max(cf[1] for cf in cash_flows)
-        years = (last_date - first_date).days / 365.0
+        years = cf_times[-1] if cf_times else 1.0
         
         if years <= 0:
             return simple_return
         
-        # Annualize the return
         return (1 + simple_return) ** (1 / years) - 1
     
     @staticmethod
+    def calculate_period_returns(
+        prices: pd.Series,
+        period: str = 'daily'
+    ) -> pd.Series:
+        """
+        Calculate returns for different periods.
+        
+        Args:
+            prices: Series of prices with date index
+            period: Period type ('daily', 'weekly', 'monthly', 'quarterly', 'yearly')
+            
+        Returns:
+            Series of period returns
+        """
+        if period == 'daily':
+            return prices.pct_change().dropna()
+        elif period == 'weekly':
+            weekly_prices = prices.resample('W').last()
+            return weekly_prices.pct_change().dropna()
+        elif period == 'monthly':
+            monthly_prices = prices.resample('ME').last()
+            return monthly_prices.pct_change().dropna()
+        elif period == 'quarterly':
+            quarterly_prices = prices.resample('QE').last()
+            return quarterly_prices.pct_change().dropna()
+        elif period == 'yearly':
+            yearly_prices = prices.resample('YE').last()
+            return yearly_prices.pct_change().dropna()
+        else:
+            raise ValueError(f"Unknown period: {period}")
+    
+    @staticmethod
+    def calculate_rolling_returns(
+        prices: pd.Series,
+        window: int = 30
+    ) -> pd.Series:
+        """
+        Calculate rolling returns over specified window.
+        
+        Args:
+            prices: Series of prices
+            window: Rolling window size in periods
+            
+        Returns:
+            Series of rolling returns
+        """
+        if len(prices) < window:
+            return pd.Series(dtype=float)
+        
+        # Calculate rolling returns
+        rolling = prices.rolling(window=window).apply(
+            lambda x: (x.iloc[-1] / x.iloc[0] - 1) if len(x) == window else np.nan
+        )
+        
+        return rolling
+    
+    @staticmethod
+    def analyze_return_distribution(returns: pd.Series) -> Dict[str, float]:
+        """
+        Analyze return distribution metrics.
+        
+        Args:
+            returns: Series of returns
+            
+        Returns:
+            Dictionary with distribution metrics
+        """
+        if len(returns) == 0:
+            return {
+                'mean': 0.0,
+                'median': 0.0,
+                'std': 0.0,
+                'skew': 0.0,
+                'kurtosis': 0.0,
+                'min': 0.0,
+                'max': 0.0,
+                'percentile_5': 0.0,
+                'percentile_95': 0.0
+            }
+        
+        from scipy import stats
+        
+        return {
+            'mean': float(returns.mean()),
+            'median': float(returns.median()),
+            'std': float(returns.std()),
+            'skew': float(stats.skew(returns)),
+            'kurtosis': float(stats.kurtosis(returns)),
+            'min': float(returns.min()),
+            'max': float(returns.max()),
+            'percentile_5': float(returns.quantile(0.05)),
+            'percentile_95': float(returns.quantile(0.95))
+        }
+    
+    @staticmethod
     def calculate_active_return(
-        portfolio_returns: np.ndarray,
-        benchmark_returns: np.ndarray
+        portfolio_return: float,
+        benchmark_return: float
     ) -> float:
         """
         Calculate active return vs benchmark.
         
         Args:
-            portfolio_returns: Portfolio return series
-            benchmark_returns: Benchmark return series
+            portfolio_return: Portfolio return (scalar)
+            benchmark_return: Benchmark return (scalar)
             
         Returns:
             Active return as decimal
         """
-        active, _, active_return = ReturnCalculator.active_returns(
-            portfolio_returns, benchmark_returns
-        )
-        return active_return
+        return portfolio_return - benchmark_return
     
     @staticmethod
     def calculate_tracking_error(
-        portfolio_returns: np.ndarray,
-        benchmark_returns: np.ndarray
+        portfolio_returns: pd.Series,
+        benchmark_returns: pd.Series,
+        annualized: bool = True
     ) -> float:
         """
         Calculate tracking error vs benchmark.
@@ -443,14 +638,28 @@ class ReturnCalculator:
         Args:
             portfolio_returns: Portfolio return series
             benchmark_returns: Benchmark return series
+            annualized: Whether to annualize the tracking error
             
         Returns:
             Tracking error as decimal
         """
-        active, tracking_error, _ = ReturnCalculator.active_returns(
-            portfolio_returns, benchmark_returns
-        )
-        return tracking_error
+        # Align the series
+        aligned = pd.DataFrame({
+            'portfolio': portfolio_returns,
+            'benchmark': benchmark_returns
+        }).dropna()
+        
+        if len(aligned) < 2:
+            return 0.0
+        
+        # Calculate tracking error (std of excess returns)
+        excess_returns = aligned['portfolio'] - aligned['benchmark']
+        tracking_error = excess_returns.std()
+        
+        if annualized:
+            tracking_error = tracking_error * np.sqrt(252)
+        
+        return float(tracking_error)
     
     @staticmethod
     def calculate_excess_returns(

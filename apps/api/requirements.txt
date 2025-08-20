@@ -10,6 +10,7 @@ python-multipart==0.0.9
 twelvedata[pandas,websocket-client]==1.2.15
 pandas==2.2.2
 numpy==2.0.1
+scipy==1.11.4
 requests==2.32.3
 email-validator==2.1.1
 redis==5.0.7

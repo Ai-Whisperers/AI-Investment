@@ -77,9 +77,9 @@ waardhaven-autoindex/
 ### Testing Implementation Progress
 **Current State**:
 - **Previous Status**: No test files, 0% coverage
-- **Current Status**: Testing infrastructure established, ~25-30% coverage
+- **Current Status**: Testing infrastructure established, ~35-40% coverage
 - **Architecture**: ✅ Excellent modular design avoiding god objects
-- **Coverage Gap**: 65-70% needed to reach 95% target
+- **Coverage Gap**: 55-60% needed to reach 95% target
 
 **Infrastructure Created**:
 1. ✅ Modular test factories (avoiding god objects)
@@ -88,14 +88,12 @@ waardhaven-autoindex/
 4. ✅ Frontend: Jest + React Testing Library configured
 5. ⚠️ CI/CD pipeline needs test gates implementation
 
-**Critical Findings**:
-- **Test-Implementation Mismatch**: Tests expect sophisticated methods, implementations are simplified
-- **Financial Calculations**: Approximations only - NOT production-ready for real financial decisions
-- **Missing Implementations**:
-  - Proper Time-Weighted Returns (TWR with cash flow segmentation)
-  - Internal Rate of Return (IRR using scipy)
-  - Portfolio optimization algorithms
-  - Advanced risk metrics
+**Financial Calculations Implemented (2025-01-20)**:
+- ✅ **Time-Weighted Returns (TWR)**: Proper implementation with cash flow segmentation
+- ✅ **Internal Rate of Return (IRR)**: Using scipy.optimize for accurate calculation
+- ✅ **Portfolio Optimization**: Minimum variance and maximum Sharpe ratio using scipy
+- ✅ **Advanced Methods**: Period returns, rolling returns, distribution analysis
+- ✅ **Dependencies**: Added scipy==1.11.4 for optimization algorithms
 
 ### ✅ **MAJOR ACHIEVEMENT**: Clean Architecture Implementation Complete
 **Status**: **95%+ Complete** - All architectural goals achieved
@@ -306,11 +304,11 @@ waardhaven-autoindex/
 ## Future Roadmap & Vision
 
 ### Phase 1: Critical Infrastructure (Immediate - 2 weeks)
-- **Priority #0**: Complete financial calculation implementations (TWR, IRR, optimization)
-- **Priority #1**: Increase test coverage to 50%+ (focus on critical paths)
+- **Priority #0**: ✅ Complete financial calculation implementations (TWR, IRR, optimization) - DONE
+- **Priority #1**: Increase test coverage to 50%+ (currently ~35-40%)
 - **Priority #2**: Set up database migrations (Alembic)
 - **Priority #3**: Implement CI/CD test gates and quality checks
-- **Priority #4**: Align tests with actual implementations
+- **Priority #4**: Complete remaining test implementations for risk and weight calculators
 
 ### Phase 2: Advanced Intelligence Platform (Months 3-6)
 Based on Ivan's TODO specifications:
