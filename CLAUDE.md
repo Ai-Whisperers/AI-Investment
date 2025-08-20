@@ -49,13 +49,18 @@ waardhaven-autoindex/
 └── turbo.json             # Turborepo configuration
 ```
 
-## Current Status (2025-01-20)
+## Current Status (2025-08-20)
 
 ### 🎯 Test Suite Performance
-- **Overall Pass Rate**: 84% (27 of 32 tests passing)
-- **Unit Tests**: 27/32 passing
+- **Overall Pass Rate**: 97.6% (122 of 125 tests passing)
+- **Unit Tests**: 122/125 passing
   - Portfolio Model: 9/9 ✅
-  - Auth Endpoints: 18/23 (78%)
+  - Auth Endpoints: 21/23 (2 skipped - admin/rate-limiting not implemented)
+  - Schema Tests: 21/21 ✅
+  - Utils/Security: 17/17 ✅
+  - Return Calculator: 21/21 ✅
+  - Risk Calculator: 20/20 ✅
+  - Weight Calculator: 14/17 (3 momentum-related failures)
 - **Integration Tests**: 8 tests configured
 - **Smoke Tests**: 12 production health checks
 - **Coverage**: ~50% (increased from 25-30%)
@@ -238,16 +243,19 @@ NEXT_PUBLIC_API_URL=<api-url>
 
 ### ✅ Resolved Issues
 1. **Dependency conflicts** → pip-tools + Dependabot
-2. **Test failures** → Fixed auth & model issues
+2. **Test failures** → Fixed auth, model, schema, utils, and most service tests
 3. **Migration warnings** → SQLite detection
 4. **Token generation** → Added `iat` field
 5. **Password validation** → 422 status codes
+6. **Schema validation** → Fixed for Pydantic v2
+7. **Security utils** → Fixed timezone issues in token tests
+8. **Return calculator** → Fixed cumulative return calculations
 
 ### ⚠️ Remaining Issues (Non-Critical)
-1. **Admin endpoints** (404) - Not implemented yet
-2. **Rate limiting tests** - Feature not built
-3. **Some ruff warnings** - Minor formatting issues
-4. **Test report generation** - XML output missing
+1. **Admin endpoints** (Skipped) - Not implemented yet
+2. **Rate limiting tests** (Skipped) - Feature not built
+3. **Weight calculator** (3 failures) - Momentum strategy implementation incomplete
+4. **Some ruff warnings** - Minor formatting issues
 
 ## Development Workflow
 1. Check existing patterns before changes
@@ -282,12 +290,13 @@ NEXT_PUBLIC_API_URL=<api-url>
 - **SSL**: Automatic HTTPS
 
 ## Next Steps
-1. Fix remaining 5 test failures (admin routes)
-2. Implement rate limiting
-3. Add WebSocket support
-4. Set up Prometheus monitoring
-5. GraphQL API alternative
-6. Increase test coverage to 70%+
+1. Fix remaining 3 momentum strategy test failures
+2. Implement admin endpoints
+3. Implement rate limiting
+4. Add WebSocket support
+5. Set up Prometheus monitoring
+6. GraphQL API alternative
+7. Increase test coverage to 70%+
 
 ## Best Practices
 - Never commit secrets or API keys

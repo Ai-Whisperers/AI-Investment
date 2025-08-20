@@ -52,7 +52,8 @@
       "Bash(npm run lint)",
       "Bash(node:*)",
       "Bash(gh workflow:*)",
-      "Bash(gh run view:*)"
+      "Bash(gh run view:*)",
+      "Bash(git reset:*)"
     ],
     "deny": [],
     "ask": [],

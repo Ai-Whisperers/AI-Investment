@@ -1,0 +1,48 @@
+﻿2025-08-20T19:29:46.3581302Z ##[group]Run python -m pip install --upgrade pip
+2025-08-20T19:29:46.3581909Z [36;1mpython -m pip install --upgrade pip[0m
+2025-08-20T19:29:46.3582252Z [36;1mpip install ruff black mypy[0m
+2025-08-20T19:29:46.3673485Z shell: /usr/bin/bash -e {0}
+2025-08-20T19:29:46.3673849Z env:
+2025-08-20T19:29:46.3674104Z   PYTHON_VERSION: 3.11
+2025-08-20T19:29:46.3674349Z   WORKING_DIR: ./apps/api
+2025-08-20T19:29:46.3674661Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-20T19:29:46.3675102Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-08-20T19:29:46.3675552Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-20T19:29:46.3675940Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-20T19:29:46.3676355Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-20T19:29:46.3676735Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-08-20T19:29:46.3677095Z ##[endgroup]
+2025-08-20T19:29:48.2587046Z Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages (25.2)
+2025-08-20T19:29:49.4944663Z Collecting ruff
+2025-08-20T19:29:49.5686676Z   Downloading ruff-0.12.9-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (25 kB)
+2025-08-20T19:29:49.6294875Z Collecting black
+2025-08-20T19:29:49.6464094Z   Downloading black-25.1.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl.metadata (81 kB)
+2025-08-20T19:29:49.7703633Z Collecting mypy
+2025-08-20T19:29:49.7865976Z   Downloading mypy-1.17.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.2 kB)
+2025-08-20T19:29:49.8200001Z Collecting click>=8.0.0 (from black)
+2025-08-20T19:29:49.8363301Z   Downloading click-8.2.1-py3-none-any.whl.metadata (2.5 kB)
+2025-08-20T19:29:49.8606309Z Collecting mypy-extensions>=0.4.3 (from black)
+2025-08-20T19:29:49.8772237Z   Downloading mypy_extensions-1.1.0-py3-none-any.whl.metadata (1.1 kB)
+2025-08-20T19:29:49.9045157Z Collecting packaging>=22.0 (from black)
+2025-08-20T19:29:49.9222134Z   Downloading packaging-25.0-py3-none-any.whl.metadata (3.3 kB)
+2025-08-20T19:29:49.9459213Z Collecting pathspec>=0.9.0 (from black)
+2025-08-20T19:29:49.9680873Z   Downloading pathspec-0.12.1-py3-none-any.whl.metadata (21 kB)
+2025-08-20T19:29:50.0005814Z Collecting platformdirs>=2 (from black)
+2025-08-20T19:29:50.0329897Z   Downloading platformdirs-4.3.8-py3-none-any.whl.metadata (12 kB)
+2025-08-20T19:29:50.0611065Z Collecting typing_extensions>=4.6.0 (from mypy)
+2025-08-20T19:29:50.0769004Z   Downloading typing_extensions-4.14.1-py3-none-any.whl.metadata (3.0 kB)
+2025-08-20T19:29:50.1007190Z Downloading ruff-0.12.9-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (13.0 MB)
+2025-08-20T19:29:50.2179829Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 13.0/13.0 MB 128.8 MB/s  0:00:00
+2025-08-20T19:29:50.2337925Z Downloading black-25.1.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl (1.7 MB)
+2025-08-20T19:29:50.2499786Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.7/1.7 MB 109.3 MB/s  0:00:00
+2025-08-20T19:29:50.2725292Z Downloading mypy-1.17.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (12.6 MB)
+2025-08-20T19:29:50.3980426Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.6/12.6 MB 123.0 MB/s  0:00:00
+2025-08-20T19:29:50.4140078Z Downloading click-8.2.1-py3-none-any.whl (102 kB)
+2025-08-20T19:29:50.4331308Z Downloading mypy_extensions-1.1.0-py3-none-any.whl (5.0 kB)
+2025-08-20T19:29:50.4515125Z Downloading packaging-25.0-py3-none-any.whl (66 kB)
+2025-08-20T19:29:50.4707137Z Downloading pathspec-0.12.1-py3-none-any.whl (31 kB)
+2025-08-20T19:29:50.4889914Z Downloading platformdirs-4.3.8-py3-none-any.whl (18 kB)
+2025-08-20T19:29:50.5070616Z Downloading typing_extensions-4.14.1-py3-none-any.whl (43 kB)
+2025-08-20T19:29:50.5767299Z Installing collected packages: typing_extensions, ruff, platformdirs, pathspec, packaging, mypy-extensions, click, mypy, black
+2025-08-20T19:29:52.2246223Z 
+2025-08-20T19:29:52.2258873Z Successfully installed black-25.1.0 click-8.2.1 mypy-1.17.1 mypy-extensions-1.1.0 packaging-25.0 pathspec-0.12.1 platformdirs-4.3.8 ruff-0.12.9 typing_extensions-4.14.1

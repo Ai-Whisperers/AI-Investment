@@ -106,12 +106,13 @@ class WeightCalculator:
         return pd.Series(weight, index=assets)
     
     @staticmethod
-    def calculate_equal_weights(assets: List[str]) -> Dict[str, float]:
+    def calculate_equal_weights(assets: List[str], precision: int = None) -> Dict[str, float]:
         """
         Calculate equal weights for all assets.
         
         Args:
             assets: List of asset symbols
+            precision: Number of decimal places to round to (optional)
             
         Returns:
             Dictionary of asset: weight pairs
@@ -120,6 +121,8 @@ class WeightCalculator:
             return {}
         
         weight = 1.0 / len(assets)
+        if precision is not None:
+            weight = round(weight, precision)
         return {asset: weight for asset in assets}
     
     @staticmethod
@@ -469,38 +472,52 @@ class WeightCalculator:
 
     @staticmethod
     def apply_constraints(
-        weights: pd.Series,
-        min_weight: float = 0.01,
-        max_weight: float = 0.25,
-        max_positions: int = 30
-    ) -> pd.Series:
+        weights,
+        constraints: dict = None
+    ):
         """
         Apply portfolio constraints to weights.
 
         Args:
-            weights: Series of weights
-            min_weight: Minimum weight per position
-            max_weight: Maximum weight per position
-            max_positions: Maximum number of positions
+            weights: Dict or Series of weights
+            constraints: Dict with constraint parameters
 
         Returns:
-            Constrained weights
+            Constrained weights as dict
         """
+        # Handle both dict and Series inputs
+        if isinstance(weights, dict):
+            weights_series = pd.Series(weights)
+            return_dict = True
+        else:
+            weights_series = weights
+            return_dict = False
+        
+        # Extract constraints
+        if constraints is None:
+            constraints = {}
+        min_weight = constraints.get('min_weight', 0.01)
+        max_weight = constraints.get('max_weight', 0.25)
+        max_positions = constraints.get('max_positions', 30)
+        
         # Apply max weight constraint
-        weights = weights.clip(upper=max_weight)
+        weights_series = weights_series.clip(upper=max_weight)
 
         # Filter by minimum weight
-        weights = weights[weights >= min_weight]
+        weights_series = weights_series[weights_series >= min_weight]
 
         # Limit number of positions
-        if len(weights) > max_positions:
-            weights = weights.nlargest(max_positions)
+        if len(weights_series) > max_positions:
+            weights_series = weights_series.nlargest(max_positions)
 
         # Renormalize
-        if weights.sum() > 0:
-            weights = weights / weights.sum()
+        if weights_series.sum() > 0:
+            weights_series = weights_series / weights_series.sum()
 
-        return weights
+        # Return in the same format as input
+        if return_dict:
+            return weights_series.to_dict()
+        return weights_series
     
     @staticmethod
     def calculate_weights(

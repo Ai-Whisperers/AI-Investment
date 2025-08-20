@@ -96,7 +96,7 @@ class TestSecurityUtils:
         # Check expiry is approximately 1 hour from now
         exp_timestamp = payload["exp"]
         expected_exp = datetime.utcnow() + custom_delta
-        actual_exp = datetime.fromtimestamp(exp_timestamp)
+        actual_exp = datetime.utcfromtimestamp(exp_timestamp)
         
         # Allow 1 minute tolerance
         assert abs((actual_exp - expected_exp).total_seconds()) < 60

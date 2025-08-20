@@ -1,0 +1,72 @@
+﻿2025-08-20T19:29:43.0251429Z ##[group]Run actions/checkout@v4
+2025-08-20T19:29:43.0252859Z with:
+2025-08-20T19:29:43.0253752Z   repository: Ai-Whisperers/AI-Investment
+2025-08-20T19:29:43.0255175Z   token: ***
+2025-08-20T19:29:43.0255969Z   ssh-strict: true
+2025-08-20T19:29:43.0256773Z   ssh-user: git
+2025-08-20T19:29:43.0257601Z   persist-credentials: true
+2025-08-20T19:29:43.0258509Z   clean: true
+2025-08-20T19:29:43.0259338Z   sparse-checkout-cone-mode: true
+2025-08-20T19:29:43.0260318Z   fetch-depth: 1
+2025-08-20T19:29:43.0261300Z   fetch-tags: false
+2025-08-20T19:29:43.0262189Z   show-progress: true
+2025-08-20T19:29:43.0263040Z   lfs: false
+2025-08-20T19:29:43.0263813Z   submodules: false
+2025-08-20T19:29:43.0264674Z   set-safe-directory: true
+2025-08-20T19:29:43.0265857Z env:
+2025-08-20T19:29:43.0266598Z   PYTHON_VERSION: 3.11
+2025-08-20T19:29:43.0267459Z   WORKING_DIR: ./apps/api
+2025-08-20T19:29:43.0268325Z ##[endgroup]
+2025-08-20T19:29:43.1363991Z Syncing repository: Ai-Whisperers/AI-Investment
+2025-08-20T19:29:43.1366843Z ##[group]Getting Git version info
+2025-08-20T19:29:43.1368352Z Working directory is '/home/runner/work/AI-Investment/AI-Investment'
+2025-08-20T19:29:43.1370333Z [command]/usr/bin/git version
+2025-08-20T19:29:43.1457662Z git version 2.50.1
+2025-08-20T19:29:43.1484633Z ##[endgroup]
+2025-08-20T19:29:43.1500584Z Temporarily overriding HOME='/home/runner/work/_temp/27d9ba4c-3b53-4c66-a700-a2c8a8d2f614' before making global git config changes
+2025-08-20T19:29:43.1503460Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-20T19:29:43.1506290Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/AI-Investment/AI-Investment
+2025-08-20T19:29:43.1544341Z Deleting the contents of '/home/runner/work/AI-Investment/AI-Investment'
+2025-08-20T19:29:43.1548160Z ##[group]Initializing the repository
+2025-08-20T19:29:43.1552304Z [command]/usr/bin/git init /home/runner/work/AI-Investment/AI-Investment
+2025-08-20T19:29:43.1666936Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-08-20T19:29:43.1670341Z hint: is subject to change. To configure the initial branch name to use in all
+2025-08-20T19:29:43.1673204Z hint: of your new repositories, which will suppress this warning, call:
+2025-08-20T19:29:43.1674875Z hint:
+2025-08-20T19:29:43.1675766Z hint: 	git config --global init.defaultBranch <name>
+2025-08-20T19:29:43.1677077Z hint:
+2025-08-20T19:29:43.1678447Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-08-20T19:29:43.1680229Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-08-20T19:29:43.1681970Z hint:
+2025-08-20T19:29:43.1682870Z hint: 	git branch -m <name>
+2025-08-20T19:29:43.1683965Z hint:
+2025-08-20T19:29:43.1685107Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-08-20T19:29:43.1687103Z Initialized empty Git repository in /home/runner/work/AI-Investment/AI-Investment/.git/
+2025-08-20T19:29:43.1690439Z [command]/usr/bin/git remote add origin https://github.com/Ai-Whisperers/AI-Investment
+2025-08-20T19:29:43.1720577Z ##[endgroup]
+2025-08-20T19:29:43.1722369Z ##[group]Disabling automatic garbage collection
+2025-08-20T19:29:43.1724461Z [command]/usr/bin/git config --local gc.auto 0
+2025-08-20T19:29:43.1756773Z ##[endgroup]
+2025-08-20T19:29:43.1758098Z ##[group]Setting up auth
+2025-08-20T19:29:43.1764521Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-20T19:29:43.1799524Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-20T19:29:43.2256198Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-20T19:29:43.2287035Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-20T19:29:43.2514829Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-08-20T19:29:43.2559663Z ##[endgroup]
+2025-08-20T19:29:43.2562543Z ##[group]Fetching the repository
+2025-08-20T19:29:43.2572955Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +08980fb49c284f5c3cf9f3ba659a6186c9cc715c:refs/remotes/origin/main
+2025-08-20T19:29:43.6874779Z From https://github.com/Ai-Whisperers/AI-Investment
+2025-08-20T19:29:43.6876646Z  * [new ref]         08980fb49c284f5c3cf9f3ba659a6186c9cc715c -> origin/main
+2025-08-20T19:29:43.6906613Z ##[endgroup]
+2025-08-20T19:29:43.6908179Z ##[group]Determining the checkout info
+2025-08-20T19:29:43.6909664Z ##[endgroup]
+2025-08-20T19:29:43.6914278Z [command]/usr/bin/git sparse-checkout disable
+2025-08-20T19:29:43.6961787Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-08-20T19:29:43.6994515Z ##[group]Checking out the ref
+2025-08-20T19:29:43.6998006Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2025-08-20T19:29:43.7273089Z Switched to a new branch 'main'
+2025-08-20T19:29:43.7275168Z branch 'main' set up to track 'origin/main'.
+2025-08-20T19:29:43.7281628Z ##[endgroup]
+2025-08-20T19:29:43.7320113Z [command]/usr/bin/git log -1 --format=%H
+2025-08-20T19:29:43.7343615Z 08980fb49c284f5c3cf9f3ba659a6186c9cc715c

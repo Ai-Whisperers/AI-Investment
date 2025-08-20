@@ -1,0 +1,138 @@
+﻿2025-08-20T19:30:54.6692194Z Print service container logs: 7964195e740b43da88257b134d654928_postgres15_e05b21
+2025-08-20T19:30:54.6697111Z ##[command]/usr/bin/docker logs --details 101acff1e13e46b4e5d700ad2a49ac9c16fe2bf7d3763c6dd21a0812f9b01d5b
+2025-08-20T19:30:54.6812656Z  The files belonging to this database system will be owned by user "postgres".
+2025-08-20T19:30:54.6815469Z  initdb: warning: enabling "trust" authentication for local connections
+2025-08-20T19:30:54.6816728Z  initdb: hint: You can change this by editing pg_hba.conf or using the option -A, or --auth-local and --auth-host, the next time you run initdb.
+2025-08-20T19:30:54.6817660Z  This user must also own the server process.
+2025-08-20T19:30:54.6818070Z  
+2025-08-20T19:30:54.6818482Z  The database cluster will be initialized with locale "en_US.utf8".
+2025-08-20T19:30:54.6819422Z  The default database encoding has accordingly been set to "UTF8".
+2025-08-20T19:30:54.6820074Z  The default text search configuration will be set to "english".
+2025-08-20T19:30:54.6820571Z  
+2025-08-20T19:30:54.6820877Z  Data page checksums are disabled.
+2025-08-20T19:30:54.6821236Z  
+2025-08-20T19:30:54.6821668Z  fixing permissions on existing directory /var/lib/postgresql/data ... ok
+2025-08-20T19:30:54.6822267Z  creating subdirectories ... ok
+2025-08-20T19:30:54.6822736Z  selecting dynamic shared memory implementation ... posix
+2025-08-20T19:30:54.6823258Z  selecting default max_connections ... 100
+2025-08-20T19:30:54.6823700Z  selecting default shared_buffers ... 128MB
+2025-08-20T19:30:54.6824131Z  selecting default time zone ... Etc/UTC
+2025-08-20T19:30:54.6824556Z  creating configuration files ... ok
+2025-08-20T19:30:54.6824964Z  running bootstrap script ... ok
+2025-08-20T19:30:54.6825397Z  performing post-bootstrap initialization ... ok
+2025-08-20T19:30:54.6825863Z  syncing data to disk ... ok
+2025-08-20T19:30:54.6826202Z  
+2025-08-20T19:30:54.6826615Z  
+2025-08-20T19:30:54.6826952Z  Success. You can now start the database server using:
+2025-08-20T19:30:54.6827396Z  
+2025-08-20T19:30:54.6827735Z      pg_ctl -D /var/lib/postgresql/data -l logfile start
+2025-08-20T19:30:54.6828177Z  
+2025-08-20T19:30:54.6829106Z  waiting for server to start....2025-08-20 19:29:51.065 UTC [48] LOG:  starting PostgreSQL 15.14 (Debian 15.14-1.pgdg13+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+2025-08-20T19:30:54.6830409Z  2025-08-20 19:29:51.066 UTC [48] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2025-08-20T19:30:54.6831232Z  2025-08-20 19:29:51.070 UTC [51] LOG:  database system was shut down at 2025-08-20 19:29:50 UTC
+2025-08-20T19:30:54.6832145Z  2025-08-20 19:29:51.074 UTC [48] LOG:  database system is ready to accept connections
+2025-08-20T19:30:54.6832682Z   done
+2025-08-20T19:30:54.6832941Z  server started
+2025-08-20T19:30:54.6833205Z  CREATE DATABASE
+2025-08-20T19:30:54.6833379Z  
+2025-08-20T19:30:54.6833517Z  
+2025-08-20T19:30:54.6833812Z  /usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+2025-08-20T19:30:54.6834168Z  
+2025-08-20T19:30:54.6834479Z  waiting for server to shut down...2025-08-20 19:29:51.283 UTC [48] LOG:  received fast shutdown request
+2025-08-20T19:30:54.6834940Z  .2025-08-20 19:29:51.284 UTC [48] LOG:  aborting any active transactions
+2025-08-20T19:30:54.6835433Z  2025-08-20 19:29:51.286 UTC [48] LOG:  background worker "logical replication launcher" (PID 54) exited with exit code 1
+2025-08-20T19:30:54.6835885Z  2025-08-20 19:29:51.287 UTC [49] LOG:  shutting down
+2025-08-20T19:30:54.6836661Z  2025-08-20 19:29:51.408 UTC [1] LOG:  starting PostgreSQL 15.14 (Debian 15.14-1.pgdg13+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+2025-08-20T19:30:54.6837272Z  2025-08-20 19:29:51.409 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2025-08-20T19:30:54.6837669Z  2025-08-20 19:29:51.409 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+2025-08-20T19:30:54.6838104Z  2025-08-20 19:29:51.409 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2025-08-20T19:30:54.6838804Z  2025-08-20 19:29:51.412 UTC [64] LOG:  database system was shut down at 2025-08-20 19:29:51 UTC
+2025-08-20T19:30:54.6839238Z  2025-08-20 19:29:51.418 UTC [1] LOG:  database system is ready to accept connections
+2025-08-20T19:30:54.6839614Z  2025-08-20 19:30:00.400 UTC [75] FATAL:  role "root" does not exist
+2025-08-20T19:30:54.6839947Z  2025-08-20 19:30:10.464 UTC [83] FATAL:  role "root" does not exist
+2025-08-20T19:30:54.6840263Z  2025-08-20 19:30:20.527 UTC [91] FATAL:  role "root" does not exist
+2025-08-20T19:30:54.6840590Z  2025-08-20 19:30:30.593 UTC [100] FATAL:  role "root" does not exist
+2025-08-20T19:30:54.6840915Z  2025-08-20 19:30:40.661 UTC [108] FATAL:  role "root" does not exist
+2025-08-20T19:30:54.6841375Z  2025-08-20 19:30:50.503 UTC [110] ERROR:  relation "users" does not exist
+2025-08-20T19:30:54.6841691Z  2025-08-20 19:30:50.503 UTC [110] STATEMENT:  
+2025-08-20T19:30:54.6841941Z  	                ALTER TABLE users 
+2025-08-20T19:30:54.6842202Z  	                ADD COLUMN is_google_user BOOLEAN DEFAULT FALSE
+2025-08-20T19:30:54.6842470Z  	            
+2025-08-20T19:30:54.6842696Z  2025-08-20 19:30:50.730 UTC [118] FATAL:  role "root" does not exist
+2025-08-20T19:30:54.6843047Z  2025-08-20 19:30:50.850 UTC [110] ERROR:  relation "users" does not exist
+2025-08-20T19:30:54.6843355Z  2025-08-20 19:30:50.850 UTC [110] STATEMENT:  
+2025-08-20T19:30:54.6843599Z  	                ALTER TABLE users 
+2025-08-20T19:30:54.6843854Z  	                ADD COLUMN is_google_user BOOLEAN DEFAULT FALSE
+2025-08-20T19:30:54.6844102Z  	            
+2025-08-20T19:30:54.6844332Z  2025-08-20 19:30:51.160 UTC [110] ERROR:  relation "users" does not exist
+2025-08-20T19:30:54.6844642Z  2025-08-20 19:30:51.160 UTC [110] STATEMENT:  
+2025-08-20T19:30:54.6844898Z  	                ALTER TABLE users 
+2025-08-20T19:30:54.6845164Z  	                ADD COLUMN is_google_user BOOLEAN DEFAULT FALSE
+2025-08-20T19:30:54.6845424Z  	            
+2025-08-20T19:30:54.6845668Z  2025-08-20 19:30:51.195 UTC [110] ERROR:  relation "users" does not exist
+2025-08-20T19:30:54.6845991Z  2025-08-20 19:30:51.195 UTC [110] STATEMENT:  
+2025-08-20T19:30:54.6846237Z  	                ALTER TABLE users 
+2025-08-20T19:30:54.6846665Z  	                ADD COLUMN is_google_user BOOLEAN DEFAULT FALSE
+2025-08-20T19:30:54.6846919Z  	            
+2025-08-20T19:30:54.6847155Z  2025-08-20 19:30:51.772 UTC [110] ERROR:  relation "users" does not exist
+2025-08-20T19:30:54.6847467Z  2025-08-20 19:30:51.772 UTC [110] STATEMENT:  
+2025-08-20T19:30:54.6847711Z  	                ALTER TABLE users 
+2025-08-20T19:30:54.6847961Z  	                ADD COLUMN is_google_user BOOLEAN DEFAULT FALSE
+2025-08-20T19:30:54.6848212Z  	            
+2025-08-20T19:30:54.6848434Z  2025-08-20 19:30:52.351 UTC [110] ERROR:  relation "users" does not exist
+2025-08-20T19:30:54.6848745Z  2025-08-20 19:30:52.351 UTC [110] STATEMENT:  
+2025-08-20T19:30:54.6848975Z  	                ALTER TABLE users 
+2025-08-20T19:30:54.6849222Z  	                ADD COLUMN is_google_user BOOLEAN DEFAULT FALSE
+2025-08-20T19:30:54.6849475Z  	            
+2025-08-20T19:30:54.6849693Z  2025-08-20 19:30:52.880 UTC [110] ERROR:  relation "users" does not exist
+2025-08-20T19:30:54.6849998Z  2025-08-20 19:30:52.880 UTC [110] STATEMENT:  
+2025-08-20T19:30:54.6850236Z  	                ALTER TABLE users 
+2025-08-20T19:30:54.6850473Z  	                ADD COLUMN is_google_user BOOLEAN DEFAULT FALSE
+2025-08-20T19:30:54.6850722Z  	            
+2025-08-20T19:30:54.6850943Z  2025-08-20 19:30:53.353 UTC [110] ERROR:  relation "users" does not exist
+2025-08-20T19:30:54.6851247Z  2025-08-20 19:30:53.353 UTC [110] STATEMENT:  
+2025-08-20T19:30:54.6851486Z  	                ALTER TABLE users 
+2025-08-20T19:30:54.6851723Z  	                ADD COLUMN is_google_user BOOLEAN DEFAULT FALSE
+2025-08-20T19:30:54.6851972Z  	            
+2025-08-20T19:30:54.6852188Z  2025-08-20 19:30:53.691 UTC [110] ERROR:  relation "users" does not exist
+2025-08-20T19:30:54.6852491Z  2025-08-20 19:30:53.691 UTC [110] STATEMENT:  
+2025-08-20T19:30:54.6852867Z  	                ALTER TABLE users 
+2025-08-20T19:30:54.6853106Z  	                ADD COLUMN is_google_user BOOLEAN DEFAULT FALSE
+2025-08-20T19:30:54.6853351Z  	            
+2025-08-20T19:30:54.6853574Z  2025-08-20 19:30:53.727 UTC [110] ERROR:  relation "users" does not exist
+2025-08-20T19:30:54.6853874Z  2025-08-20 19:30:53.727 UTC [110] STATEMENT:  
+2025-08-20T19:30:54.6854109Z  	                ALTER TABLE users 
+2025-08-20T19:30:54.6854346Z  	                ADD COLUMN is_google_user BOOLEAN DEFAULT FALSE
+2025-08-20T19:30:54.6854592Z  	            
+2025-08-20T19:30:54.6854820Z  2025-08-20 19:30:53.763 UTC [110] ERROR:  relation "users" does not exist
+2025-08-20T19:30:54.6855119Z  2025-08-20 19:30:53.763 UTC [110] STATEMENT:  
+2025-08-20T19:30:54.6855463Z  	                ALTER TABLE users 
+2025-08-20T19:30:54.6855708Z  	                ADD COLUMN is_google_user BOOLEAN DEFAULT FALSE
+2025-08-20T19:30:54.6855947Z  	            
+2025-08-20T19:30:54.6856189Z  2025-08-20 19:29:51.287 UTC [49] LOG:  checkpoint starting: shutdown immediate
+2025-08-20T19:30:54.6857228Z  2025-08-20 19:29:51.308 UTC [49] LOG:  checkpoint complete: wrote 922 buffers (5.6%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.017 s, sync=0.003 s, total=0.022 s; sync files=301, longest=0.001 s, average=0.001 s; distance=4239 kB, estimate=4239 kB
+2025-08-20T19:30:54.6858019Z  2025-08-20 19:29:51.317 UTC [48] LOG:  database system is shut down
+2025-08-20T19:30:54.6858295Z   done
+2025-08-20T19:30:54.6858445Z  server stopped
+2025-08-20T19:30:54.6858610Z  
+2025-08-20T19:30:54.6858819Z  PostgreSQL init process complete; ready for start up.
+2025-08-20T19:30:54.6859083Z  
+2025-08-20T19:30:54.6864413Z Stop and remove container: 7964195e740b43da88257b134d654928_postgres15_e05b21
+2025-08-20T19:30:54.6869031Z ##[command]/usr/bin/docker rm --force 101acff1e13e46b4e5d700ad2a49ac9c16fe2bf7d3763c6dd21a0812f9b01d5b
+2025-08-20T19:30:55.2302848Z 101acff1e13e46b4e5d700ad2a49ac9c16fe2bf7d3763c6dd21a0812f9b01d5b
+2025-08-20T19:30:55.2322651Z Print service container logs: b5dd1f2741e24740baad41026642ba05_redis7alpine_bb90a6
+2025-08-20T19:30:55.2323737Z ##[command]/usr/bin/docker logs --details 23074dc5014dbcb400da537f971bb155a4db391d1fa85896ed4bbd53a4aa2c42
+2025-08-20T19:30:55.2441813Z  1:C 20 Aug 2025 19:29:51.613 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+2025-08-20T19:30:55.2443341Z  1:C 20 Aug 2025 19:29:51.613 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+2025-08-20T19:30:55.2443828Z  1:C 20 Aug 2025 19:29:51.613 * Redis version=7.4.5, bits=64, commit=00000000, modified=0, pid=1, just started
+2025-08-20T19:30:55.2444525Z  1:C 20 Aug 2025 19:29:51.613 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+2025-08-20T19:30:55.2445147Z  1:M 20 Aug 2025 19:29:51.613 * monotonic clock: POSIX clock_gettime
+2025-08-20T19:30:55.2445486Z  1:M 20 Aug 2025 19:29:51.614 * Running mode=standalone, port=6379.
+2025-08-20T19:30:55.2445804Z  1:M 20 Aug 2025 19:29:51.614 * Server initialized
+2025-08-20T19:30:55.2446106Z  1:M 20 Aug 2025 19:29:51.614 * Ready to accept connections tcp
+2025-08-20T19:30:55.2452896Z Stop and remove container: b5dd1f2741e24740baad41026642ba05_redis7alpine_bb90a6
+2025-08-20T19:30:55.2453592Z ##[command]/usr/bin/docker rm --force 23074dc5014dbcb400da537f971bb155a4db391d1fa85896ed4bbd53a4aa2c42
+2025-08-20T19:30:55.3533455Z 23074dc5014dbcb400da537f971bb155a4db391d1fa85896ed4bbd53a4aa2c42
+2025-08-20T19:30:55.3555746Z Remove container network: github_network_6babc8a2ce824d2e9ee7efb85dacd322
+2025-08-20T19:30:55.3560387Z ##[command]/usr/bin/docker network rm github_network_6babc8a2ce824d2e9ee7efb85dacd322
+2025-08-20T19:30:55.4754114Z github_network_6babc8a2ce824d2e9ee7efb85dacd322
