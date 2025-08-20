@@ -21,6 +21,14 @@ from app.models.asset import Asset, Price
 from app.models.index import IndexValue, Allocation
 from app.models.portfolio import Portfolio
 
+# Import modular test factories
+from tests.factories import (
+    UserFactory,
+    AssetFactory,
+    PortfolioFactory,
+    StrategyFactory
+)
+
 
 # Test database configuration
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
@@ -77,13 +85,12 @@ def client(test_db_session) -> Generator[TestClient, None, None]:
 
 @pytest.fixture
 def test_user(test_db_session) -> User:
-    """Create a test user."""
+    """Create a test user using factory."""
+    user_data = UserFactory.create_user_data()
     user = User(
-        email="test@example.com",
-        username="testuser",
-        hashed_password=get_password_hash("TestPassword123!"),
-        is_active=True,
-        is_superuser=False
+        email=user_data["email"],
+        password_hash=get_password_hash(user_data["password"]),
+        is_google_user=user_data["is_google_user"]
     )
     test_db_session.add(user)
     test_db_session.commit()
@@ -93,13 +100,15 @@ def test_user(test_db_session) -> User:
 
 @pytest.fixture
 def admin_user(test_db_session) -> User:
-    """Create an admin user."""
-    user = User(
+    """Create an admin user using factory."""
+    admin_data = UserFactory.create_user_data(
         email="admin@example.com",
-        username="admin",
-        hashed_password=get_password_hash("AdminPassword123!"),
-        is_active=True,
-        is_superuser=True
+        password="AdminPassword123!"
+    )
+    user = User(
+        email=admin_data["email"],
+        password_hash=get_password_hash(admin_data["password"]),
+        is_google_user=False
     )
     test_db_session.add(user)
     test_db_session.commit()
@@ -123,15 +132,17 @@ def admin_auth_headers(admin_user) -> dict:
 
 @pytest.fixture
 def sample_assets(test_db_session) -> list[Asset]:
-    """Create sample assets for testing."""
-    assets = [
-        Asset(symbol="AAPL", name="Apple Inc.", asset_type="stock", sector="Technology"),
-        Asset(symbol="GOOGL", name="Alphabet Inc.", asset_type="stock", sector="Technology"),
-        Asset(symbol="MSFT", name="Microsoft Corp.", asset_type="stock", sector="Technology"),
-        Asset(symbol="SPY", name="SPDR S&P 500 ETF", asset_type="etf", sector="Index"),
-    ]
-    for asset in assets:
+    """Create sample assets using factory."""
+    assets = []
+    test_symbols = [("AAPL", "Apple Inc."), ("GOOGL", "Alphabet Inc."), 
+                    ("MSFT", "Microsoft Corp."), ("SPY", "SPDR S&P 500 ETF")]
+    
+    for symbol, name in test_symbols:
+        asset_data = AssetFactory.create_asset_data(symbol=symbol, name=name)
+        asset = Asset(**asset_data)
         test_db_session.add(asset)
+        assets.append(asset)
+    
     test_db_session.commit()
     return assets
 
@@ -168,14 +179,16 @@ def sample_prices(test_db_session, sample_assets) -> list[Price]:
 
 @pytest.fixture
 def sample_portfolio(test_db_session, test_user, sample_assets) -> Portfolio:
-    """Create a sample portfolio for testing."""
-    portfolio = Portfolio(
-        user_id=test_user.id,
+    """Create a sample portfolio using factory."""
+    portfolio_data = PortfolioFactory.create_portfolio_data(
         name="Test Portfolio",
-        initial_value=Decimal("100000.00"),
-        strategy="moderate",
-        created_at=datetime.now()
+        user_id=test_user.id,
+        total_value=100000.00
     )
+    # Add strategy config from factory
+    portfolio_data["strategy_config"] = StrategyFactory.create_strategy_config()
+    
+    portfolio = Portfolio(**portfolio_data)
     test_db_session.add(portfolio)
     test_db_session.commit()
     test_db_session.refresh(portfolio)

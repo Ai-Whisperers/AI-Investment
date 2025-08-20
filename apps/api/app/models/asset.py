@@ -25,13 +25,13 @@ class Asset(Base):
     name = Column(String, nullable=True)
     sector = Column(String, nullable=True)
 
-    # Relationships - commented out until news feature is fully implemented
-    # news_articles = relationship(
-    #     "NewsArticle",
-    #     secondary="asset_news",
-    #     back_populates="assets",
-    #     overlaps="assets",
-    # )
+    # Relationships
+    news_articles = relationship(
+        "NewsArticle",
+        secondary="asset_news",
+        back_populates="assets",
+        overlaps="assets",
+    )
 
     def __repr__(self):
         return f"<Asset(symbol='{self.symbol}', name='{self.name}')>"
