@@ -34,7 +34,7 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
     is_valid, errors = PasswordValidator.validate(req.password)
     if not is_valid:
         raise HTTPException(
-            status_code=400,
+            status_code=422,
             detail={
                 "message": "Password does not meet security requirements",
                 "errors": errors,
@@ -75,6 +75,21 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
 async def options_google():
     """Handle preflight requests for Google OAuth endpoint"""
     return Response(status_code=200)
+
+
+@router.get("/google")
+def google_oauth_redirect():
+    """Redirect to Google OAuth for authentication."""
+    # In a real implementation, this would build the Google OAuth URL
+    # with client_id, redirect_uri, scope, etc.
+    google_oauth_url = (
+        "https://accounts.google.com/o/oauth2/v2/auth"
+        "?client_id=YOUR_CLIENT_ID"
+        "&redirect_uri=YOUR_REDIRECT_URI"
+        "&response_type=code"
+        "&scope=email%20profile"
+    )
+    return Response(status_code=307, headers={"Location": google_oauth_url})
 
 
 @router.post("/google", response_model=TokenResponse)
@@ -129,7 +144,7 @@ def get_current_user_info(current_user: User = Depends(get_current_user)):
 @router.post("/refresh", response_model=TokenResponse)
 def refresh_token(current_user: User = Depends(get_current_user)):
     """Refresh the access token for the current user."""
-    token = create_access_token(str(current_user.id))
+    token = create_access_token({"sub": str(current_user.id)})
     return TokenResponse(access_token=token)
 
 

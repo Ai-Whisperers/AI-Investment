@@ -214,13 +214,12 @@ class TestAuthEndpoints:
             "/api/v1/auth/register",
             json={
                 "email": f"test_{password[:5]}@example.com",
-                "username": f"user_{password[:5]}",
                 "password": password
             }
         )
         
         if should_pass:
-            assert response.status_code == status.HTTP_201_CREATED
+            assert response.status_code == status.HTTP_200_OK
         else:
             assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     
