@@ -8,13 +8,25 @@ Waardhaven AutoIndex is a production-ready investment portfolio management syste
 - **Frontend**: Next.js 14, React 18, TypeScript, Tailwind CSS, Recharts
 - **Infrastructure**: Docker, Render.com deployment, GitHub Actions CI/CD
 - **Package Manager**: npm (standardized across monorepo)
-- **Testing**: pytest (backend), 10 test files with comprehensive coverage
+- **Testing**: pytest (backend - 78 tests), Jest (frontend - configured), modular test architecture
 
 ## Project Structure
 ```
 waardhaven-autoindex/
 ├── apps/
 │   ├── api/          # FastAPI backend
+│   │   ├── app/
+│   │   │   ├── services/
+│   │   │   │   ├── performance_modules/  # Performance calculations
+│   │   │   │   ├── strategy_modules/     # Strategy implementations
+│   │   │   │   └── news_modules/         # News processing
+│   │   │   └── models/
+│   │   └── tests/
+│   │       ├── factories/   # Modular test data generators
+│   │       ├── helpers/     # Test utilities and adapters
+│   │       ├── unit/        # Unit tests (78 tests)
+│   │       ├── integration/ # Integration tests
+│   │       └── contract/    # API contract tests
 │   └── web/          # Next.js frontend (Clean Architecture)
 │       └── app/
 │           ├── core/           # Clean Architecture layers
@@ -23,7 +35,11 @@ waardhaven-autoindex/
 │           │   ├── infrastructure/# API clients, repositories
 │           │   └── presentation/  # React components, hooks
 │           ├── services/api/   # Direct API service calls
-│           └── components/     # Shared UI components
+│           ├── components/     # Shared UI components
+│           └── __tests__/     # Frontend tests
+│               ├── components/ # Component tests
+│               ├── hooks/      # Hook tests
+│               └── utils/      # Test utilities
 ├── docs/             # Comprehensive documentation
 └── turbo.json        # Turborepo configuration
 ```
@@ -41,6 +57,12 @@ cd apps/web && npx tsc --noEmit
 
 # Python linting (available tools: black, flake8, mypy, ruff)
 cd apps/api && ruff check .
+
+# Testing commands
+cd apps/api && python -m pytest tests/unit -v  # Backend unit tests
+cd apps/api && python -m pytest --cov=app      # Backend with coverage
+cd apps/web && npm test                        # Frontend tests
+cd apps/web && npm run test:coverage           # Frontend with coverage
 ```
 
 ## Recently Implemented Features (2025-01-17)
@@ -126,19 +148,46 @@ Component/
 - ✅ **Deployment Ready**: Render.com deployment auth issues resolved
 
 ## Testing
+
+### Backend Testing (78 tests collected)
 ```bash
 # Run all tests
-npm run test:api
+cd apps/api && python -m pytest
 
 # Run with coverage
-npm run test:api:coverage
+cd apps/api && python -m pytest --cov=app --cov-report=html
 
 # Run only unit tests
-npm run test:api:unit
+cd apps/api && python -m pytest tests/unit -v
 
 # Run only integration tests
-npm run test:api:integration
+cd apps/api && python -m pytest tests/integration
+
+# Run specific test file
+cd apps/api && python -m pytest tests/unit/services/test_return_calculator.py
 ```
+
+### Frontend Testing
+```bash
+# Run all tests
+cd apps/web && npm test
+
+# Run tests in watch mode
+cd apps/web && npm run test:watch
+
+# Run with coverage
+cd apps/web && npm run test:coverage
+
+# Run tests in CI mode
+cd apps/web && npm run test:ci
+```
+
+### Test Infrastructure
+- **Backend**: pytest with modular factories (78 tests collected)
+- **Frontend**: Jest with React Testing Library (configured)
+- **Coverage targets**: Backend 95%, Frontend 80%
+- **Test categories**: unit, integration, contract, smoke, financial
+- **Test architecture**: Modular design avoiding god objects
 
 ## Redis & Caching
 - Automatic caching of frequently accessed data

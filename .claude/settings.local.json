@@ -45,7 +45,8 @@
       "Bash(git remote add:*)",
       "Bash(git branch:*)",
       "WebFetch(domain:nextjs.org)",
-      "WebFetch(domain:www.typescriptlang.org)"
+      "WebFetch(domain:www.typescriptlang.org)",
+      "Bash(npm test:*)"
     ],
     "deny": [],
     "ask": [],
