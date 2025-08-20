@@ -83,6 +83,32 @@ cd apps/web && npm run test:coverage           # Frontend with coverage
 
 ## Latest Updates (2025-01-20)
 
+### 🔧 Dependency Management Fixed
+**Issue**: GitHub Actions failing due to dependency version conflicts
+**Resolution**: Complete overhaul of dependency management system
+
+#### Changes Made:
+- **Fixed numpy conflict**: Changed from `==2.0.1` to `>=1.23.2,<1.28.0` for scipy compatibility
+- **Removed tavern**: Incompatible with pytest>=7.4.0, removed from test dependencies
+- **Added Dependabot**: Automated weekly dependency updates with security focus
+- **Enhanced CI/CD**: Better dependency caching and conflict detection
+- **Added packaging>=22.0**: Fixed black formatting tool compatibility
+
+#### Current Test Status:
+- ✅ Dependencies installing successfully  
+- ✅ Test framework executing properly
+- ⚠️ Some tests still failing (working on fixes)
+
+#### Code Issues Fixed (2025-01-20):
+1. ✅ **Settings.ALGORITHM**: Changed to use `settings.JWT_ALGORITHM` in security.py
+2. ✅ **create_access_token signature**: Fixed to pass `{"sub": user_id}` dict
+3. ✅ **User model fields**: Fixed tests to use `email` and `password_hash` correctly
+4. ✅ **User.is_active**: Added missing `is_active` field to User model
+5. ✅ **Database migrations**: Added SQLite skip for test environment
+6. ✅ **Import paths**: Fixed imports from utils.security to core.security
+
+## Latest Updates (2025-01-20)
+
 ### ✅ Production-Ready Financial Calculations
 **Issue**: Financial calculations were simplified approximations not suitable for production
 **Resolution**: Implemented proper algorithms using scipy optimization

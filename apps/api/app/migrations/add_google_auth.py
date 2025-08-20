@@ -7,6 +7,11 @@ from sqlalchemy import text
 
 def upgrade(engine):
     """Add is_google_user column to users table."""
+    # Skip migration for SQLite test database
+    if "sqlite" in str(engine.url):
+        print("Skipping Google auth migration for SQLite database")
+        return
+        
     with engine.connect() as conn:
         # Check if column already exists
         result = conn.execute(

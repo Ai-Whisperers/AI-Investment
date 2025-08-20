@@ -8,7 +8,7 @@ from ..schemas.auth import (
     TokenResponse,
     GoogleAuthRequest,
 )
-from ..utils.security import get_password_hash, verify_password, create_access_token
+from ..core.security import get_password_hash, verify_password, create_access_token
 from ..utils.password_validator import PasswordValidator
 from ..utils.token_dep import get_current_user
 
@@ -53,7 +53,7 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
     db.refresh(user)
 
     # Generate token
-    token = create_access_token(str(user.id))
+    token = create_access_token({"sub": str(user.id)})
     return TokenResponse(access_token=token)
 
 
@@ -102,7 +102,7 @@ def google_auth(req: GoogleAuthRequest, db: Session = Depends(get_db)):
         db.commit()
 
     # Generate token
-    token = create_access_token(str(user.id))
+    token = create_access_token({"sub": str(user.id)})
     return TokenResponse(access_token=token)
 
 

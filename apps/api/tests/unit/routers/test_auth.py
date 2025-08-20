@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from jose import jwt
 
 from app.core.config import settings
-from app.utils.security import create_access_token, verify_password
+from app.core.security import create_access_token, verify_password, get_password_hash
 from app.models.user import User
 
 
@@ -102,8 +102,8 @@ class TestAuthEndpoints:
         """Test login with non-existent user."""
         response = client.post(
             "/api/v1/auth/login",
-            data={
-                "username": "nonexistent@example.com",
+            json={
+                "email": "nonexistent@example.com",
                 "password": "Password123!"
             }
         )
@@ -112,14 +112,10 @@ class TestAuthEndpoints:
     
     def test_login_inactive_user(self, client, test_db_session):
         """Test login with inactive user."""
-        from app.models.user import User
-        from app.core.security import get_password_hash
-        
         # Create inactive user
         inactive_user = User(
             email="inactive@example.com",
-            username="inactive",
-            hashed_password=get_password_hash("Password123!"),
+            password_hash=get_password_hash("Password123!"),
             is_active=False
         )
         test_db_session.add(inactive_user)
@@ -127,8 +123,8 @@ class TestAuthEndpoints:
         
         response = client.post(
             "/api/v1/auth/login",
-            data={
-                "username": "inactive@example.com",
+            json={
+                "email": "inactive@example.com",
                 "password": "Password123!"
             }
         )

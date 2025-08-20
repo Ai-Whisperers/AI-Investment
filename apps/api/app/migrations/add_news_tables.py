@@ -12,6 +12,11 @@ logger = logging.getLogger(__name__)
 
 def create_news_tables():
     """Create news-related tables if they don't exist."""
+    
+    # Skip migration for SQLite test database
+    if "sqlite" in str(engine.url):
+        logger.info("Skipping news tables migration for SQLite database")
+        return
 
     with engine.begin() as conn:
         # Check if tables already exist
