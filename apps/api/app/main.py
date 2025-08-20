@@ -15,6 +15,7 @@ from .routers import (
     strategy,
     background,
     news,
+    portfolio_calculations,
 )
 from .core.config import settings
 import time
@@ -235,3 +236,4 @@ app.include_router(manual_refresh.router, prefix="/api/v1/manual", tags=["manual
 app.include_router(strategy.router, prefix="/api/v1/strategy", tags=["strategy"])
 app.include_router(background.router, prefix="/api/v1/background", tags=["background"])
 app.include_router(news.router, prefix="/api/v1", tags=["news"])
+app.include_router(portfolio_calculations.router, prefix="/api/v1/portfolio", tags=["portfolio"])

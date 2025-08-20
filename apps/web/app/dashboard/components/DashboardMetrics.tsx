@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { type RiskMetric } from '../../services/api';
+import { type RiskMetric, portfolioService } from '../../services/api';
 
 type SeriesPoint = { date: string; value: number };
 
@@ -19,25 +19,69 @@ export const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
   simResult,
   currency
 }) => {
-  const calculateReturns = (series: SeriesPoint[]) => {
+  const [indexReturns, setIndexReturns] = useState({ daily: 0, monthly: 0, yearly: 0, total: 0 });
+  const [spReturns, setSpReturns] = useState({ daily: 0, monthly: 0, yearly: 0, total: 0 });
+  const [loading, setLoading] = useState(false);
+
+  const calculateReturnsWithAPI = async (series: SeriesPoint[]) => {
     if (series.length < 2) return { daily: 0, monthly: 0, yearly: 0, total: 0 };
     
-    const latest = series[series.length - 1];
-    const yesterday = series[series.length - 2];
-    const monthAgo = series.find((_, i) => i === Math.max(0, series.length - 30));
-    const yearAgo = series.find((_, i) => i === Math.max(0, series.length - 252));
-    const first = series[0];
-    
-    return {
-      daily: yesterday ? ((latest.value - yesterday.value) / yesterday.value) * 100 : 0,
-      monthly: monthAgo ? ((latest.value - monthAgo.value) / monthAgo.value) * 100 : 0,
-      yearly: yearAgo ? ((latest.value - yearAgo.value) / yearAgo.value) * 100 : 0,
-      total: ((latest.value - first.value) / first.value) * 100
-    };
+    try {
+      const latest = series[series.length - 1];
+      const yesterday = series[series.length - 2];
+      const monthAgo = series.find((_, i) => i === Math.max(0, series.length - 30));
+      const yearAgo = series.find((_, i) => i === Math.max(0, series.length - 252));
+      const first = series[0];
+      
+      // Use API for total return calculation
+      const total = await portfolioService.calculateTotalReturn(first.value, latest.value);
+      
+      // Calculate period returns using API
+      const daily = yesterday ? await portfolioService.calculateTotalReturn(yesterday.value, latest.value) : 0;
+      const monthly = monthAgo ? await portfolioService.calculateTotalReturn(monthAgo.value, latest.value) : 0;
+      const yearly = yearAgo ? await portfolioService.calculateTotalReturn(yearAgo.value, latest.value) : 0;
+      
+      return { daily, monthly, yearly, total };
+    } catch (error) {
+      console.error('Error calculating returns:', error);
+      // Fallback to local calculation if API fails
+      const latest = series[series.length - 1];
+      const yesterday = series[series.length - 2];
+      const monthAgo = series.find((_, i) => i === Math.max(0, series.length - 30));
+      const yearAgo = series.find((_, i) => i === Math.max(0, series.length - 252));
+      const first = series[0];
+      
+      return {
+        daily: yesterday ? ((latest.value - yesterday.value) / yesterday.value) * 100 : 0,
+        monthly: monthAgo ? ((latest.value - monthAgo.value) / monthAgo.value) * 100 : 0,
+        yearly: yearAgo ? ((latest.value - yearAgo.value) / yearAgo.value) * 100 : 0,
+        total: ((latest.value - first.value) / first.value) * 100
+      };
+    }
   };
 
-  const indexReturns = calculateReturns(indexSeries);
-  const spReturns = calculateReturns(spSeries);
+  // Calculate returns when series data changes
+  useEffect(() => {
+    const updateReturns = async () => {
+      if (indexSeries.length > 0 || spSeries.length > 0) {
+        setLoading(true);
+        try {
+          const [indexReturnsCalc, spReturnsCalc] = await Promise.all([
+            calculateReturnsWithAPI(indexSeries),
+            calculateReturnsWithAPI(spSeries)
+          ]);
+          setIndexReturns(indexReturnsCalc);
+          setSpReturns(spReturnsCalc);
+        } catch (error) {
+          console.error('Error updating returns:', error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    updateReturns();
+  }, [indexSeries, spSeries]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

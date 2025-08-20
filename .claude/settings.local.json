@@ -48,7 +48,9 @@
       "WebFetch(domain:www.typescriptlang.org)",
       "Bash(npm test:*)",
       "Bash(git pull:*)",
-      "Bash(touch:*)"
+      "Bash(touch:*)",
+      "Bash(npm run lint)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": [],

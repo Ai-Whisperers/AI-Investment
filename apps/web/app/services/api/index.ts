@@ -39,6 +39,8 @@ export type {
 
 export type { RiskMetric, StrategyConfig } from './strategy';
 
+export type { PerformanceMetrics } from './portfolio';
+
 export type {
   RefreshResponse,
   SmartRefreshOptions
