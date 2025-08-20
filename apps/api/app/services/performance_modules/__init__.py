@@ -11,6 +11,8 @@ from .performance_tracker import PerformanceTracker
 # Legacy imports for backward compatibility
 from .risk_metrics import RiskMetricsCalculator as PerformanceCalculator
 
+# Functions from parent performance.py will be imported separately to avoid circular imports
+
 # Re-export commonly used constants
 RISK_FREE_RATE = DEFAULT_RISK_FREE_RATE
 

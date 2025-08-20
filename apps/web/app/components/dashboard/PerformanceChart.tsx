@@ -1,3 +1,3 @@
 // Re-export the modularized PerformanceChart component
-export { PerformanceChart as default } from './PerformanceChart';
-export * from './PerformanceChart';
+export { default, default as PerformanceChart } from './PerformanceChart/index';
+export * from './PerformanceChart/index';

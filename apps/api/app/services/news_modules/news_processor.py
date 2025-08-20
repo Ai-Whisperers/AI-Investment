@@ -7,10 +7,10 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 
-from ..news import NewsArticle as NewsArticleModel
-from ..news import NewsSentiment as NewsSentimentModel
-from ..news import NewsEntity as NewsEntityModel
-from ..news import NewsSource as NewsSourceModel
+from ...models.news import NewsArticle as NewsArticleModel
+from ...models.news import NewsSentiment as NewsSentimentModel
+from ...models.news import NewsEntity as NewsEntityModel
+from ...models.news import NewsSource as NewsSourceModel
 from .sentiment_analyzer import SentimentAnalyzer
 from .entity_extractor import EntityExtractor, ExtractedEntity
 

@@ -14,10 +14,10 @@ from ..models.index import IndexValue, Allocation
 from ..core.config import settings
 
 # Import modular components
-from .strategy.data_validator import DataValidator
-from .strategy.weight_calculator import WeightCalculator
-from .strategy.risk_calculator import RiskCalculator
-from .strategy.portfolio_optimizer import PortfolioOptimizer
+from .strategy_modules.data_validator import DataValidator
+from .strategy_modules.weight_calculator import WeightCalculator
+from .strategy_modules.risk_calculator import RiskCalculator
+from .strategy_modules.portfolio_optimizer import PortfolioOptimizer
 
 logger = logging.getLogger(__name__)
 

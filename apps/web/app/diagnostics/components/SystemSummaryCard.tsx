@@ -29,7 +29,7 @@ export const SystemSummaryCard: React.FC<SystemSummaryCardProps> = ({
     
     if (refreshStatus) {
       total++;
-      if (refreshStatus.data_freshness === 'fresh') score++;
+      if (refreshStatus.data_freshness?.status === 'fresh') score++;
     }
     
     if (total === 0) return 'unknown';
@@ -118,9 +118,9 @@ export const SystemSummaryCard: React.FC<SystemSummaryCardProps> = ({
         
         <div className="text-center">
           <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-2 ${
-            refreshStatus?.data_freshness === 'fresh'
+            refreshStatus?.data_freshness?.status === 'fresh'
               ? 'bg-green-500/20 text-green-400'
-              : refreshStatus?.data_freshness === 'stale'
+              : refreshStatus?.data_freshness?.status === 'stale'
               ? 'bg-yellow-500/20 text-yellow-400'
               : 'bg-red-500/20 text-red-400'
           }`}>
@@ -130,8 +130,8 @@ export const SystemSummaryCard: React.FC<SystemSummaryCardProps> = ({
           </div>
           <p className="text-sm font-medium text-white">Data Refresh</p>
           <p className="text-xs text-white/60">
-            {refreshStatus?.data_freshness === 'fresh' ? 'Fresh' : 
-             refreshStatus?.data_freshness === 'stale' ? 'Stale' : 'No Data'}
+            {refreshStatus?.data_freshness?.status === 'fresh' ? 'Fresh' : 
+             refreshStatus?.data_freshness?.status === 'stale' ? 'Stale' : 'No Data'}
           </p>
         </div>
       </div>

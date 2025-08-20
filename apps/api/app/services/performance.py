@@ -7,7 +7,7 @@ from typing import Dict, List, Optional
 from sqlalchemy.orm import Session
 import logging
 
-from .performance import (
+from .performance_modules import (
     PerformanceTracker,
     PerformanceCalculator,  # Legacy alias for RiskMetricsCalculator
     TRADING_DAYS_PER_YEAR,

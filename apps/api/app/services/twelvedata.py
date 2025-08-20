@@ -379,3 +379,29 @@ class TwelveDataService:
             'remaining_credits': self.rate_limiter.get_remaining_credits(),
             'credits_per_minute': self.rate_limiter.credits_per_minute
         }
+
+    def get_exchange_rate(self, from_currency: str, to_currency: str) -> float:
+        """
+        Get exchange rate between two currencies.
+        Wrapper for get_forex_rate for backward compatibility.
+        
+        Args:
+            from_currency: Source currency code
+            to_currency: Target currency code
+            
+        Returns:
+            Exchange rate
+        """
+        rate = self.get_forex_rate(from_currency, to_currency)
+        if rate is None:
+            raise ValueError(f"Failed to get exchange rate for {from_currency}/{to_currency}")
+        return rate
+
+
+# Create singleton instance
+_service_instance = TwelveDataService()
+
+# Export functions for backward compatibility
+def get_exchange_rate(from_currency: str, to_currency: str) -> float:
+    """Module-level function for backward compatibility."""
+    return _service_instance.get_exchange_rate(from_currency, to_currency)

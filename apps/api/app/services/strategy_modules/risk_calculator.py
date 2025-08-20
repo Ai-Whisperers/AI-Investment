@@ -196,80 +196,71 @@ class RiskCalculator:
             return 0.0
 
         return aligned['r1'].corr(aligned['r2'])
-
+    
     @staticmethod
     def calculate_var(
-        returns: pd.Series, 
-        confidence_level: float = 0.95
+        returns: pd.Series,
+        confidence_level: float = 0.95,
+        periods: int = 1
     ) -> float:
         """
         Calculate Value at Risk (VaR).
-
+        
         Args:
             returns: Series of returns
             confidence_level: Confidence level (e.g., 0.95 for 95%)
-
+            periods: Number of periods for VaR calculation
+            
         Returns:
-            VaR value
+            VaR as a positive number (potential loss)
         """
-        if len(returns) < 20:  # Need sufficient data
+        if len(returns) < 2:
             return 0.0
-
-        # Calculate percentile
-        var_percentile = (1 - confidence_level) * 100
-        return np.percentile(returns, var_percentile)
-
+        
+        # Calculate the percentile
+        alpha = 1 - confidence_level
+        var = np.percentile(returns, alpha * 100)
+        
+        # Scale by number of periods
+        if periods > 1:
+            var = var * np.sqrt(periods)
+        
+        return abs(var)  # Return as positive number
+    
     @staticmethod
     def calculate_cvar(
-        returns: pd.Series, 
-        confidence_level: float = 0.95
+        returns: pd.Series,
+        confidence_level: float = 0.95,
+        periods: int = 1
     ) -> float:
         """
-        Calculate Conditional Value at Risk (CVaR).
-
+        Calculate Conditional Value at Risk (CVaR) / Expected Shortfall.
+        
         Args:
             returns: Series of returns
             confidence_level: Confidence level
-
+            periods: Number of periods
+            
         Returns:
-            CVaR value
+            CVaR as a positive number
         """
-        var = RiskCalculator.calculate_var(returns, confidence_level)
+        if len(returns) < 2:
+            return 0.0
         
-        # Calculate mean of returns worse than VaR
-        tail_returns = returns[returns <= var]
+        # Calculate VaR threshold
+        var = RiskCalculator.calculate_var(returns, confidence_level, 1)
+        
+        # Get returns worse than VaR
+        tail_returns = returns[returns <= -var]
         
         if len(tail_returns) == 0:
             return var
         
-        return tail_returns.mean()
-
-    @staticmethod
-    def calculate_information_ratio(
-        portfolio_returns: pd.Series,
-        benchmark_returns: pd.Series
-    ) -> float:
-        """
-        Calculate Information Ratio.
-
-        Args:
-            portfolio_returns: Portfolio return series
-            benchmark_returns: Benchmark return series
-
-        Returns:
-            Information ratio
-        """
-        if len(portfolio_returns) < 2 or len(benchmark_returns) < 2:
-            return 0.0
-
-        # Calculate excess returns
-        excess_returns = portfolio_returns - benchmark_returns
-
-        # Annualize
-        annual_excess_return = (1 + excess_returns.mean()) ** 252 - 1
-        tracking_error = excess_returns.std() * np.sqrt(252)
-
-        if tracking_error == 0:
-            return 0.0
-
-        return annual_excess_return / tracking_error
+        # Calculate mean of tail returns
+        cvar = abs(tail_returns.mean())
+        
+        # Scale by periods
+        if periods > 1:
+            cvar = cvar * np.sqrt(periods)
+        
+        return cvar

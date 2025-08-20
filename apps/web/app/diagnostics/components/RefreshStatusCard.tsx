@@ -78,14 +78,14 @@ export const RefreshStatusCard: React.FC<RefreshStatusCardProps> = ({
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold text-white">Refresh Status</h2>
         <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-          status.data_freshness === 'fresh' 
+          status.data_freshness?.status === 'fresh' 
             ? 'bg-green-500/20 text-green-400' 
-            : status.data_freshness === 'stale'
+            : status.data_freshness?.status === 'stale'
             ? 'bg-yellow-500/20 text-yellow-400'
             : 'bg-red-500/20 text-red-400'
         }`}>
-          {status.data_freshness === 'fresh' ? 'Fresh Data' : 
-           status.data_freshness === 'stale' ? 'Stale Data' : 'No Data'}
+          {status.data_freshness?.status === 'fresh' ? 'Fresh Data' : 
+           status.data_freshness?.status === 'stale' ? 'Stale Data' : 'No Data'}
         </div>
       </div>
       

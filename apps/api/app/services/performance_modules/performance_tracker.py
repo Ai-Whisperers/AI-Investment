@@ -3,7 +3,7 @@ Performance tracking and database operations.
 Orchestrates performance calculations and persists metrics to database.
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 from datetime import date, timedelta
 from sqlalchemy.orm import Session
 import logging

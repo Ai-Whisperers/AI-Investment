@@ -118,7 +118,7 @@ function DashboardContent() {
             
             {showAdvancedAnalytics && (
               <div className="mt-6">
-                <AdvancedAnalytics />
+                <AdvancedAnalytics allocations={allocations} />
               </div>
             )}
           </div>

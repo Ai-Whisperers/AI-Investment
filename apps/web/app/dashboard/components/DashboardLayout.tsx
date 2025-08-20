@@ -33,7 +33,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         </motion.div>
 
         <div className="flex flex-wrap gap-4 mb-6">
-          <SmartRefresh onRefresh={onRefresh} isRefreshing={refreshing} />
+          <SmartRefresh onRefresh={onRefresh} />
           
           <button
             onClick={() => setShowAdvancedAnalytics(!showAdvancedAnalytics)}

@@ -43,7 +43,9 @@
       "Bash(gh run view:*)",
       "Bash(ruff check:*)",
       "Bash(git remote add:*)",
-      "Bash(git branch:*)"
+      "Bash(git branch:*)",
+      "WebFetch(domain:nextjs.org)",
+      "WebFetch(domain:www.typescriptlang.org)"
     ],
     "deny": [],
     "ask": [],

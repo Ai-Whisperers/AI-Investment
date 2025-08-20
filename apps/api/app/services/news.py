@@ -21,10 +21,10 @@ from ..providers.news import MarketauxProvider, NewsSearchParams
 from ..core.redis_client import get_redis_client
 
 # Import modular components
-from .news.sentiment_analyzer import SentimentAnalyzer
-from .news.entity_extractor import EntityExtractor
-from .news.news_aggregator import NewsAggregator
-from .news.news_processor import NewsProcessor
+from .news_modules.sentiment_analyzer import SentimentAnalyzer
+from .news_modules.entity_extractor import EntityExtractor
+from .news_modules.news_aggregator import NewsAggregator
+from .news_modules.news_processor import NewsProcessor
 
 logger = logging.getLogger(__name__)
 

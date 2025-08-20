@@ -12,6 +12,8 @@ export interface TableInfo {
 
 export interface DatabaseStatus {
   timestamp: string;
+  connected?: boolean;
+  database_name?: string;
   tables: {
     users: TableInfo;
     assets: TableInfo;
@@ -35,18 +37,37 @@ export interface RefreshStatus {
     needs_update: boolean;
   };
   recommendation: string;
+  last_attempt?: string;
+  last_successful?: string;
+  last_status?: string;
+  last_error?: string;
+  assets_updated?: number;
+  prices_added?: number;
+  data_freshness?: {
+    hours: number;
+    status: 'fresh' | 'stale' | 'outdated';
+  };
 }
 
 export interface CacheStatus {
   timestamp: string;
   status: 'connected' | 'disconnected' | 'error';
   message: string;
+  connected?: boolean;
+  total_requests?: number;
+  hits?: number;
+  misses?: number;
+  keys?: number;
+  memory_usage?: string;
+  cache_by_type?: Record<string, number>;
   stats?: {
     total_entries: number;
     memory_usage?: string;
+    memory_used?: string;
     hit_rate?: number;
     miss_rate?: number;
     keys_by_prefix?: Record<string, number>;
+    prefixes?: Record<string, number>;
   };
   error?: string;
 }
