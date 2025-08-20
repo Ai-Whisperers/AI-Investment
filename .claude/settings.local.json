@@ -47,7 +47,8 @@
       "WebFetch(domain:nextjs.org)",
       "WebFetch(domain:www.typescriptlang.org)",
       "Bash(npm test:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(touch:*)"
     ],
     "deny": [],
     "ask": [],
