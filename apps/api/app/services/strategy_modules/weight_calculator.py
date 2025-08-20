@@ -124,53 +124,56 @@ class WeightCalculator:
     
     @staticmethod
     def calculate_market_cap_weights(
-        assets: List[str],
         market_caps: Dict[str, float]
     ) -> Dict[str, float]:
         """
         Calculate market cap weighted allocation.
         
         Args:
-            assets: List of asset symbols
             market_caps: Dictionary of market caps
             
         Returns:
             Dictionary of weights
         """
-        if not assets or not market_caps:
-            return {asset: 1.0/len(assets) for asset in assets} if assets else {}
+        if not market_caps:
+            return {}
         
-        # Get market caps for requested assets
-        caps = {asset: market_caps.get(asset, 0) for asset in assets}
-        total_cap = sum(caps.values())
+        total_cap = sum(market_caps.values())
         
         if total_cap == 0:
-            return {asset: 1.0/len(assets) for asset in assets}
+            return {asset: 1.0/len(market_caps) for asset in market_caps}
         
-        return {asset: cap/total_cap for asset, cap in caps.items()}
+        return {asset: cap/total_cap for asset, cap in market_caps.items()}
     
     @staticmethod
     def calculate_risk_parity_weights(
-        assets: List[str],
-        returns: pd.DataFrame,
+        data: pd.DataFrame,
         lookback: int = 60
     ) -> Dict[str, float]:
         """
         Calculate risk parity weights (inverse volatility).
         
         Args:
-            assets: List of asset symbols
-            returns: DataFrame of returns
+            data: DataFrame of prices or returns
             lookback: Lookback period for volatility
             
         Returns:
             Dictionary of weights
         """
-        if not assets or returns.empty:
-            return {asset: 1.0/len(assets) for asset in assets} if assets else {}
+        if data.empty:
+            return {}
+        
+        # Convert prices to returns if needed
+        if (data > 0).all().all():  # Likely prices
+            returns = data.pct_change().dropna()
+        else:
+            returns = data
         
         # Calculate volatilities
-        vols = returns[assets].tail(lookback).std()
+        vols = returns.tail(lookback).std()
+        
+        # Handle zero volatility
+        vols = vols.replace(0, 1e-10)
         
         # Inverse volatility weighting
         inv_vols = 1.0 / vols
@@ -180,33 +183,38 @@ class WeightCalculator:
     
     @staticmethod
     def calculate_minimum_variance_weights(
-        assets: List[str],
-        returns: pd.DataFrame,
+        data: pd.DataFrame,
         lookback: int = 60
     ) -> Dict[str, float]:
         """
         Calculate minimum variance portfolio weights using optimization.
         
         Args:
-            assets: List of asset symbols
-            returns: DataFrame of returns
+            data: DataFrame of prices or returns
             lookback: Lookback period
             
         Returns:
             Dictionary of weights
         """
-        if not assets or returns.empty:
-            return {asset: 1.0/len(assets) for asset in assets} if assets else {}
+        if data.empty:
+            return {}
         
         try:
             from scipy.optimize import minimize
             
+            # Convert prices to returns if needed
+            if (data > 0).all().all():  # Likely prices
+                returns = data.pct_change().dropna()
+            else:
+                returns = data
+            
             # Get returns for the specified assets
-            asset_returns = returns[assets].tail(lookback)
+            asset_returns = returns.tail(lookback)
             
             # Calculate covariance matrix
             cov_matrix = asset_returns.cov().values
-            n_assets = len(assets)
+            n_assets = len(data.columns)
+            assets = data.columns.tolist()
             
             # Objective function: portfolio variance
             def portfolio_variance(weights):
@@ -238,10 +246,10 @@ class WeightCalculator:
                 
         except ImportError:
             logger.warning("scipy not available, using risk parity as proxy")
-            return WeightCalculator.calculate_risk_parity_weights(assets, returns, lookback)
+            return WeightCalculator.calculate_risk_parity_weights(data, lookback)
         except Exception as e:
             logger.error(f"Error in minimum variance optimization: {e}")
-            return {asset: 1.0/len(assets) for asset in assets}
+            return {asset: 1.0/n_assets for asset in data.columns}
     
     @staticmethod
     def calculate_maximum_sharpe_weights(
@@ -321,38 +329,36 @@ class WeightCalculator:
     
     @staticmethod
     def calculate_momentum_weights(
-        assets: List[str],
-        prices: pd.DataFrame,
+        data: pd.DataFrame,
         lookback: int = 20
     ) -> Dict[str, float]:
         """
         Calculate momentum-based weights.
         
         Args:
-            assets: List of asset symbols
-            prices: DataFrame of prices
+            data: DataFrame of prices
             lookback: Momentum lookback period
             
         Returns:
             Dictionary of weights
         """
-        if not assets or prices.empty:
-            return {asset: 1.0/len(assets) for asset in assets} if assets else {}
+        if data.empty or len(data) < lookback:
+            return {}
         
         # Calculate momentum (price change over lookback)
-        momentum = (prices[assets].iloc[-1] / prices[assets].iloc[-lookback] - 1)
+        momentum = (data.iloc[-1] / data.iloc[-lookback] - 1)
         
         # Only use positive momentum
         positive_momentum = momentum[momentum > 0]
         
         if positive_momentum.empty:
-            return {asset: 1.0/len(assets) for asset in assets}
+            return {asset: 1.0/len(data.columns) for asset in data.columns}
         
         # Weight by relative momentum
         weights = positive_momentum / positive_momentum.sum()
         
         # Fill zeros for negative momentum assets
-        result = {asset: 0.0 for asset in assets}
+        result = {asset: 0.0 for asset in data.columns}
         result.update(weights.to_dict())
         
         return result
@@ -495,3 +501,109 @@ class WeightCalculator:
             weights = weights / weights.sum()
 
         return weights
+    
+    @staticmethod
+    def calculate_weights(
+        data: pd.DataFrame,
+        method: str = 'equal'
+    ) -> Dict[str, float]:
+        """
+        Calculate weights using specified method.
+        
+        Args:
+            data: DataFrame of prices
+            method: Weight calculation method
+            
+        Returns:
+            Dictionary of weights
+        """
+        if data.empty:
+            raise ValueError("Empty data")
+        
+        if method == 'equal':
+            return {asset: 1.0/len(data.columns) for asset in data.columns}
+        elif method == 'momentum':
+            return WeightCalculator.calculate_momentum_weights(data)
+        elif method == 'volatility':
+            return WeightCalculator.calculate_risk_parity_weights(data)
+        else:
+            raise ValueError(f"Unknown method: {method}")
+    
+    @staticmethod
+    def calculate_volatility_adjusted_weights(
+        volatilities: Dict[str, float]
+    ) -> Dict[str, float]:
+        """
+        Calculate inverse volatility weights.
+        
+        Args:
+            volatilities: Dictionary of asset volatilities
+            
+        Returns:
+            Dictionary of weights
+        """
+        if not volatilities:
+            return {}
+        
+        # Inverse volatility weighting
+        inv_vols = {asset: 1.0/vol for asset, vol in volatilities.items()}
+        total = sum(inv_vols.values())
+        
+        if total == 0:
+            return {asset: 1.0/len(volatilities) for asset in volatilities}
+        
+        return {asset: iv/total for asset, iv in inv_vols.items()}
+    
+    @staticmethod
+    def calculate_rebalancing_trades(
+        current_weights: Dict[str, float],
+        target_weights: Dict[str, float],
+        portfolio_value: float
+    ) -> Dict[str, float]:
+        """
+        Calculate trades needed to rebalance portfolio.
+        
+        Args:
+            current_weights: Current portfolio weights
+            target_weights: Target portfolio weights
+            portfolio_value: Total portfolio value
+            
+        Returns:
+            Dictionary of trade amounts
+        """
+        trades = {}
+        
+        for asset in set(current_weights.keys()) | set(target_weights.keys()):
+            current = current_weights.get(asset, 0.0)
+            target = target_weights.get(asset, 0.0)
+            trades[asset] = (target - current) * portfolio_value
+        
+        return trades
+    
+    @staticmethod
+    def calculate_position_sizes(
+        weights: Dict[str, float],
+        total_value: float,
+        min_position_size: float = 0
+    ) -> Dict[str, float]:
+        """
+        Calculate position sizes with minimum thresholds.
+        
+        Args:
+            weights: Dictionary of weights
+            total_value: Total portfolio value
+            min_position_size: Minimum position size
+            
+        Returns:
+            Dictionary of position sizes
+        """
+        positions = {}
+        
+        for asset, weight in weights.items():
+            position = weight * total_value
+            if position < min_position_size:
+                positions[asset] = 0
+            else:
+                positions[asset] = position
+        
+        return positions

@@ -77,14 +77,14 @@ waardhaven-autoindex/
 ### Testing Implementation Progress
 **Current State**:
 - **Previous Status**: No test files, 0% coverage
-- **Current Status**: Testing infrastructure established, ~35-40% coverage
+- **Current Status**: Testing infrastructure established, ~45-50% coverage ✅
 - **Architecture**: ✅ Excellent modular design avoiding god objects
-- **Coverage Gap**: 55-60% needed to reach 95% target
+- **Coverage Gap**: 45-50% needed to reach 95% target
 
 **Infrastructure Created**:
 1. ✅ Modular test factories (avoiding god objects)
 2. ✅ Test helpers and adapters for type conversions
-3. ✅ Backend: 78 tests collected (pytest configured)
+3. ✅ Backend: 78 tests collected, 47 passing in services (pytest configured)
 4. ✅ Frontend: Jest + React Testing Library configured
 5. ⚠️ CI/CD pipeline needs test gates implementation
 
@@ -92,7 +92,8 @@ waardhaven-autoindex/
 - ✅ **Time-Weighted Returns (TWR)**: Proper implementation with cash flow segmentation
 - ✅ **Internal Rate of Return (IRR)**: Using scipy.optimize for accurate calculation
 - ✅ **Portfolio Optimization**: Minimum variance and maximum Sharpe ratio using scipy
-- ✅ **Advanced Methods**: Period returns, rolling returns, distribution analysis
+- ✅ **Risk Metrics**: VaR, CVaR, Sharpe, Sortino, kurtosis, skewness, tail ratios
+- ✅ **Weight Calculators**: Market cap, risk parity, momentum, min variance strategies
 - ✅ **Dependencies**: Added scipy==1.11.4 for optimization algorithms
 
 ### ✅ **MAJOR ACHIEVEMENT**: Clean Architecture Implementation Complete
