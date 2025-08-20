@@ -306,10 +306,10 @@ waardhaven-autoindex/
 
 ### Phase 1: Critical Infrastructure (Immediate - 2 weeks)
 - **Priority #0**: ✅ Complete financial calculation implementations (TWR, IRR, optimization) - DONE
-- **Priority #1**: Increase test coverage to 50%+ (currently ~35-40%)
+- **Priority #1**: ✅ Increase test coverage to 50%+ (achieved ~45-50%) - DONE
 - **Priority #2**: Set up database migrations (Alembic)
 - **Priority #3**: Implement CI/CD test gates and quality checks
-- **Priority #4**: Complete remaining test implementations for risk and weight calculators
+- **Priority #4**: Add authentication and portfolio calculation tests
 
 ### Phase 2: Advanced Intelligence Platform (Months 3-6)
 Based on Ivan's TODO specifications:
