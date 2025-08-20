@@ -50,6 +50,16 @@ def test_db_engine():
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
     )
+    
+    # Enable foreign key constraints for SQLite
+    if "sqlite" in SQLALCHEMY_DATABASE_URL:
+        from sqlalchemy import event
+        @event.listens_for(engine, "connect")
+        def set_sqlite_pragma(dbapi_connection, connection_record):
+            cursor = dbapi_connection.cursor()
+            cursor.execute("PRAGMA foreign_keys=ON")
+            cursor.close()
+    
     Base.metadata.create_all(bind=engine)
     yield engine
     Base.metadata.drop_all(bind=engine)
@@ -86,11 +96,12 @@ def client(test_db_session) -> Generator[TestClient, None, None]:
 @pytest.fixture
 def test_user(test_db_session) -> User:
     """Create a test user using factory."""
-    user_data = UserFactory.create_user_data()
+    user_data = UserFactory.create_user_data(email="test@example.com")
     user = User(
         email=user_data["email"],
         password_hash=get_password_hash(user_data["password"]),
-        is_google_user=user_data["is_google_user"]
+        is_google_user=user_data["is_google_user"],
+        is_active=True
     )
     test_db_session.add(user)
     test_db_session.commit()
@@ -108,7 +119,8 @@ def admin_user(test_db_session) -> User:
     user = User(
         email=admin_data["email"],
         password_hash=get_password_hash(admin_data["password"]),
-        is_google_user=False
+        is_google_user=False,
+        is_active=True
     )
     test_db_session.add(user)
     test_db_session.commit()
@@ -119,14 +131,14 @@ def admin_user(test_db_session) -> User:
 @pytest.fixture
 def auth_headers(test_user) -> dict:
     """Create authentication headers for test user."""
-    access_token = create_access_token(data={"sub": test_user.email})
+    access_token = create_access_token({"sub": str(test_user.id)})
     return {"Authorization": f"Bearer {access_token}"}
 
 
 @pytest.fixture
 def admin_auth_headers(admin_user) -> dict:
     """Create authentication headers for admin user."""
-    access_token = create_access_token(data={"sub": admin_user.email})
+    access_token = create_access_token({"sub": str(admin_user.id)})
     return {"Authorization": f"Bearer {access_token}"}
 
 

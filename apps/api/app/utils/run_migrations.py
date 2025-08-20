@@ -161,8 +161,12 @@ def run_index_migration():
 def run_google_auth_migration():
     """Add Google OAuth support to users table."""
     try:
+        # Skip for SQLite test databases
+        if "sqlite" in str(engine.url):
+            logger.info("Skipping Google auth migration for SQLite database")
+            return True
+            
         from ..migrations.add_google_auth import upgrade
-
         upgrade(engine)
         return True
     except Exception as e:

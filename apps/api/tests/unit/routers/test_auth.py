@@ -159,7 +159,7 @@ class TestAuthEndpoints:
         """Test with expired token."""
         # Create token that expires immediately
         expired_token = create_access_token(
-            data={"sub": test_user.email},
+            {"sub": str(test_user.id)},
             expires_delta=timedelta(seconds=-1)
         )
         

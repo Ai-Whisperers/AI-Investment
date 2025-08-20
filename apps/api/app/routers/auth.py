@@ -62,7 +62,12 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == req.email).first()
     if not user or not verify_password(req.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    token = create_access_token(str(user.id))
+    
+    # Check if user is active
+    if not user.is_active:
+        raise HTTPException(status_code=401, detail="User account is inactive")
+    
+    token = create_access_token({"sub": str(user.id)})
     return TokenResponse(access_token=token)
 
 
