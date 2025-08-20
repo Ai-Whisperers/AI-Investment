@@ -19,7 +19,7 @@ coverage==7.3.2
 
 # For security testing
 safety==2.3.5
-bandit==1.7.5
+bandit==1.8.6
 
 # For performance testing
 locust==2.17.0
