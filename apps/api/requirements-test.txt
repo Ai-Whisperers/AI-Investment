@@ -1,28 +1,29 @@
 # Testing dependencies
-pip-tools==7.4.1  # For dependency compilation and management
+pip-tools>=7.4.0
+packaging>=22.0  # Fix black compatibility
 
-# Testing frameworks - Remove tavern due to version conflicts
+# Testing frameworks
 pytest>=7.4.0,<8.0.0
-pytest-asyncio==0.21.1
-pytest-cov==4.1.0
-pytest-mock==3.11.1
-pytest-env==1.0.1
-pytest-dotenv==0.5.2
-pytest-benchmark==4.0.0
-Faker==19.6.2
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+pytest-mock>=3.11.0
+pytest-env>=1.0.0
+pytest-dotenv>=0.5.0
+pytest-benchmark>=4.0.0
+Faker>=19.0.0
 
 # Additional testing utilities
-factory-boy==3.3.0
-responses==0.23.3
+factory-boy>=3.3.0
+responses>=0.23.0
 httpx==0.27.0  # Match main requirements version
-coverage==7.3.2
+coverage>=7.3.0
 
 # For security testing
-safety==2.3.5
-bandit==1.7.5
+safety>=2.3.0
+bandit>=1.7.0
 
 # For performance testing
-locust==2.17.0
+locust>=2.17.0
 
 # API testing - tavern removed due to pytest version conflict
 # Consider using httpx or pytest-httpserver for API testing instead
