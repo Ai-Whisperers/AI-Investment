@@ -8,6 +8,7 @@
 - [API Endpoints](#api-endpoints)
   - [Authentication](#authentication-endpoints)
   - [Portfolio Index](#portfolio-index-endpoints)
+  - [Portfolio Calculations](#portfolio-calculations-endpoints)
   - [Benchmark](#benchmark-endpoints)
   - [Strategy](#strategy-endpoints)
   - [News & Sentiment](#news--sentiment-endpoints)
@@ -377,6 +378,151 @@ Base path: `/api/v1/index`
   "expected_impact": 0.0012
 }
 ```
+
+### Portfolio Calculations Endpoints
+
+Base path: `/api/v1/portfolio/calculations`
+
+**NEW (2025-08-20)**: Backend calculation services replacing frontend calculations for consistency and performance.
+
+#### POST /api/v1/portfolio/calculations/returns
+**Description**: Calculate daily returns from price series  
+**Authentication**: Required  
+**Request Body**:
+```json
+{
+  "values": [100, 105, 102, 108, 110, 95, 98, 103, 107, 109]
+}
+```
+
+**Response**:
+```json
+{
+  "returns": [0.05, -0.0286, 0.0588, 0.0185, -0.1364, 0.0316, 0.0510, 0.0388, 0.0187]
+}
+```
+
+#### POST /api/v1/portfolio/calculations/total-return
+**Description**: Calculate total return between two values  
+**Authentication**: Required  
+**Request Body**:
+```json
+{
+  "start_value": 100,
+  "end_value": 109
+}
+```
+
+**Response**:
+```json
+{
+  "total_return": 9.0
+}
+```
+
+#### POST /api/v1/portfolio/calculations/annualized-return
+**Description**: Calculate annualized return from total return and period  
+**Authentication**: Required  
+**Request Body**:
+```json
+{
+  "total_return": 9.0,
+  "period_in_days": 252
+}
+```
+
+**Response**:
+```json
+{
+  "annualized_return": 9.23
+}
+```
+
+#### POST /api/v1/portfolio/calculations/volatility
+**Description**: Calculate annualized volatility from returns  
+**Authentication**: Required  
+**Request Body**:
+```json
+{
+  "returns": [0.05, -0.0286, 0.0588, 0.0185, -0.1364, 0.0316, 0.0510, 0.0388, 0.0187]
+}
+```
+
+**Response**:
+```json
+{
+  "volatility": 91.66
+}
+```
+
+#### POST /api/v1/portfolio/calculations/sharpe-ratio
+**Description**: Calculate Sharpe ratio  
+**Authentication**: Required  
+**Request Body**:
+```json
+{
+  "annualized_return": 9.23,
+  "volatility": 91.66,
+  "risk_free_rate": 2.0
+}
+```
+
+**Response**:
+```json
+{
+  "sharpe_ratio": 0.079
+}
+```
+
+#### POST /api/v1/portfolio/calculations/max-drawdown
+**Description**: Calculate maximum and current drawdown  
+**Authentication**: Required  
+**Request Body**:
+```json
+{
+  "values": [100, 105, 102, 108, 110, 95, 98, 103, 107, 109]
+}
+```
+
+**Response**:
+```json
+{
+  "max_drawdown": 13.64,
+  "current_drawdown": 0.93
+}
+```
+
+#### POST /api/v1/portfolio/calculations/portfolio-metrics
+**Description**: Calculate comprehensive portfolio performance metrics  
+**Authentication**: Required  
+**Request Body**:
+```json
+{
+  "values": [100, 105, 102, 108, 110, 95, 98, 103, 107, 109],
+  "period_in_days": 10
+}
+```
+
+**Response**:
+```json
+{
+  "metrics": {
+    "total_return": 9.0,
+    "annualized_return": 9.23,
+    "volatility": 91.66,
+    "sharpe_ratio": 0.079,
+    "max_drawdown": 13.64,
+    "current_drawdown": 0.93
+  }
+}
+```
+
+**Features**:
+- ✅ **Production Algorithms**: Using scipy for accurate financial calculations
+- ✅ **Error Handling**: Comprehensive validation and graceful error responses
+- ✅ **Consistency**: Same algorithms used across all client applications
+- ✅ **Performance**: Server-side calculations with optimized algorithms
+- ✅ **Validation**: Input validation and business rule enforcement
 
 ### Benchmark Endpoints
 
