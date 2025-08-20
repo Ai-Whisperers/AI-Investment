@@ -9,7 +9,8 @@ from datetime import datetime, timedelta
 from jose import jwt
 
 from app.core.config import settings
-from app.core.security import create_access_token, verify_password
+from app.utils.security import create_access_token, verify_password
+from app.models.user import User
 
 
 @pytest.mark.unit
@@ -17,23 +18,25 @@ from app.core.security import create_access_token, verify_password
 class TestAuthEndpoints:
     """Test authentication API endpoints."""
     
-    def test_register_new_user(self, client):
+    def test_register_new_user(self, client, test_db_session):
         """Test user registration endpoint."""
         response = client.post(
             "/api/v1/auth/register",
             json={
                 "email": "newuser@example.com",
-                "username": "newuser",
                 "password": "StrongPassword123!"
             }
         )
         
-        assert response.status_code == status.HTTP_201_CREATED
+        assert response.status_code == status.HTTP_200_OK
         data = response.json()
-        assert data["email"] == "newuser@example.com"
-        assert data["username"] == "newuser"
-        assert "id" in data
-        assert "hashed_password" not in data  # Should not expose
+        assert "access_token" in data
+        assert data["token_type"] == "bearer"
+        
+        # Verify user was created in database
+        user = test_db_session.query(User).filter(User.email == "newuser@example.com").first()
+        assert user is not None
+        assert user.email == "newuser@example.com"
     
     def test_register_duplicate_email(self, client, test_user):
         """Test registration with existing email."""
@@ -41,7 +44,6 @@ class TestAuthEndpoints:
             "/api/v1/auth/register",
             json={
                 "email": test_user.email,
-                "username": "anotheruser",
                 "password": "Password123!"
             }
         )
@@ -55,19 +57,20 @@ class TestAuthEndpoints:
             "/api/v1/auth/register",
             json={
                 "email": "weak@example.com",
-                "username": "weakuser",
                 "password": "weak"  # Too short, no complexity
             }
         )
         
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        detail = response.json()["detail"]
+        assert "Password does not meet security requirements" in detail["message"]
     
     def test_login_valid_credentials(self, client, test_user):
         """Test login with valid credentials."""
         response = client.post(
             "/api/v1/auth/login",
-            data={
-                "username": test_user.email,
+            json={
+                "email": test_user.email,
                 "password": "TestPassword123!"
             }
         )
@@ -80,20 +83,20 @@ class TestAuthEndpoints:
         # Verify token is valid
         token = data["access_token"]
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-        assert payload["sub"] == test_user.email
+        assert payload["sub"] == str(test_user.id)
     
     def test_login_invalid_password(self, client, test_user):
         """Test login with wrong password."""
         response = client.post(
             "/api/v1/auth/login",
-            data={
-                "username": test_user.email,
+            json={
+                "email": test_user.email,
                 "password": "WrongPassword123!"
             }
         )
         
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
-        assert "incorrect" in response.json()["detail"].lower()
+        assert "Invalid credentials" in response.json()["detail"]
     
     def test_login_nonexistent_user(self, client):
         """Test login with non-existent user."""
