@@ -50,7 +50,7 @@ jobs:
           npm run test -- --ci --coverage --maxWorkers=2 --passWithNoTests
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           file: ${{ env.WORKING_DIR }}/coverage/lcov.info
           flags: frontend
