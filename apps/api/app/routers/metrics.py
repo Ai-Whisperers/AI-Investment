@@ -3,17 +3,18 @@ Metrics endpoints for system monitoring and performance tracking.
 Provides cache statistics, API usage metrics, and performance indicators.
 """
 
+import traceback
+from datetime import datetime
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from datetime import datetime
-import traceback
 
-from ..core.database import get_db
 from ..core.config import settings
-from ..models.user import User
-from ..utils.token_dep import get_current_user, require_admin
-from ..utils.cache_utils import CacheManager
+from ..core.database import get_db
 from ..core.redis_client import get_redis_client
+from ..models.user import User
+from ..utils.cache_utils import CacheManager
+from ..utils.token_dep import get_current_user, require_admin
 
 router = APIRouter(prefix="/metrics", tags=["metrics"])
 

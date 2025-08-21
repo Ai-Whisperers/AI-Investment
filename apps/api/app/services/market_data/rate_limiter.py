@@ -2,10 +2,9 @@
 Rate limiting module for API calls.
 """
 
-import time
 import json
 import logging
-from typing import Optional
+import time
 
 from ...core.redis_client import get_redis_client
 
@@ -22,7 +21,7 @@ class RateLimiter:
     ):
         """
         Initialize rate limiter.
-        
+
         Args:
             credits_per_minute: Maximum API credits per minute
             redis_key_prefix: Prefix for Redis keys
@@ -36,10 +35,10 @@ class RateLimiter:
     def wait_if_needed(self, credits_required: int = 1) -> float:
         """
         Wait if rate limit would be exceeded.
-        
+
         Args:
             credits_required: Number of credits required for operation
-            
+
         Returns:
             Time waited in seconds
         """
@@ -58,7 +57,7 @@ class RateLimiter:
 
         # Record new credit usage
         self._record_credit_usage(credits_required, now)
-        
+
         return wait_time
 
     def _check_redis_rate_limit(
@@ -72,20 +71,20 @@ class RateLimiter:
             usage_data = self.redis_client.get(self.redis_key)
             if usage_data:
                 self.credits_used = json.loads(usage_data)
-            
+
             # Clean up old credits
             self.credits_used = [
-                t for t in self.credits_used 
+                t for t in self.credits_used
                 if current_time - t < self.window_seconds
             ]
-            
+
             # Check if we need to wait
             if len(self.credits_used) + credits_required > self.credits_per_minute:
                 oldest_credit = min(self.credits_used)
                 return self.window_seconds - (current_time - oldest_credit) + 1
-            
+
             return 0
-            
+
         except Exception as e:
             logger.warning(f"Failed to check Redis rate limit: {e}")
             # Fall back to local rate limiting
@@ -99,7 +98,7 @@ class RateLimiter:
         """Check rate limit using local memory."""
         # Remove credits older than window
         self.credits_used = [
-            t for t in self.credits_used 
+            t for t in self.credits_used
             if current_time - t < self.window_seconds
         ]
 
@@ -130,19 +129,19 @@ class RateLimiter:
     def get_remaining_credits(self) -> int:
         """Get number of remaining credits in current window."""
         now = time.time()
-        
+
         # Clean up old credits
         self.credits_used = [
-            t for t in self.credits_used 
+            t for t in self.credits_used
             if now - t < self.window_seconds
         ]
-        
+
         return max(0, self.credits_per_minute - len(self.credits_used))
 
     def reset(self):
         """Reset rate limiter (clear all credit usage)."""
         self.credits_used = []
-        
+
         if self.redis_client.is_connected:
             try:
                 self.redis_client.delete(self.redis_key)
@@ -161,7 +160,7 @@ class BatchRateLimiter(RateLimiter):
     ):
         """
         Initialize batch rate limiter.
-        
+
         Args:
             credits_per_minute: Maximum API credits per minute
             batch_multiplier: Credit cost multiplier for batch operations
@@ -173,10 +172,10 @@ class BatchRateLimiter(RateLimiter):
     def calculate_batch_credits(self, batch_size: int) -> int:
         """
         Calculate credits required for batch operation.
-        
+
         Args:
             batch_size: Number of items in batch
-            
+
         Returns:
             Number of credits required
         """
@@ -186,10 +185,10 @@ class BatchRateLimiter(RateLimiter):
     def wait_for_batch(self, batch_size: int) -> float:
         """
         Wait if needed for batch operation.
-        
+
         Args:
             batch_size: Number of items in batch
-            
+
         Returns:
             Time waited in seconds
         """

@@ -1,12 +1,14 @@
-from fastapi import APIRouter, Depends, BackgroundTasks
-from sqlalchemy.orm import Session
-from sqlalchemy import func
-from datetime import datetime
-from ..core.database import get_db
-from ..models.index import IndexValue
-from ..models.asset import Price
 import logging
 import traceback
+from datetime import datetime
+
+from fastapi import APIRouter, BackgroundTasks, Depends
+from sqlalchemy import func
+from sqlalchemy.orm import Session
+
+from ..core.database import get_db
+from ..models.asset import Price
+from ..models.index import IndexValue
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -133,11 +135,12 @@ def minimal_data_refresh(db: Session = Depends(get_db)):
     Perform a minimal refresh with just a few days of data for testing.
     """
     try:
-        from ..services.refresh import ensure_assets
-        from ..services.twelvedata import fetch_prices
+        from datetime import date, timedelta
+
         from ..models.asset import Asset, Price
         from ..models.index import IndexValue
-        from datetime import date, timedelta
+        from ..services.refresh import ensure_assets
+        from ..services.twelvedata import fetch_prices
 
         results = {"timestamp": datetime.utcnow().isoformat(), "steps": []}
 

@@ -4,27 +4,29 @@ News service for handling news data and sentiment analysis.
 
 import logging
 from datetime import datetime, timedelta
-from typing import List, Optional, Dict, Any
-from sqlalchemy.orm import Session
-from sqlalchemy import func, desc
+from typing import Any
 
+from sqlalchemy import desc
+from sqlalchemy.orm import Session
+
+from ..core.redis_client import get_redis_client
+from ..models.asset import Asset
 from ..models.news import (
     NewsArticle as NewsArticleModel,
-    NewsSentiment as NewsSentimentModel,
-    NewsEntity as NewsEntityModel,
-    NewsSource as NewsSourceModel,
-    EntitySentimentHistory,
-    asset_news_association,
 )
-from ..models.asset import Asset
+from ..models.news import (
+    NewsEntity as NewsEntityModel,
+)
+from ..models.news import (
+    NewsSentiment as NewsSentimentModel,
+)
 from ..providers.news import MarketauxProvider, NewsSearchParams
-from ..core.redis_client import get_redis_client
-
-# Import modular components
-from .news_modules.sentiment_analyzer import SentimentAnalyzer
 from .news_modules.entity_extractor import EntityExtractor
 from .news_modules.news_aggregator import NewsAggregator
 from .news_modules.news_processor import NewsProcessor
+
+# Import modular components
+from .news_modules.sentiment_analyzer import SentimentAnalyzer
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +38,7 @@ class NewsService:
         self.db = db
         self.provider = MarketauxProvider()
         self.redis_client = get_redis_client()
-        
+
         # Initialize components
         self._init_components()
 
@@ -44,31 +46,31 @@ class NewsService:
         """Initialize modular components."""
         # Get known symbols for entity extraction
         known_symbols = self._get_known_symbols()
-        
+
         # Initialize components
         self.sentiment_analyzer = SentimentAnalyzer()
         self.entity_extractor = EntityExtractor(known_symbols)
         self.news_aggregator = NewsAggregator()
         self.news_processor = NewsProcessor(self.db, known_symbols)
 
-    def _get_known_symbols(self) -> Dict[str, str]:
+    def _get_known_symbols(self) -> dict[str, str]:
         """Get mapping of known symbols to company names."""
         assets = self.db.query(Asset).all()
         return {asset.symbol: asset.name for asset in assets}
 
     def search_news(
         self,
-        symbols: Optional[List[str]] = None,
-        keywords: Optional[str] = None,
-        sentiment_min: Optional[float] = None,
-        sentiment_max: Optional[float] = None,
-        published_after: Optional[datetime] = None,
-        published_before: Optional[datetime] = None,
+        symbols: list[str] | None = None,
+        keywords: str | None = None,
+        sentiment_min: float | None = None,
+        sentiment_max: float | None = None,
+        published_after: datetime | None = None,
+        published_before: datetime | None = None,
         limit: int = 50,
         offset: int = 0,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Search for news articles in database and fetch new ones if needed."""
-        
+
         # First, check database
         query = self.db.query(NewsArticleModel)
 
@@ -116,7 +118,7 @@ class NewsService:
         # Convert to response format
         return [self._article_to_dict(article) for article in articles]
 
-    def get_article(self, article_id: str) -> Optional[Dict[str, Any]]:
+    def get_article(self, article_id: str) -> dict[str, Any] | None:
         """Get a specific article by ID."""
         article = (
             self.db.query(NewsArticleModel)
@@ -126,14 +128,14 @@ class NewsService:
         return self._article_to_dict(article) if article else None
 
     def get_sentiment_analysis(
-        self, 
-        symbol: str, 
+        self,
+        symbol: str,
         days: int = 30
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Get sentiment analysis for a symbol."""
         # Calculate sentiment history
         history = self.news_processor.calculate_entity_sentiment_history(symbol, days)
-        
+
         # Get current sentiment from recent articles
         recent_articles = (
             self.db.query(NewsArticleModel)
@@ -144,7 +146,7 @@ class NewsService:
             )
             .all()
         )
-        
+
         current_sentiment = 0.0
         if recent_articles:
             sentiments = [
@@ -165,10 +167,10 @@ class NewsService:
         }
 
     def get_trending_entities(
-        self, 
-        entity_type: Optional[str] = None, 
+        self,
+        entity_type: str | None = None,
         limit: int = 20
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Get trending entities from news."""
         # Get recent articles
         recent_articles = (
@@ -176,44 +178,44 @@ class NewsService:
             .filter(NewsArticleModel.published_at >= datetime.now() - timedelta(days=7))
             .all()
         )
-        
+
         # Convert to dict format
         articles_data = [self._article_to_dict(a) for a in recent_articles]
-        
+
         # Use aggregator to find trending
         aggregated = self.news_aggregator.aggregate_by_symbol(
             articles_data,
             self._get_known_symbols().keys()
         )
-        
+
         # Calculate trending scores
         trending = []
         for symbol, symbol_articles in aggregated.items():
             if len(symbol_articles) < 2:
                 continue
-            
+
             # Calculate metrics
             sentiment_scores = []
             for article in symbol_articles:
                 if article.get('sentiment'):
                     sentiment_scores.append(article['sentiment']['sentiment_score'])
-            
+
             avg_sentiment = self.sentiment_analyzer.calculate_aggregate_sentiment(sentiment_scores)
-            
+
             # Get most recent article time
             recent_time = max(
                 datetime.fromisoformat(a['published_at'].replace('Z', '+00:00'))
                 for a in symbol_articles
             )
             recency_hours = (datetime.now() - recent_time).total_seconds() / 3600
-            
+
             # Calculate trending score
             score = self.news_aggregator.calculate_trending_score(
                 len(symbol_articles),
                 avg_sentiment,
                 recency_hours
             )
-            
+
             trending.append({
                 'symbol': symbol,
                 'name': self._get_known_symbols().get(symbol, symbol),
@@ -221,12 +223,12 @@ class NewsService:
                 'average_sentiment': avg_sentiment,
                 'trend_score': score
             })
-        
+
         # Sort by trend score and return top results
         trending.sort(key=lambda x: x['trend_score'], reverse=True)
         return trending[:limit]
 
-    def refresh_news(self, symbols: Optional[List[str]] = None) -> Dict[str, Any]:
+    def refresh_news(self, symbols: list[str] | None = None) -> dict[str, Any]:
         """Refresh news data for specified symbols."""
         if not symbols:
             # Get top assets by default
@@ -246,7 +248,7 @@ class NewsService:
                 news_data = self.provider.fetch_news(
                     NewsSearchParams(symbols=[symbol], limit=20)
                 )
-                
+
                 if news_data and news_data.get("data"):
                     # Process articles
                     processed = self.news_processor.process_batch(
@@ -254,13 +256,13 @@ class NewsService:
                         extract_entities=True,
                         analyze_sentiment=True
                     )
-                    
+
                     # Store in database
                     for article in processed:
                         result = self.news_processor.store_processed_article(article)
                         if result:
                             articles_processed += 1
-                            
+
             except Exception as e:
                 logger.error(f"Failed to refresh news for {symbol}: {e}")
                 errors.append(f"{symbol}: {str(e)}")
@@ -272,28 +274,28 @@ class NewsService:
             "errors": errors
         }
 
-    def _fetch_and_store_news(self, symbols: List[str], limit: int):
+    def _fetch_and_store_news(self, symbols: list[str], limit: int):
         """Fetch and store news from provider."""
         for symbol in symbols:
             try:
                 news_data = self.provider.fetch_news(
                     NewsSearchParams(symbols=[symbol], limit=limit)
                 )
-                
+
                 if news_data and news_data.get("data"):
                     processed = self.news_processor.process_batch(
                         news_data["data"],
                         extract_entities=True,
                         analyze_sentiment=True
                     )
-                    
+
                     for article in processed:
                         self.news_processor.store_processed_article(article)
-                        
+
             except Exception as e:
                 logger.error(f"Failed to fetch news for {symbol}: {e}")
 
-    def _article_to_dict(self, article: NewsArticleModel) -> Dict[str, Any]:
+    def _article_to_dict(self, article: NewsArticleModel) -> dict[str, Any]:
         """Convert article model to dictionary."""
         if not article:
             return None

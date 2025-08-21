@@ -2,22 +2,21 @@
 Enhanced AutoIndex strategy service with modular architecture.
 """
 
-from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Optional
 import logging
+from datetime import datetime
 
-from ..models.asset import Asset, Price
-from ..models.index import IndexValue, Allocation
+import pandas as pd
+from sqlalchemy.orm import Session
+
 from ..core.config import settings
+from ..models.asset import Asset, Price
+from ..models.index import Allocation, IndexValue
 
 # Import modular components
 from .strategy_modules.data_validator import DataValidator
-from .strategy_modules.weight_calculator import WeightCalculator
-from .strategy_modules.risk_calculator import RiskCalculator
 from .strategy_modules.portfolio_optimizer import PortfolioOptimizer
+from .strategy_modules.risk_calculator import RiskCalculator
+from .strategy_modules.weight_calculator import WeightCalculator
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +31,7 @@ class StrategyService:
         self.risk_calc = RiskCalculator()
         self.optimizer = PortfolioOptimizer(db)
 
-    def compute_index_and_allocations(self, config: Optional[Dict] = None):
+    def compute_index_and_allocations(self, config: dict | None = None):
         """
         Compute index values using dynamic weighted strategy.
 
@@ -72,7 +71,7 @@ class StrategyService:
         # Compute index values
         self._compute_index_values(prices_clean, returns, config)
 
-    def _get_default_config(self) -> Dict:
+    def _get_default_config(self) -> dict:
         """Get default strategy configuration."""
         return {
             "momentum_weight": 0.4,
@@ -113,10 +112,10 @@ class StrategyService:
         return df.pivot_table(index="date", columns="symbol", values="close").sort_index()
 
     def _compute_index_values(
-        self, 
-        prices_df: pd.DataFrame, 
-        returns: pd.DataFrame, 
-        config: Dict
+        self,
+        prices_df: pd.DataFrame,
+        returns: pd.DataFrame,
+        config: dict
     ):
         """Compute and store index values."""
         # Determine rebalance dates
@@ -135,7 +134,7 @@ class StrategyService:
             if date in rebalance_dates:
                 # Get market caps (simplified for now)
                 market_caps = self._get_market_caps(prices_df.columns, date)
-                
+
                 # Optimize portfolio
                 current_weights = self.optimizer.optimize_portfolio(
                     prices_df[:date],
@@ -143,7 +142,7 @@ class StrategyService:
                     config,
                     date
                 )
-                
+
                 # Store allocations
                 self._store_allocations(date, current_weights)
 
@@ -197,7 +196,7 @@ class StrategyService:
 
         self.db.commit()
 
-    def _store_index_values(self, index_values: List[Dict]):
+    def _store_index_values(self, index_values: list[dict]):
         """Store index values in database."""
         for entry in index_values:
             # Check if value exists
@@ -217,13 +216,13 @@ class StrategyService:
         self.db.commit()
 
     def calculate_risk_metrics(
-        self, 
+        self,
         lookback_days: int = 30
-    ) -> Dict:
+    ) -> dict:
         """Calculate comprehensive risk metrics for the index."""
         # Get index values
         index_values = self.db.query(IndexValue).order_by(IndexValue.date).all()
-        
+
         if len(index_values) < lookback_days:
             return {}
 
@@ -255,7 +254,7 @@ class StrategyService:
 
         return metrics
 
-    def trigger_rebalance(self, force: bool = False) -> Dict:
+    def trigger_rebalance(self, force: bool = False) -> dict:
         """Trigger portfolio rebalancing."""
         # Get current allocations
         latest_allocation = self.db.query(Allocation).order_by(
@@ -279,7 +278,7 @@ class StrategyService:
 
 
 # Backward compatibility function
-def compute_index_and_allocations(db: Session, config: Optional[Dict] = None):
+def compute_index_and_allocations(db: Session, config: dict | None = None):
     """Legacy function for backward compatibility."""
     service = StrategyService(db)
     service.compute_index_and_allocations(config)

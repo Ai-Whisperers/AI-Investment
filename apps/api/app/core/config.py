@@ -1,6 +1,7 @@
 import os
-from pydantic_settings import BaseSettings
+
 from pydantic import Field
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -80,4 +81,5 @@ if os.getenv("RENDER") or os.getenv("PRODUCTION"):  # Production environment
             "Admin endpoints will be vulnerable. "
             "Please set a secure token of at least 32 characters.",
             RuntimeWarning,
+            stacklevel=2,
         )

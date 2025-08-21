@@ -3,17 +3,16 @@ Health check endpoints for system monitoring.
 Provides basic health checks and system status information.
 """
 
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-from sqlalchemy import func
-from datetime import datetime
 import traceback
+from datetime import datetime
+
+from fastapi import APIRouter, Depends
+from sqlalchemy import func
+from sqlalchemy.orm import Session
 
 from ..core.database import get_db
-from ..models.asset import Asset, Price
-from ..models.index import IndexValue
-from ..utils.cache_utils import CacheManager
 from ..core.redis_client import get_redis_client
+from ..models.asset import Asset, Price
 
 router = APIRouter(prefix="/health", tags=["health"])
 
@@ -43,11 +42,11 @@ def readiness_probe(db: Session = Depends(get_db)):
     try:
         # Check database connectivity
         db.execute("SELECT 1")
-        
+
         # Check Redis connectivity
         redis_client = get_redis_client()
         redis_connected = redis_client.health_check()
-        
+
         return {
             "status": "ready",
             "database": "connected",
@@ -82,8 +81,9 @@ def test_refresh_process(db: Session = Depends(get_db)):
         })
 
         # Step 2: Test price fetching for one symbol
-        from ..services.twelvedata import fetch_prices
         from datetime import date, timedelta
+
+        from ..services.twelvedata import fetch_prices
 
         results["steps"].append({"step": "fetch_prices", "status": "starting"})
         test_symbol = "AAPL"

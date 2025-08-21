@@ -2,15 +2,15 @@
 News and sentiment API endpoints.
 """
 
+from datetime import datetime, timedelta
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from typing import List, Optional
-from datetime import datetime, timedelta
 
 from ..core.database import get_db
 from ..schemas.news import (
-    NewsArticleResponse,
     EntitySentimentResponse,
+    NewsArticleResponse,
     TrendingEntityResponse,
 )
 from ..services.news import NewsService
@@ -19,14 +19,14 @@ from ..utils.token_dep import get_current_user
 router = APIRouter(prefix="/news", tags=["news"])
 
 
-@router.get("/search", response_model=List[NewsArticleResponse])
+@router.get("/search", response_model=list[NewsArticleResponse])
 async def search_news(
-    symbols: Optional[str] = Query(None, description="Comma-separated stock symbols"),
-    keywords: Optional[str] = Query(None, description="Search keywords"),
-    sentiment_min: Optional[float] = Query(None, ge=-1, le=1),
-    sentiment_max: Optional[float] = Query(None, ge=-1, le=1),
-    published_after: Optional[datetime] = None,
-    published_before: Optional[datetime] = None,
+    symbols: str | None = Query(None, description="Comma-separated stock symbols"),
+    keywords: str | None = Query(None, description="Search keywords"),
+    sentiment_min: float | None = Query(None, ge=-1, le=1),
+    sentiment_max: float | None = Query(None, ge=-1, le=1),
+    published_after: datetime | None = None,
+    published_before: datetime | None = None,
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
@@ -72,7 +72,7 @@ async def get_article(
     return article
 
 
-@router.get("/similar/{article_id}", response_model=List[NewsArticleResponse])
+@router.get("/similar/{article_id}", response_model=list[NewsArticleResponse])
 async def get_similar_articles(
     article_id: str,
     limit: int = Query(10, ge=1, le=50),
@@ -110,9 +110,9 @@ async def get_entity_sentiment(
     return sentiment_data
 
 
-@router.get("/trending", response_model=List[TrendingEntityResponse])
+@router.get("/trending", response_model=list[TrendingEntityResponse])
 async def get_trending_entities(
-    entity_type: Optional[str] = Query(None, description="Filter by entity type"),
+    entity_type: str | None = Query(None, description="Filter by entity type"),
     limit: int = Query(20, ge=1, le=50),
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
@@ -128,7 +128,7 @@ async def get_trending_entities(
 
 @router.post("/refresh")
 async def refresh_news(
-    symbols: Optional[List[str]] = None,
+    symbols: list[str] | None = None,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):

@@ -1,14 +1,16 @@
-from sqlalchemy.orm import Session
-from sqlalchemy import func
 from datetime import date
+
 import pandas as pd
-from ..models.asset import Asset, Price
-from ..models.index import IndexValue, Allocation
+from sqlalchemy import func
+from sqlalchemy.orm import Session
+
 from ..core.config import settings
-from ..utils.cache_utils import CacheManager
-from ..providers.market_data import TwelveDataProvider
-from .strategy import compute_index_and_allocations
+from ..models.asset import Asset, Price
+from ..models.index import Allocation, IndexValue
 from ..models.strategy import StrategyConfig
+from ..providers.market_data import TwelveDataProvider
+from ..utils.cache_utils import CacheManager
+from .strategy import compute_index_and_allocations
 
 DEFAULT_ASSETS = [
     # Stocks
@@ -42,9 +44,9 @@ def ensure_assets(db: Session):
 
 
 def refresh_all(db: Session, smart_mode: bool = True):
+    import json
     import logging
     from datetime import datetime
-    import json
 
     logger = logging.getLogger(__name__)
 

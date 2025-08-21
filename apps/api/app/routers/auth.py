@@ -1,14 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
+
 from ..core.database import get_db
+from ..core.security import create_access_token, get_password_hash, verify_password
 from ..models.user import User
 from ..schemas.auth import (
-    RegisterRequest,
-    LoginRequest,
-    TokenResponse,
     GoogleAuthRequest,
+    LoginRequest,
+    RegisterRequest,
+    TokenResponse,
 )
-from ..core.security import get_password_hash, verify_password, create_access_token
 from ..utils.password_validator import PasswordValidator
 from ..utils.token_dep import get_current_user
 
@@ -62,11 +63,11 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == req.email).first()
     if not user or not verify_password(req.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    
+
     # Check if user is active
     if not user.is_active:
         raise HTTPException(status_code=401, detail="User account is inactive")
-    
+
     token = create_access_token({"sub": str(user.id)})
     return TokenResponse(access_token=token)
 

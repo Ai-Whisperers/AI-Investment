@@ -3,16 +3,17 @@ Main news processing orchestrator module.
 """
 
 import logging
-from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
+from typing import Any
+
 from sqlalchemy.orm import Session
 
 from ...models.news import NewsArticle as NewsArticleModel
-from ...models.news import NewsSentiment as NewsSentimentModel
 from ...models.news import NewsEntity as NewsEntityModel
+from ...models.news import NewsSentiment as NewsSentimentModel
 from ...models.news import NewsSource as NewsSourceModel
-from .sentiment_analyzer import SentimentAnalyzer
 from .entity_extractor import EntityExtractor, ExtractedEntity
+from .sentiment_analyzer import SentimentAnalyzer
 
 logger = logging.getLogger(__name__)
 
@@ -20,10 +21,10 @@ logger = logging.getLogger(__name__)
 class NewsProcessor:
     """Orchestrates news processing pipeline."""
 
-    def __init__(self, db: Session, known_symbols: Optional[Dict[str, str]] = None):
+    def __init__(self, db: Session, known_symbols: dict[str, str] | None = None):
         """
         Initialize news processor.
-        
+
         Args:
             db: Database session
             known_symbols: Dict mapping symbols to company names
@@ -34,23 +35,23 @@ class NewsProcessor:
 
     def process_article(
         self,
-        article_data: Dict[str, Any],
+        article_data: dict[str, Any],
         extract_entities: bool = True,
         analyze_sentiment: bool = True
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Process a single news article.
-        
+
         Args:
             article_data: Raw article data
             extract_entities: Whether to extract entities
             analyze_sentiment: Whether to analyze sentiment
-            
+
         Returns:
             Processed article data
         """
         processed = article_data.copy()
-        
+
         # Extract entities if requested
         if extract_entities:
             entities = self.entity_extractor.extract_entities(
@@ -58,7 +59,7 @@ class NewsProcessor:
                 title=article_data.get('title')
             )
             processed['entities'] = [self._entity_to_dict(e) for e in entities]
-        
+
         # Analyze sentiment if requested
         if analyze_sentiment:
             sentiment_result = self.sentiment_analyzer.analyze_article_sentiment(
@@ -67,28 +68,28 @@ class NewsProcessor:
                 content=article_data.get('content')
             )
             processed['sentiment'] = sentiment_result
-        
+
         return processed
 
     def process_batch(
         self,
-        articles: List[Dict[str, Any]],
+        articles: list[dict[str, Any]],
         extract_entities: bool = True,
         analyze_sentiment: bool = True
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Process a batch of articles.
-        
+
         Args:
             articles: List of raw article data
             extract_entities: Whether to extract entities
             analyze_sentiment: Whether to analyze sentiment
-            
+
         Returns:
             List of processed articles
         """
         processed_articles = []
-        
+
         for article in articles:
             try:
                 processed = self.process_article(
@@ -102,19 +103,19 @@ class NewsProcessor:
                 # Add article anyway but mark as processing failed
                 article['processing_error'] = str(e)
                 processed_articles.append(article)
-        
+
         return processed_articles
 
     def store_processed_article(
         self,
-        processed_article: Dict[str, Any]
-    ) -> Optional[NewsArticleModel]:
+        processed_article: dict[str, Any]
+    ) -> NewsArticleModel | None:
         """
         Store processed article in database.
-        
+
         Args:
             processed_article: Processed article data
-            
+
         Returns:
             Stored article model or None if failed
         """
@@ -123,18 +124,18 @@ class NewsProcessor:
             existing = self.db.query(NewsArticleModel).filter(
                 NewsArticleModel.external_id == processed_article.get('id')
             ).first()
-            
+
             if existing:
                 logger.debug(f"Article {processed_article.get('id')} already exists")
                 return existing
-            
+
             # Get or create source
             source_data = processed_article.get('source', {})
             source = self._get_or_create_source(
                 source_data.get('name', 'Unknown'),
                 source_data.get('url')
             )
-            
+
             # Create article
             article = NewsArticleModel(
                 external_id=processed_article.get('id'),
@@ -149,7 +150,7 @@ class NewsProcessor:
             )
             self.db.add(article)
             self.db.flush()
-            
+
             # Store sentiment if available
             sentiment_data = processed_article.get('sentiment')
             if sentiment_data:
@@ -160,7 +161,7 @@ class NewsProcessor:
                     confidence=sentiment_data.get('confidence', 0)
                 )
                 self.db.add(sentiment)
-            
+
             # Store entities if available
             for entity_data in processed_article.get('entities', []):
                 entity = NewsEntityModel(
@@ -172,10 +173,10 @@ class NewsProcessor:
                     mentions=entity_data.get('mentions', 1)
                 )
                 self.db.add(entity)
-            
+
             self.db.commit()
             return article
-            
+
         except Exception as e:
             logger.error(f"Failed to store article: {e}")
             self.db.rollback()
@@ -184,13 +185,13 @@ class NewsProcessor:
     def _get_or_create_source(
         self,
         name: str,
-        url: Optional[str] = None
+        url: str | None = None
     ) -> NewsSourceModel:
         """Get or create news source."""
         source = self.db.query(NewsSourceModel).filter(
             NewsSourceModel.name == name
         ).first()
-        
+
         if not source:
             source = NewsSourceModel(
                 name=name,
@@ -199,10 +200,10 @@ class NewsProcessor:
             )
             self.db.add(source)
             self.db.flush()
-        
+
         return source
 
-    def _entity_to_dict(self, entity: ExtractedEntity) -> Dict[str, Any]:
+    def _entity_to_dict(self, entity: ExtractedEntity) -> dict[str, Any]:
         """Convert ExtractedEntity to dictionary."""
         return {
             'symbol': entity.symbol,
@@ -213,14 +214,14 @@ class NewsProcessor:
             'sentiment_score': entity.sentiment_score
         }
 
-    def _parse_datetime(self, date_str: Any) -> Optional[datetime]:
+    def _parse_datetime(self, date_str: Any) -> datetime | None:
         """Parse datetime from various formats."""
         if not date_str:
             return None
-        
+
         if isinstance(date_str, datetime):
             return date_str
-        
+
         if isinstance(date_str, str):
             try:
                 # Try ISO format
@@ -233,27 +234,27 @@ class NewsProcessor:
                 except:
                     logger.warning(f"Could not parse date: {date_str}")
                     return None
-        
+
         return None
 
     def calculate_entity_sentiment_history(
         self,
         symbol: str,
         days: int = 30
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Calculate sentiment history for an entity.
-        
+
         Args:
             symbol: Entity symbol
             days: Number of days of history
-            
+
         Returns:
             List of daily sentiment data
         """
         end_date = datetime.now()
         start_date = end_date - timedelta(days=days)
-        
+
         # Query articles with this entity
         articles = (
             self.db.query(NewsArticleModel)
@@ -264,13 +265,13 @@ class NewsProcessor:
             )
             .all()
         )
-        
+
         # Group by day and calculate sentiment
         daily_sentiments = {}
-        
+
         for article in articles:
             date_key = article.published_at.date()
-            
+
             if date_key not in daily_sentiments:
                 daily_sentiments[date_key] = {
                     'scores': [],
@@ -279,24 +280,24 @@ class NewsProcessor:
                     'neutral': 0,
                     'count': 0
                 }
-            
+
             day_data = daily_sentiments[date_key]
-            
+
             # Get sentiment
             if article.sentiment:
                 score = article.sentiment.sentiment_score
                 label = article.sentiment.sentiment_label
-                
+
                 day_data['scores'].append(score)
                 day_data['count'] += 1
-                
+
                 if label == 'positive':
                     day_data['positive'] += 1
                 elif label == 'negative':
                     day_data['negative'] += 1
                 else:
                     day_data['neutral'] += 1
-        
+
         # Calculate daily averages
         history = []
         for date, data in sorted(daily_sentiments.items()):
@@ -308,5 +309,5 @@ class NewsProcessor:
                 'negative_count': data['negative'],
                 'neutral_count': data['neutral']
             })
-        
+
         return history

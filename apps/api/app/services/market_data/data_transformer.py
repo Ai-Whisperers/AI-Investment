@@ -3,10 +3,10 @@ Data transformation module for market data.
 """
 
 import logging
-from typing import Dict, List, Any, Optional
-from datetime import datetime, date
-import pandas as pd
+from typing import Any
+
 import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -19,23 +19,23 @@ class MarketDataTransformer:
         df: pd.DataFrame,
         symbol: str,
         include_volume: bool = True
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Transform time series DataFrame to list of price records.
-        
+
         Args:
             df: DataFrame with OHLCV data
             symbol: Stock symbol
             include_volume: Whether to include volume data
-            
+
         Returns:
             List of price dictionaries
         """
         if df.empty:
             return []
-        
+
         records = []
-        
+
         for timestamp, row in df.iterrows():
             record = {
                 'symbol': symbol,
@@ -45,24 +45,24 @@ class MarketDataTransformer:
                 'low': float(row.get('low', 0)),
                 'close': float(row.get('close', 0))
             }
-            
+
             if include_volume and 'volume' in row:
                 record['volume'] = int(row.get('volume', 0))
-            
+
             records.append(record)
-        
+
         return records
 
     @staticmethod
     def transform_quote(
-        quote_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        quote_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Transform quote data to standardized format.
-        
+
         Args:
             quote_data: Raw quote data from API
-            
+
         Returns:
             Standardized quote dictionary
         """
@@ -84,16 +84,16 @@ class MarketDataTransformer:
 
     @staticmethod
     def transform_fundamentals(
-        fundamental_data: Dict[str, Any],
+        fundamental_data: dict[str, Any],
         data_type: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Transform fundamental data to standardized format.
-        
+
         Args:
             fundamental_data: Raw fundamental data
             data_type: Type of fundamental data
-            
+
         Returns:
             Standardized fundamental dictionary
         """
@@ -108,7 +108,7 @@ class MarketDataTransformer:
                 '52_week_low': fundamental_data.get('fifty_two_week_low'),
                 'shares_outstanding': fundamental_data.get('shares_outstanding')
             }
-        
+
         elif data_type == 'dividends':
             dividends = []
             for div in fundamental_data.get('dividends', []):
@@ -118,7 +118,7 @@ class MarketDataTransformer:
                     'amount': float(div.get('amount', 0))
                 })
             return {'dividends': dividends}
-        
+
         else:
             # Return raw data for other types
             return fundamental_data
@@ -130,17 +130,17 @@ class MarketDataTransformer:
     ) -> pd.Series:
         """
         Calculate returns from price series.
-        
+
         Args:
             prices: Series of prices
             period: Period for return calculation
-            
+
         Returns:
             Series of returns
         """
         if len(prices) < period + 1:
             return pd.Series()
-        
+
         return prices.pct_change(period)
 
     @staticmethod
@@ -151,21 +151,21 @@ class MarketDataTransformer:
     ) -> pd.Series:
         """
         Calculate rolling volatility.
-        
+
         Args:
             returns: Series of returns
             window: Rolling window size
             annualize: Whether to annualize volatility
-            
+
         Returns:
             Series of volatility values
         """
         volatility = returns.rolling(window=window).std()
-        
+
         if annualize:
             # Assume 252 trading days per year
             volatility = volatility * np.sqrt(252)
-        
+
         return volatility
 
     @staticmethod
@@ -175,27 +175,27 @@ class MarketDataTransformer:
     ) -> pd.DataFrame:
         """
         Normalize prices to a base value.
-        
+
         Args:
             df: DataFrame with price data
             base_value: Base value for normalization
-            
+
         Returns:
             DataFrame with normalized prices
         """
         if df.empty:
             return df
-        
+
         normalized = df.copy()
-        
+
         # Get first valid value for each column
         first_values = normalized.iloc[0]
-        
+
         # Normalize each column
         for col in normalized.columns:
             if first_values[col] != 0:
                 normalized[col] = (normalized[col] / first_values[col]) * base_value
-        
+
         return normalized
 
     @staticmethod
@@ -205,17 +205,17 @@ class MarketDataTransformer:
     ) -> pd.DataFrame:
         """
         Aggregate OHLCV data to a different interval.
-        
+
         Args:
             df: DataFrame with OHLCV data
             target_interval: Target interval (e.g., '1W', '1M')
-            
+
         Returns:
             Aggregated DataFrame
         """
         if df.empty:
             return df
-        
+
         # Define aggregation rules
         agg_rules = {
             'open': 'first',
@@ -224,13 +224,13 @@ class MarketDataTransformer:
             'close': 'last',
             'volume': 'sum'
         }
-        
+
         # Resample based on target interval
         resampled = df.resample(target_interval).agg(agg_rules)
-        
+
         # Remove rows with all NaN values
         resampled = resampled.dropna(how='all')
-        
+
         return resampled
 
     @staticmethod
@@ -241,25 +241,25 @@ class MarketDataTransformer:
     ) -> pd.DataFrame:
         """
         Fill missing data in DataFrame.
-        
+
         Args:
             df: DataFrame with potential missing data
             method: Fill method ('ffill', 'bfill', 'interpolate')
             limit: Maximum number of consecutive NaNs to fill
-            
+
         Returns:
             DataFrame with filled data
         """
         if df.empty:
             return df
-        
+
         filled = df.copy()
-        
+
         if method == 'interpolate':
             filled = filled.interpolate(method='linear', limit=limit)
         else:
             filled = filled.fillna(method=method, limit=limit)
-        
+
         return filled
 
     @staticmethod
@@ -269,30 +269,30 @@ class MarketDataTransformer:
     ) -> pd.DataFrame:
         """
         Detect outliers in price data.
-        
+
         Args:
             df: DataFrame with price data
             n_std: Number of standard deviations for outlier threshold
-            
+
         Returns:
             DataFrame with outlier flags
         """
         if df.empty:
             return pd.DataFrame()
-        
+
         outliers = pd.DataFrame(index=df.index)
-        
+
         for col in df.columns:
             if col == 'volume':
                 continue  # Skip volume column
-            
+
             # Calculate returns
             returns = df[col].pct_change()
-            
+
             # Calculate z-scores
             z_scores = np.abs((returns - returns.mean()) / returns.std())
-            
+
             # Flag outliers
             outliers[f'{col}_outlier'] = z_scores > n_std
-        
+
         return outliers

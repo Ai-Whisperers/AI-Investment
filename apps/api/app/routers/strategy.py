@@ -2,18 +2,19 @@
 API endpoints for managing strategy configuration.
 """
 
+import logging
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import Dict
-from datetime import datetime
+
+from ..core.config import settings
 from ..core.database import get_db
+from ..models.strategy import RiskMetrics, StrategyConfig
 from ..models.user import User
-from ..models.strategy import StrategyConfig, RiskMetrics
-from ..utils.token_dep import get_current_user
 from ..schemas.validation import SecureStrategyConfig
 from ..services.refresh import refresh_all
-from ..core.config import settings
-import logging
+from ..utils.token_dep import get_current_user
 
 logger = logging.getLogger(__name__)
 
@@ -116,7 +117,7 @@ def update_strategy_config(
 
 @router.post("/config/ai-adjust")
 def ai_adjust_strategy(
-    adjustments: Dict,
+    adjustments: dict,
     reason: str,
     confidence: float,
     db: Session = Depends(get_db),

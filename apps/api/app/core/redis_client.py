@@ -1,10 +1,12 @@
 """Redis client configuration and connection management."""
 
-import redis
 import json
 import logging
-from typing import Optional, Any, Union
 from datetime import timedelta
+from typing import Any
+
+import redis
+
 from .config import settings
 
 logger = logging.getLogger(__name__)
@@ -16,7 +18,7 @@ class RedisClient:
     def __init__(self):
         """Initialize Redis client with connection pool."""
         self.redis_url = settings.REDIS_URL if hasattr(settings, "REDIS_URL") else None
-        self.client: Optional[redis.Redis] = None
+        self.client: redis.Redis | None = None
         self.is_connected = False
 
         if self.redis_url:
@@ -47,7 +49,7 @@ class RedisClient:
         else:
             logger.info("Redis URL not configured. Cache will be disabled.")
 
-    def get(self, key: str) -> Optional[Any]:
+    def get(self, key: str) -> Any | None:
         """Get value from cache."""
         if not self.is_connected:
             return None
@@ -66,7 +68,7 @@ class RedisClient:
             return None
 
     def set(
-        self, key: str, value: Any, expire: Optional[Union[int, timedelta]] = None
+        self, key: str, value: Any, expire: int | timedelta | None = None
     ) -> bool:
         """Set value in cache with optional expiration."""
         if not self.is_connected:

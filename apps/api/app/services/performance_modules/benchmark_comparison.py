@@ -3,9 +3,9 @@ Benchmark comparison metrics for portfolio performance analysis.
 Includes beta, alpha, information ratio, and correlation calculations.
 """
 
-import numpy as np
-from typing import Tuple, Optional
 import logging
+
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -22,20 +22,20 @@ class BenchmarkComparison:
     def align_returns(
         portfolio_returns: np.ndarray,
         benchmark_returns: np.ndarray
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray]:
         """
         Align portfolio and benchmark returns to same length.
-        
+
         Args:
             portfolio_returns: Portfolio return series
             benchmark_returns: Benchmark return series
-            
+
         Returns:
             Tuple of aligned (portfolio_returns, benchmark_returns)
         """
         if len(portfolio_returns) == 0 or len(benchmark_returns) == 0:
             return np.array([]), np.array([])
-        
+
         min_len = min(len(portfolio_returns), len(benchmark_returns))
         return portfolio_returns[:min_len], benchmark_returns[:min_len]
 
@@ -61,7 +61,7 @@ class BenchmarkComparison:
         portfolio_aligned, market_aligned = BenchmarkComparison.align_returns(
             portfolio_returns, market_returns
         )
-        
+
         if len(portfolio_aligned) < 2:
             return 1.0
 
@@ -83,7 +83,7 @@ class BenchmarkComparison:
     def alpha(
         portfolio_returns: np.ndarray,
         market_returns: np.ndarray,
-        beta: Optional[float] = None,
+        beta: float | None = None,
         risk_free_rate: float = DEFAULT_RISK_FREE_RATE
     ) -> float:
         """
@@ -105,7 +105,7 @@ class BenchmarkComparison:
         portfolio_aligned, market_aligned = BenchmarkComparison.align_returns(
             portfolio_returns, market_returns
         )
-        
+
         if len(portfolio_aligned) == 0:
             return 0.0
 
@@ -145,7 +145,7 @@ class BenchmarkComparison:
         portfolio_aligned, benchmark_aligned = BenchmarkComparison.align_returns(
             portfolio_returns, benchmark_returns
         )
-        
+
         if len(portfolio_aligned) == 0:
             return 0.0
 
@@ -183,17 +183,17 @@ class BenchmarkComparison:
         portfolio_aligned, benchmark_aligned = BenchmarkComparison.align_returns(
             portfolio_returns, benchmark_returns
         )
-        
+
         if len(portfolio_aligned) < 2:
             return 0.0
 
         try:
             correlation_matrix = np.corrcoef(portfolio_aligned, benchmark_aligned)
             correlation = float(correlation_matrix[0, 1])
-            
+
             if np.isnan(correlation):
                 return 0.0
-            
+
             return correlation
         except Exception as e:
             logger.warning(f"Error calculating correlation: {e}")
@@ -221,7 +221,7 @@ class BenchmarkComparison:
         portfolio_aligned, benchmark_aligned = BenchmarkComparison.align_returns(
             portfolio_returns, benchmark_returns
         )
-        
+
         if len(portfolio_aligned) == 0:
             return 0.0
 
@@ -236,7 +236,7 @@ class BenchmarkComparison:
     def treynor_ratio(
         portfolio_returns: np.ndarray,
         market_returns: np.ndarray,
-        beta: Optional[float] = None,
+        beta: float | None = None,
         risk_free_rate: float = DEFAULT_RISK_FREE_RATE
     ) -> float:
         """
@@ -292,7 +292,7 @@ class BenchmarkComparison:
         portfolio_aligned, benchmark_aligned = BenchmarkComparison.align_returns(
             portfolio_returns, benchmark_returns
         )
-        
+
         if len(portfolio_aligned) == 0:
             return 0.0
 

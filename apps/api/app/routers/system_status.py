@@ -3,17 +3,18 @@ System status endpoints for monitoring database and infrastructure state.
 Provides detailed information about database tables, data freshness, and system components.
 """
 
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-from sqlalchemy import func
-from datetime import datetime
 import traceback
+from datetime import datetime
+
+from fastapi import APIRouter, Depends
+from sqlalchemy import func
+from sqlalchemy.orm import Session
 
 from ..core.database import get_db
 from ..models.asset import Asset, Price
-from ..models.index import IndexValue, Allocation
-from ..models.user import User
+from ..models.index import Allocation, IndexValue
 from ..models.strategy import RiskMetrics
+from ..models.user import User
 
 router = APIRouter(prefix="/system", tags=["system"])
 
@@ -213,14 +214,14 @@ def get_system_summary(db: Session = Depends(get_db)):
     try:
         # Get database status
         db_status = check_database_status(db)
-        
+
         # Get data freshness
         freshness = check_data_freshness(db)
-        
+
         # Get basic counts
         user_count = db.query(func.count()).select_from(User).scalar()
         asset_count = db.query(func.count()).select_from(Asset).scalar()
-        
+
         return {
             "timestamp": datetime.utcnow().isoformat(),
             "status": "operational",
@@ -236,7 +237,7 @@ def get_system_summary(db: Session = Depends(get_db)):
                 "freshness": freshness
             }
         }
-        
+
     except Exception as e:
         return {
             "timestamp": datetime.utcnow().isoformat(),

@@ -1,18 +1,19 @@
 """Background tasks API router."""
 
+from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException
-from typing import Dict, Any, Optional
 from pydantic import BaseModel
 
-from ..utils.token_dep import get_current_user
 from ..models.user import User
 from ..tasks.background_tasks import (
-    refresh_market_data,
+    cleanup_old_data,
     compute_index,
     generate_report,
-    cleanup_old_data,
     get_task_status,
+    refresh_market_data,
 )
+from ..utils.token_dep import get_current_user
 
 router = APIRouter()
 
@@ -34,9 +35,9 @@ class RefreshRequest(BaseModel):
 class ComputeRequest(BaseModel):
     """Request model for compute task."""
 
-    momentum_weight: Optional[float] = None
-    market_cap_weight: Optional[float] = None
-    risk_parity_weight: Optional[float] = None
+    momentum_weight: float | None = None
+    market_cap_weight: float | None = None
+    risk_parity_weight: float | None = None
 
 
 class ReportRequest(BaseModel):
@@ -144,13 +145,13 @@ def trigger_cleanup_task(
 @router.get("/status/{task_id}")
 def get_task_result(
     task_id: str, user: User = Depends(get_current_user)
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Get the status and result of a background task."""
     return get_task_status(task_id)
 
 
 @router.get("/active")
-def get_active_tasks(user: User = Depends(get_current_user)) -> Dict[str, Any]:
+def get_active_tasks(user: User = Depends(get_current_user)) -> dict[str, Any]:
     """Get list of active tasks."""
     try:
         from ..core.celery_app import celery_app

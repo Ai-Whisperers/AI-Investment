@@ -2,18 +2,15 @@
 Portfolio optimization and rebalancing logic.
 """
 
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Optional, Tuple
-from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
 import logging
+from datetime import datetime
 
-from ...models.asset import Asset, Price
-from ...models.index import Allocation
+import pandas as pd
+from sqlalchemy.orm import Session
+
 from .data_validator import DataValidator
-from .weight_calculator import WeightCalculator
 from .risk_calculator import RiskCalculator
+from .weight_calculator import WeightCalculator
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +28,7 @@ class PortfolioOptimizer:
         self,
         prices_df: pd.DataFrame,
         market_caps: pd.Series,
-        strategy_config: Dict,
+        strategy_config: dict,
         current_date: datetime
     ) -> pd.Series:
         """
@@ -53,7 +50,7 @@ class PortfolioOptimizer:
 
         # Calculate returns
         returns = prices_df.pct_change().dropna()
-        
+
         # Clean returns
         returns = self.validator.cap_returns(returns)
         returns = self.validator.detect_outliers(returns)
@@ -64,9 +61,9 @@ class PortfolioOptimizer:
             lookback=strategy_config.get("momentum_lookback", 20),
             threshold=strategy_config.get("momentum_threshold", -0.01)
         )
-        
+
         market_cap_w = self.weight_calc.market_cap_weights(market_caps)
-        
+
         risk_parity_w = self.weight_calc.risk_parity_weights(
             returns,
             lookback=strategy_config.get("risk_lookback", 60)
@@ -116,7 +113,7 @@ class PortfolioOptimizer:
         all_assets = current_weights.index.union(target_weights.index)
         current = current_weights.reindex(all_assets, fill_value=0)
         target = target_weights.reindex(all_assets, fill_value=0)
-        
+
         deviations = abs(current - target)
         max_deviation = deviations.max()
 
@@ -141,7 +138,7 @@ class PortfolioOptimizer:
         all_assets = old_weights.index.union(new_weights.index)
         old = old_weights.reindex(all_assets, fill_value=0)
         new = new_weights.reindex(all_assets, fill_value=0)
-        
+
         return abs(new - old).sum()
 
     def calculate_transaction_costs(
@@ -165,10 +162,10 @@ class PortfolioOptimizer:
 
     def get_rebalance_trades(
         self,
-        current_holdings: Dict[str, float],
+        current_holdings: dict[str, float],
         target_weights: pd.Series,
         portfolio_value: float
-    ) -> List[Dict]:
+    ) -> list[dict]:
         """
         Calculate trades needed for rebalancing.
 
@@ -181,19 +178,19 @@ class PortfolioOptimizer:
             List of trade orders
         """
         trades = []
-        
+
         # Calculate target values
         target_values = target_weights * portfolio_value
-        
+
         # Calculate trades for each asset
         all_assets = set(current_holdings.keys()).union(set(target_weights.index))
-        
+
         for asset in all_assets:
             current_value = current_holdings.get(asset, 0)
             target_value = target_values.get(asset, 0)
-            
+
             trade_value = target_value - current_value
-            
+
             if abs(trade_value) > 10:  # Minimum trade size
                 trades.append({
                     'symbol': asset,
@@ -201,16 +198,16 @@ class PortfolioOptimizer:
                     'value': abs(trade_value),
                     'target_weight': target_weights.get(asset, 0)
                 })
-        
+
         # Sort by absolute value (execute larger trades first)
         trades.sort(key=lambda x: x['value'], reverse=True)
-        
+
         return trades
 
     def backtest_strategy(
         self,
         prices_df: pd.DataFrame,
-        strategy_config: Dict,
+        strategy_config: dict,
         initial_value: float = 10000,
         rebalance_frequency: str = 'monthly'
     ) -> pd.DataFrame:
@@ -229,7 +226,7 @@ class PortfolioOptimizer:
         results = []
         portfolio_value = initial_value
         current_weights = pd.Series()
-        
+
         # Determine rebalance dates
         if rebalance_frequency == 'monthly':
             rebalance_dates = pd.date_range(
@@ -245,13 +242,13 @@ class PortfolioOptimizer:
             )
         else:  # daily
             rebalance_dates = prices_df.index
-        
+
         for date in prices_df.index:
             # Check if rebalance needed
             if date in rebalance_dates:
                 # Get market caps (simplified - use equal caps for backtest)
                 market_caps = pd.Series(1.0, index=prices_df.columns)
-                
+
                 # Optimize portfolio
                 current_weights = self.optimize_portfolio(
                     prices_df[:date],
@@ -259,7 +256,7 @@ class PortfolioOptimizer:
                     strategy_config,
                     date
                 )
-            
+
             # Calculate portfolio value
             if not current_weights.empty:
                 # Get returns for this date
@@ -267,11 +264,11 @@ class PortfolioOptimizer:
                     returns = prices_df.loc[date] / prices_df.shift(1).loc[date] - 1
                     portfolio_return = (current_weights * returns).sum()
                     portfolio_value *= (1 + portfolio_return)
-            
+
             results.append({
                 'date': date,
                 'value': portfolio_value,
                 'weights': current_weights.to_dict() if not current_weights.empty else {}
             })
-        
+
         return pd.DataFrame(results).set_index('date')

@@ -53,7 +53,8 @@
       "Bash(node:*)",
       "Bash(gh workflow:*)",
       "Bash(gh run view:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(ruff check:*)"
     ],
     "deny": [],
     "ask": [],

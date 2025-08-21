@@ -1,21 +1,22 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
 from sqlalchemy import func
+from sqlalchemy.orm import Session
+
 from ..core.database import get_db
 from ..models.asset import Asset, Price
 from ..models.index import Allocation, IndexValue
 from ..models.user import User
 from ..schemas.index import (
-    IndexCurrentResponse,
     AllocationItem,
+    IndexCurrentResponse,
     IndexHistoryResponse,
     SeriesPoint,
     SimulationRequest,
     SimulationResponse,
 )
 from ..services.currency import convert_amount, get_supported_currencies
+from ..utils.cache_utils import CacheManager, cache_for_1hour, cache_for_5min
 from ..utils.token_dep import get_current_user
-from ..utils.cache_utils import cache_for_5min, cache_for_1hour, CacheManager
 
 router = APIRouter()
 

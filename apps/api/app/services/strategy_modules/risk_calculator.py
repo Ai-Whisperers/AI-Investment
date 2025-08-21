@@ -2,10 +2,11 @@
 Risk metrics calculation for portfolio performance analysis.
 """
 
-import pandas as pd
-import numpy as np
-from typing import Tuple, Optional, Dict, Any
 import logging
+from typing import Any
+
+import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +60,7 @@ class RiskCalculator:
         return (annual_return - risk_free_rate) / downside_std
 
     @staticmethod
-    def calculate_max_drawdown(values: pd.Series) -> Tuple[float, pd.Timestamp, pd.Timestamp]:
+    def calculate_max_drawdown(values: pd.Series) -> tuple[float, pd.Timestamp, pd.Timestamp]:
         """
         Calculate maximum drawdown and dates.
 
@@ -106,7 +107,7 @@ class RiskCalculator:
             return 0.0
 
         annual_return = (1 + returns.mean()) ** 252 - 1
-        
+
         try:
             max_dd, _, _ = RiskCalculator.calculate_max_drawdown(values)
         except ValueError:
@@ -138,7 +139,7 @@ class RiskCalculator:
             return 0.0
 
         vol = returns.std()
-        
+
         # Handle case where all values are the same (floating point precision)
         if pd.isna(vol) or vol < 1e-10:
             return 0.0
@@ -150,7 +151,7 @@ class RiskCalculator:
 
     @staticmethod
     def calculate_beta(
-        asset_returns: pd.Series, 
+        asset_returns: pd.Series,
         market_returns: pd.Series
     ) -> float:
         """
@@ -185,7 +186,7 @@ class RiskCalculator:
 
     @staticmethod
     def calculate_correlation(
-        returns1: pd.Series, 
+        returns1: pd.Series,
         returns2: pd.Series
     ) -> float:
         """
@@ -211,7 +212,7 @@ class RiskCalculator:
             return 0.0
 
         return aligned['r1'].corr(aligned['r2'])
-    
+
     @staticmethod
     def calculate_var(
         returns: pd.Series,
@@ -221,19 +222,19 @@ class RiskCalculator:
     ) -> float:
         """
         Calculate Value at Risk (VaR).
-        
+
         Args:
             returns: Series of returns
             confidence: Confidence level (e.g., 0.95 for 95%)
             periods: Number of periods for VaR calculation
             method: 'historical' or 'parametric'
-            
+
         Returns:
             VaR as a negative number (potential loss)
         """
         if len(returns) < 2:
             return 0.0
-        
+
         if method == 'historical':
             # Calculate the percentile
             alpha = 1 - confidence
@@ -247,13 +248,13 @@ class RiskCalculator:
             var = mean + std * stats.norm.ppf(alpha)
         else:
             raise ValueError(f"Unknown VaR method: {method}")
-        
+
         # Scale by number of periods
         if periods > 1:
             var = var * np.sqrt(periods)
-        
+
         return var  # Return negative value representing loss
-    
+
     @staticmethod
     def calculate_cvar(
         returns: pd.Series,
@@ -262,36 +263,36 @@ class RiskCalculator:
     ) -> float:
         """
         Calculate Conditional Value at Risk (CVaR) / Expected Shortfall.
-        
+
         Args:
             returns: Series of returns
             confidence: Confidence level
             periods: Number of periods
-            
+
         Returns:
             CVaR as a negative number
         """
         if len(returns) < 2:
             return 0.0
-        
+
         # Calculate VaR threshold
         var = RiskCalculator.calculate_var(returns, confidence, 1)
-        
+
         # Get returns worse than VaR
         tail_returns = returns[returns <= var]
-        
+
         if len(tail_returns) == 0:
             return var
-        
+
         # Calculate mean of tail returns
         cvar = tail_returns.mean()
-        
+
         # Scale by periods
         if periods > 1:
             cvar = cvar * np.sqrt(periods)
-        
+
         return cvar  # Return negative value
-    
+
     @staticmethod
     def calculate_rolling_volatility(
         returns: pd.Series,
@@ -299,85 +300,85 @@ class RiskCalculator:
     ) -> pd.Series:
         """
         Calculate rolling volatility.
-        
+
         Args:
             returns: Series of returns
             window: Rolling window size
-            
+
         Returns:
             Series of rolling volatility
         """
         rolling_vol = returns.rolling(window=window, min_periods=1).std()
         # Fill any remaining NaN values with 0
         return rolling_vol.fillna(0)
-    
+
     @staticmethod
     def calculate_kurtosis(returns: pd.Series) -> float:
         """
         Calculate kurtosis (measure of tail heaviness).
-        
+
         Args:
             returns: Series of returns
-            
+
         Returns:
             Kurtosis (excess kurtosis, where normal = 0)
         """
         from scipy import stats
         return float(stats.kurtosis(returns))
-    
+
     @staticmethod
     def calculate_skewness(returns: pd.Series) -> float:
         """
         Calculate skewness (measure of asymmetry).
-        
+
         Args:
             returns: Series of returns
-            
+
         Returns:
             Skewness
         """
         from scipy import stats
         return float(stats.skew(returns))
-    
+
     @staticmethod
     def calculate_tail_ratio(returns: pd.Series, percentile: float = 0.05) -> float:
         """
         Calculate tail ratio (ratio of gains to losses in tails).
-        
+
         Args:
             returns: Series of returns
             percentile: Percentile for tail definition
-            
+
         Returns:
             Tail ratio
         """
         upper_tail = np.percentile(returns, 100 * (1 - percentile))
         lower_tail = np.percentile(returns, 100 * percentile)
-        
+
         if lower_tail == 0:
             return float('inf')
-        
+
         return abs(upper_tail / lower_tail)
-    
+
     @staticmethod
     def calculate_risk_adjusted_metrics(
         returns: pd.Series,
         prices: pd.Series,
         risk_free_rate: float = RISK_FREE_RATE
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Calculate comprehensive risk-adjusted metrics.
-        
+
         Args:
             returns: Series of returns
             prices: Series of prices
             risk_free_rate: Risk-free rate
-            
+
         Returns:
             Dictionary of risk metrics
         """
         max_dd, _, _ = RiskCalculator.calculate_max_drawdown(prices)
-        
+
         return {
             'sharpe_ratio': RiskCalculator.calculate_sharpe_ratio(returns, risk_free_rate),
             'sortino_ratio': RiskCalculator.calculate_sortino_ratio(returns, risk_free_rate),
@@ -387,7 +388,7 @@ class RiskCalculator:
             'var_95': RiskCalculator.calculate_var(returns, 0.95),
             'cvar_95': RiskCalculator.calculate_cvar(returns, 0.95)
         }
-    
+
     @staticmethod
     def calculate_portfolio_risk(
         returns: pd.DataFrame,
@@ -395,41 +396,41 @@ class RiskCalculator:
     ) -> float:
         """
         Calculate portfolio risk given weights.
-        
+
         Args:
             returns: DataFrame of asset returns
             weights: Array of portfolio weights
-            
+
         Returns:
             Portfolio risk (standard deviation)
         """
         # Calculate covariance matrix
         cov_matrix = returns.cov()
-        
+
         # Calculate portfolio variance
         portfolio_variance = weights @ cov_matrix.values @ weights
-        
+
         # Return portfolio standard deviation
         return np.sqrt(portfolio_variance)
-    
+
     @staticmethod
     def apply_stress_scenarios(
         returns: pd.Series,
-        scenarios: Dict[str, float]
-    ) -> Dict[str, Dict[str, Any]]:
+        scenarios: dict[str, float]
+    ) -> dict[str, dict[str, Any]]:
         """
         Apply stress test scenarios.
-        
+
         Args:
             returns: Series of returns
             scenarios: Dictionary of scenario names and stress factors
-            
+
         Returns:
             Dictionary of stress test results
         """
         base_var = RiskCalculator.calculate_var(returns, 0.95)
         results = {}
-        
+
         for scenario_name, stress_factor in scenarios.items():
             if scenario_name == 'volatility_spike':
                 # Multiply volatility
@@ -447,17 +448,17 @@ class RiskCalculator:
                     'base_var': base_var,
                     'new_var': base_var + stress_factor
                 }
-        
+
         return results
-    
+
     @staticmethod
     def _clean_series(series: pd.Series) -> pd.Series:
         """
         Clean series by removing NaN values.
-        
+
         Args:
             series: Series to clean
-            
+
         Returns:
             Cleaned series
         """

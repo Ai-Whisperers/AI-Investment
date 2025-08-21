@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+
 from ..core.database import get_db
-from ..models.index import IndexValue
 from ..models.asset import Asset, Price
+from ..models.index import IndexValue
 from ..models.user import User
 from ..schemas.benchmark import BenchmarkResponse
 from ..schemas.index import SeriesPoint

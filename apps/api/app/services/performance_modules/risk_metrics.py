@@ -3,9 +3,9 @@ Risk metrics calculations for portfolio performance.
 Includes Sharpe ratio, Sortino ratio, Calmar ratio, volatility, and drawdown metrics.
 """
 
-import numpy as np
-from typing import List, Tuple, Optional
 import logging
+
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -121,7 +121,7 @@ class RiskMetricsCalculator:
         return float(vol)
 
     @staticmethod
-    def max_drawdown(values: List[float]) -> Tuple[float, int, int]:
+    def max_drawdown(values: list[float]) -> tuple[float, int, int]:
         """
         Calculate maximum drawdown.
 
@@ -148,7 +148,7 @@ class RiskMetricsCalculator:
         return float(max_dd * 100), int(peak_idx), int(trough_idx)
 
     @staticmethod
-    def current_drawdown(values: List[float]) -> float:
+    def current_drawdown(values: list[float]) -> float:
         """
         Calculate current drawdown from peak.
 
@@ -163,7 +163,7 @@ class RiskMetricsCalculator:
 
         current_value = values[-1]
         running_max = max(values)
-        
+
         if running_max <= 0:
             return 0.0
 
@@ -216,18 +216,18 @@ class RiskMetricsCalculator:
 
         # Sort returns
         sorted_returns = np.sort(returns)
-        
+
         # Find the percentile
         index = int((1 - confidence_level) * len(sorted_returns))
-        
+
         if index >= len(sorted_returns):
             index = len(sorted_returns) - 1
-        
+
         var_daily = sorted_returns[index]
-        
+
         # Scale to multiple periods if needed
         var_scaled = var_daily * np.sqrt(periods)
-        
+
         return float(var_scaled * 100)
 
     @staticmethod
@@ -250,16 +250,16 @@ class RiskMetricsCalculator:
 
         # Sort returns
         sorted_returns = np.sort(returns)
-        
+
         # Find the VaR threshold
         var_index = int((1 - confidence_level) * len(sorted_returns))
-        
+
         if var_index >= len(sorted_returns):
             var_index = len(sorted_returns) - 1
-        
+
         # Calculate mean of returns below VaR
         cvar = sorted_returns[:var_index + 1].mean()
-        
+
         return float(cvar * 100)
 
     @staticmethod
@@ -282,12 +282,12 @@ class RiskMetricsCalculator:
 
         # Filter returns below target
         downside_returns = returns[returns < target_return]
-        
+
         if len(downside_returns) == 0:
             return 0.0
-        
+
         # Calculate downside deviation
         downside_std = np.sqrt(np.mean((downside_returns - target_return) ** 2))
-        
+
         # Annualize
         return float(downside_std * np.sqrt(TRADING_DAYS_PER_YEAR))

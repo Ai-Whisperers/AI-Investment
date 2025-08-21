@@ -1,5 +1,5 @@
-from typing import Dict, Optional
 import logging
+
 from .twelvedata import get_exchange_rate as td_get_exchange_rate
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ SUPPORTED_CURRENCIES = [
 ]
 
 
-def get_exchange_rate(from_currency: str, to_currency: str = "USD") -> Optional[float]:
+def get_exchange_rate(from_currency: str, to_currency: str = "USD") -> float | None:
     """
     Get current exchange rate between two currencies using TwelveData.
     Returns the rate to convert from_currency to to_currency.
@@ -55,7 +55,7 @@ def get_exchange_rate(from_currency: str, to_currency: str = "USD") -> Optional[
 
 def convert_amount(
     amount: float, from_currency: str, to_currency: str = "USD"
-) -> Optional[float]:
+) -> float | None:
     """
     Convert an amount from one currency to another.
     Returns None if conversion fails.
@@ -69,7 +69,7 @@ def convert_amount(
     return None
 
 
-def get_supported_currencies() -> Dict[str, str]:
+def get_supported_currencies() -> dict[str, str]:
     """
     Return dictionary of supported currency codes and their names.
     """

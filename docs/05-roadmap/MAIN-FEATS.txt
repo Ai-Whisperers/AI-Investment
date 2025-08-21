@@ -1,0 +1,27 @@
+Stock identification and full supply chain mapping and organization with metadata, we need to have tags such as financial area of the stock so we could filter by similar companies or assets. The areas could be divided with high granularity such as finance, fintech, tech, research, commodities, and other areas you think we should add for long and stable investment of serious business grade portfolios
+
+dataset focus: assets investment, fundamental analysis, technical analysis
+iterate: sources of dataset, types of dataset, types of dataset analysis, types of result analysis and so on
+
+we want to focus our value into AI-powered cross-sourcing of information to obtain hidden financial info and clues to invest. Then we could convert that cross-sourcing raw information in an  analogue of google indexation search. After we polish that raw information we could display a feed of financial news with AI chatbot and interactivity features with also filtering features to dynamically interact with the financial information WHILE the AI finds financial opportunities and gaps that a single human user could not
+
+we want to make a website that helps you invest without being a finance bro or specialist
+
+Minimal features that have to work perfectly for our investment MVP:
+	Display of financial news, official and scrapped from sources
+	Display numerical financial news, fetched from marketaux and TwelveData
+Both financial datasets have to be live tracked. Its not necessary that we use websockets, nor trading signals periods of time, we are aiming to a mid-long term serious platform
+
+SOCIALNETS SOURCES:
+Users we focus: Finances and/or investment experts/specialists
+Sites we focus: youtube, reddit, tiktok
+Feed we focus: users, videos, comments
+Transcriptions, from videos, comments etc
+Sentiment analysis
+ML
+
+For Human-financial-sources:
+whitelisted: analytic-informative, trustworthy-nice-kind
+testlisted: context needed
+blacklisted: scammers, non trustworthy (Based on AI, comments)
+si esta en prueba  prueba listed ?
