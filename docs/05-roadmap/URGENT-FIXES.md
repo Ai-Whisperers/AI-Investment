@@ -1,159 +1,182 @@
 # 🚨 URGENT: Critical Issues Blocking Deployment
 *Last Updated: 2025-08-21*
+*Status: ACTUAL issues verified, not theoretical*
 
 ## Overview
-The project has **3 failing tests** preventing CI/CD pipeline from passing. These must be fixed before any new development.
+The project has **multiple critical infrastructure failures** preventing deployment:
+1. Test suite times out when run together (database connection issues)
+2. Frontend has 15 TypeScript compilation errors
+3. All GitHub Actions workflows failing
+4. Previously reported "failing" tests actually pass individually
 
-## Issue #1: Weight Constraint Algorithm Failure ❌
+## Issue #1: Test Suite Timeout (Database Connection Exhaustion) 🔴
 
-### Test: `test_apply_weight_constraints`
-**File**: `apps/api/tests/unit/services/test_weight_calculator.py:105`
-**Implementation**: `apps/api/app/services/strategy_modules/weight_calculator.py:474`
+### Symptom
+- Individual tests pass when run separately
+- Full test suite times out after 1-2 minutes
+- Command: `python -m pytest tests/unit` hangs indefinitely
 
-### Problem
-Mathematical impossibility when filtering assets:
-- Input: 4 assets (AAPL: 0.6, GOOGL: 0.35, MSFT: 0.03, AMZN: 0.02)
-- Constraints: min_weight=0.05, max_weight=0.40
-- After filtering: Only 2 assets remain (AAPL, GOOGL)
-- Issue: Cannot satisfy max_weight=0.40 with only 2 assets summing to 1.0
-- Result: Each asset gets 0.50, violating max_weight constraint
+### Root Cause
+- Database connection pool exhaustion
+- Tests not properly cleaning up connections
+- Missing test isolation/teardown
+- Possible SQLite locking issues in test environment
 
-### Solution Options
+### Evidence
+```bash
+# This works:
+pytest tests/unit/services/test_weight_calculator.py::TestWeightCalculator::test_apply_weight_constraints -xvs
+# Result: PASSED
 
-#### Option A: Adjust Minimum Weight (Recommended)
-```python
-def apply_constraints(weights, constraints=None):
-    # ... existing code ...
-    
-    # Dynamically adjust min_weight if it would leave too few assets
-    num_assets_above_min = sum(1 for w in weights_series.values if w >= min_weight)
-    min_required_assets = math.ceil(1.0 / max_weight)
-    
-    if num_assets_above_min < min_required_assets:
-        # Lower min_weight to include more assets
-        sorted_weights = weights_series.sort_values(ascending=False)
-        min_weight = sorted_weights.iloc[min_required_assets - 1] * 0.99
-    
-    # Continue with filtering...
+# This times out:
+pytest tests/unit --tb=no -q
+# Result: Timeout after 60s
 ```
 
-#### Option B: Allow Constraint Violations
+### Solution Required
+
+#### Fix Test Infrastructure
 ```python
-def apply_constraints(weights, constraints=None):
-    # ... existing code ...
+# conftest.py - Add proper cleanup
+@pytest.fixture(autouse=True)
+def cleanup_db_connections():
+    yield
+    # Force close all connections
+    engine.dispose()
     
-    # Check if constraints are mathematically possible
-    if len(weights_series) * max_weight < 1.0:
-        # Log warning and allow violation
-        logger.warning(f"Cannot satisfy max_weight={max_weight} with {len(weights_series)} assets")
-        # Distribute equally
-        equal_weight = 1.0 / len(weights_series)
-        weights_series = pd.Series({k: equal_weight for k in weights_series.index})
-    
-    # Continue normally...
+# Alternative: Use separate test databases
+@pytest.fixture
+def test_db_session():
+    # Create new in-memory database for each test
+    engine = create_engine("sqlite:///:memory:")
+    # ... rest of setup
 ```
 
-#### Option C: Add More Assets
-```python
-def apply_constraints(weights, constraints=None):
-    # ... existing code ...
-    
-    # If too few assets after filtering, add back smallest ones
-    min_required = math.ceil(1.0 / max_weight)
-    if len(filtered_weights) < min_required:
-        # Add back the largest excluded assets
-        excluded = original_weights[original_weights < min_weight].nlargest(
-            min_required - len(filtered_weights)
-        )
-        filtered_weights = pd.concat([filtered_weights, excluded])
-    
-    # Continue with normalization...
+#### Run Tests in Smaller Batches
+```bash
+# Workaround until fixed:
+pytest tests/unit/models -v
+pytest tests/unit/routers -v  
+pytest tests/unit/services -v
+pytest tests/unit/core -v
 ```
 
-## Issue #2: Token Refresh Test Failure ❌
-
-### Test: `test_refresh_token`
-**File**: `apps/api/tests/unit/routers/test_auth.py:171`
-**Implementation**: `apps/api/app/routers/auth.py:146`
-
-### Problem
-Test expects new token to be different from old token, but tokens generated in rapid succession may be identical due to same `iat` timestamp.
-
-### Solution
+#### Investigate Connection Pool
 ```python
-import time
-from datetime import datetime, timedelta
-import uuid
-
-def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
-    """Create a JWT access token with guaranteed uniqueness."""
-    to_encode = data.copy()
-    now = datetime.utcnow()
-    
-    if expires_delta:
-        expire = now + expires_delta
-    else:
-        expire = now + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    
-    to_encode.update({
-        "exp": expire,
-        "iat": now,
-        "jti": str(uuid.uuid4())[:8]  # Add unique JWT ID
-    })
-    
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
-    return encoded_jwt
+# Check pool settings in database.py
+engine = create_engine(
+    DATABASE_URL,
+    pool_size=5,  # May be too small
+    max_overflow=10,
+    pool_pre_ping=True,  # Add this
+    pool_recycle=3600
+)
 ```
 
-## Issue #3: Google OAuth Redirect Test ❌
+## Issue #2: Frontend TypeScript Compilation Errors 🔴
 
-### Test: `test_google_oauth_redirect`
-**File**: `apps/api/tests/unit/routers/test_auth.py:194`
-**Implementation**: `apps/api/app/routers/auth.py:82`
-
-### Problem
-Test expects status code 307 with Location header, but implementation might not be returning proper Response object.
-
-### Solution
-```python
-from fastapi import Response
-from fastapi.responses import RedirectResponse
-
-@router.get("/google")
-def google_oauth_redirect():
-    """Redirect to Google OAuth for authentication."""
-    google_oauth_url = (
-        "https://accounts.google.com/o/oauth2/v2/auth"
-        "?client_id=YOUR_CLIENT_ID"
-        "&redirect_uri=YOUR_REDIRECT_URI"
-        "&response_type=code"
-        "&scope=email%20profile"
-    )
-    # Use RedirectResponse for proper redirect
-    return RedirectResponse(url=google_oauth_url, status_code=307)
+### Errors Found
+```bash
+cd apps/web && npx tsc --noEmit
+# Result: 15 errors
 ```
 
-## Issue #4: Test Coverage Below Threshold ⚠️
+### Main Issues
+1. **Missing imports**: `Cannot find module '@/dashboard/components/DashboardMetrics'`
+2. **Missing Jest types**: `Property 'toBeInTheDocument' does not exist`
+3. **Broken test imports**: Multiple test files have incorrect import paths
 
-### Current: 42% | Required: 50% | Target: 70%
+### Solutions Required
 
-### Quick Coverage Wins
-Focus on files with 0% coverage that are easy to test:
+#### 1. Fix Import Paths
+```typescript
+// Fix test imports
+// Current (broken):
+import DashboardMetrics from '@/dashboard/components/DashboardMetrics'
 
-1. **app/services/news_modules/** (0% coverage)
-   - Add basic unit tests for news processing
-   - Mock external API calls
-   - ~200 lines to cover
+// Should be:
+import DashboardMetrics from '@/app/dashboard/components/DashboardMetrics'
+// Or check actual component location
+```
 
-2. **app/services/strategy_modules/** (partial coverage)
-   - Add edge case tests
-   - Test error handling
-   - ~150 lines to cover
+#### 2. Add Jest Type Definitions
+```bash
+cd apps/web
+npm install --save-dev @types/jest @testing-library/jest-dom
+```
 
-3. **app/routers/** (partial coverage)
-   - Add negative test cases
-   - Test validation errors
-   - ~100 lines to cover
+#### 3. Update tsconfig.json
+```json
+{
+  "compilerOptions": {
+    "types": ["jest", "@testing-library/jest-dom"]
+  }
+}
+```
+
+## Issue #3: GitHub Actions CI/CD Pipeline Failures 🔴
+
+### Current Status
+```bash
+gh run list --workflow=ci-cd-pipeline.yml --limit=5
+# All runs: completed failure
+```
+
+### Failing Workflows
+1. **Backend Tests**: Test failures + coverage < 50%
+2. **Security**: Bandit exit code 2
+3. **Build Deploy**: Blocked by quality gates
+4. **Quality Gates**: Depends on backend tests
+
+### Solutions Required
+
+#### 1. Fix Bandit Configuration
+```bash
+# Create .bandit file
+cd apps/api
+echo '[bandit]' > .bandit
+echo 'exclude_dirs = tests/,venv/,.venv/' >> .bandit
+echo 'skips = B101' >> .bandit  # Skip assert_used test
+```
+
+#### 2. Fix Test Running in CI
+```yaml
+# Update ci-cd-pipeline.yml
+- name: Run tests
+  run: |
+    # Run in batches to avoid timeout
+    pytest tests/unit/models -v
+    pytest tests/unit/routers -v
+    pytest tests/unit/services -v
+```
+
+#### 3. Remove False Success Conditions
+```yaml
+# Remove any || true statements
+# Remove continue-on-error: true
+```
+
+## Issue #4: Misleading Test Status (Not Actually Failing) ⚠️
+
+### Reality Check
+- `test_apply_weight_constraints`: **PASSES** (not failing)
+- `test_refresh_token`: **PASSES** (not failing)  
+- `test_google_oauth_redirect`: **SKIPPED** (not implemented)
+
+### The Real Problem
+Tests work individually but fail when run together:
+
+```bash
+# Individual tests - ALL PASS:
+pytest test_weight_calculator.py::test_apply_weight_constraints  # PASSES
+pytest test_auth.py::test_refresh_token  # PASSES
+pytest test_auth.py::test_google_oauth_redirect  # SKIPPED
+
+# Full suite - TIMES OUT:
+pytest tests/unit  # Hangs after 12 tests
+```
+
+This is a test infrastructure problem, not a test logic problem.
 
 ### Sample Test Template
 ```python
@@ -182,15 +205,13 @@ class TestNewsProcessor:
         assert result == {"articles": []}
 ```
 
-## Issue #5: Ruff Linting Violations 🟡
+## Issue #5: Test Coverage Cannot Be Measured 🟡
 
-### Remaining Issues (21 errors)
-Most have been auto-fixed. Remaining require manual intervention:
-
-1. **B904**: Add `from err` or `from None` to exception raises
-2. **E722**: Replace bare `except:` with specific exceptions
-3. **B007**: Rename unused loop variables with underscore prefix
-4. **F821**: Import missing `date` from datetime
+### Why Coverage Appears Low
+- Full test suite cannot complete
+- Coverage measurement requires all tests to run
+- Individual test runs don't aggregate coverage
+- Actual coverage unknown until infrastructure fixed
 
 ### Quick Fix Commands
 ```bash
@@ -204,38 +225,31 @@ cd apps/api && ruff check . --select=B904,E722,B007,F821
 cd apps/api && black .
 ```
 
-## Immediate Action Plan (Next 24 Hours)
+## Immediate Action Plan (Realistic Priorities)
 
-### Hour 1-2: Fix Weight Constraint
-- [ ] Implement Option A (dynamic min_weight adjustment)
-- [ ] Run test to verify fix
-- [ ] Update documentation
+### Priority 1: Fix Test Infrastructure (4-8 hours)
+- [ ] Debug database connection pool issues
+- [ ] Add proper test isolation
+- [ ] Fix test teardown/cleanup
+- [ ] Enable full suite execution
 
-### Hour 3-4: Fix Token Refresh
-- [ ] Add UUID to token generation
-- [ ] Run auth tests
-- [ ] Verify no side effects
+### Priority 2: Fix Frontend Build (2-4 hours)
+- [ ] Install missing type definitions
+- [ ] Fix all import paths
+- [ ] Resolve TypeScript errors
+- [ ] Ensure build passes
 
-### Hour 5-6: Fix OAuth Redirect
-- [ ] Use RedirectResponse
-- [ ] Test redirect behavior
-- [ ] Check frontend compatibility
+### Priority 3: Fix CI/CD Pipeline (2-4 hours)
+- [ ] Fix Bandit configuration
+- [ ] Update GitHub Actions to run tests in batches
+- [ ] Remove false success conditions
+- [ ] Verify all workflows pass
 
-### Hour 7-12: Increase Coverage
-- [ ] Write 10 tests for news modules
-- [ ] Write 5 tests for strategy modules
-- [ ] Write 5 tests for error cases
-- [ ] Run coverage report
-
-### Hour 13-14: Final Cleanup
-- [ ] Fix remaining ruff issues
-- [ ] Run full test suite
-- [ ] Check CI/CD pipeline
-
-### Hour 15-16: Verification
-- [ ] Push to feature branch
-- [ ] Monitor GitHub Actions
-- [ ] Document any remaining issues
+### Priority 4: Documentation Accuracy (1-2 hours)
+- [ ] Remove duplicate status files
+- [ ] Stop overstating progress
+- [ ] Document actual issues
+- [ ] Create single source of truth
 
 ## Commands to Run
 
@@ -257,13 +271,14 @@ pytest --cov=app --cov-report=term-missing
 pytest --cov=app --cov-fail-under=50
 ```
 
-## Success Criteria
+## Real Success Criteria
 
-✅ All 125 tests passing
-✅ Coverage ≥ 50%
-✅ No ruff violations
-✅ GitHub Actions green
-✅ Successful deployment to Render
+✅ Test suite runs to completion without timeout
+✅ Frontend TypeScript compilation passes
+✅ GitHub Actions workflows actually pass (not fake)
+✅ Can run `pytest tests/unit` successfully
+✅ Can run `npx tsc --noEmit` without errors
+✅ Documentation reflects actual state
 
 ## If Tests Still Fail
 
@@ -282,4 +297,5 @@ pytest --cov=app --cov-fail-under=50
 
 ---
 
-**Priority: CRITICAL - Block all other work until resolved**
+**Priority: CRITICAL - Fix infrastructure before claiming progress**
+**Note: Previous documentation significantly overstated completion status**

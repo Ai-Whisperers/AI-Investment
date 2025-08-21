@@ -1,49 +1,52 @@
 # Test Pipeline Status Report
 *Generated: 2025-01-21*
+*Updated: 2025-08-21 with verified actual status*
 
 ## Executive Summary
-The Waardhaven AutoIndex project has **125 unit tests** with **3 critical failures** blocking deployment. All GitHub Actions workflows are failing as of the last commit on 2025-01-20.
+The Waardhaven AutoIndex project's test infrastructure is **critically broken**. Tests pass individually but the full suite times out due to database connection issues. GitHub Actions are completely failing. Previous reports incorrectly claimed specific test failures that don't actually exist.
 
-## Current Test Statistics
+## Actual Test Statistics (Verified)
 
 ### Overall Metrics
-- **Total Tests**: 125 (unit tests)
-- **Passing Tests**: 122 (estimated)
-- **Failing Tests**: 3 (confirmed)
-- **Pass Rate**: ~97.6%
-- **Test Coverage**: 42% (below 50% requirement)
+- **Total Tests**: ~125 unit tests
+- **Individual Test Status**: Tests PASS when run separately
+- **Full Suite Status**: TIMES OUT (database connection exhaustion)
+- **Actual Failures**: 0 (previously reported failures don't exist)
+- **Skipped Tests**: 1 (test_google_oauth_redirect)
+- **Test Coverage**: Cannot measure (suite doesn't complete)
 - **CI/CD Status**: ❌ All workflows failing
 
 ## GitHub Actions Pipeline Status
 
-### Last Run: 2025-01-20 23:39:23Z
+### Last Verified Run: 2025-08-21
 
-| Workflow | Status | Issue |
+| Workflow | Status | Actual Issue |
 |----------|--------|-------|
-| Backend Tests | ❌ Failed | 3 test failures + coverage < 50% |
+| Backend Tests | ❌ Failed | Test suite timeout, not specific failures |
 | Build Deploy | ❌ Failed | Blocked by quality gates |
-| Security | ❌ Failed | Bandit exit code 2 |
+| Security | ❌ Failed | Bandit configuration issues |
 | Quality Gates | ❌ Failed | Depends on backend tests |
+| Frontend Build | ❌ Not tested | 15 TypeScript errors |
 
-## Failing Tests Detail
+## Actual Test Status (Individual Runs)
 
-### 1. test_apply_weight_constraints ❌
+### 1. test_apply_weight_constraints ✅ PASSES
 **Location**: `tests/unit/services/test_weight_calculator.py:105`
-**Issue**: Mathematical impossibility when only 2 assets remain after filtering
-**Current Behavior**: Returns weights of 0.5 each, violating max_weight=0.40
-**Root Cause**: Algorithm doesn't handle edge case where number of assets * max_weight < 1.0
+**Status**: PASSES when run individually
+**Evidence**: `pytest test_weight_calculator.py::test_apply_weight_constraints -xvs`
+**Result**: `1 passed, 33 warnings in 0.17s`
 
-### 2. test_refresh_token ❌
+### 2. test_refresh_token ✅ PASSES
 **Location**: `tests/unit/routers/test_auth.py:171`
-**Issue**: New token identical to old token
-**Root Cause**: Tokens generated in rapid succession have same `iat` timestamp
-**Solution**: Add unique identifier (UUID) to each token
+**Status**: PASSES when run individually
+**Evidence**: `pytest test_auth.py::test_refresh_token -xvs`
+**Result**: `1 passed, 37 warnings in 20.66s`
 
-### 3. test_google_oauth_redirect ❌
+### 3. test_google_oauth_redirect ⏩ SKIPPED
 **Location**: `tests/unit/routers/test_auth.py:194`
-**Issue**: Response type or status code mismatch
-**Root Cause**: Using Response instead of RedirectResponse
-**Solution**: Use FastAPI's RedirectResponse class
+**Status**: SKIPPED (not implemented)
+**Evidence**: `pytest test_auth.py::test_google_oauth_redirect -xvs`
+**Result**: `1 skipped, 33 warnings in 0.04s`
 
 ## Code Quality Issues
 
@@ -91,67 +94,87 @@ The Waardhaven AutoIndex project has **125 unit tests** with **3 critical failur
 3. **pkg_resources**: Deprecated API usage
 4. **pytest marks**: Unknown marks (unit, critical, financial)
 
-## Test Execution Issues
+## Critical Infrastructure Issue
 
-### Performance Problems
-- Test suite hangs when running all tests together
-- Individual test files run successfully
-- Possible database connection pool exhaustion
-- May need test isolation improvements
+### The Real Problem
+- **NOT** individual test failures
+- **IS** test infrastructure breakdown
+- Full suite command: `pytest tests/unit` times out after 60-120 seconds
+- Database connection pool gets exhausted
+- Tests don't properly clean up resources
+- No proper test isolation/teardown
 
-## Action Items (Priority Order)
+### Evidence
+```bash
+# Times out:
+cd apps/api && python -m pytest tests/unit --tb=no -q
+# Result: Command timed out after 1m 0.0s
 
-### Critical (Blocking Deployment)
-1. ✅ Fix weight constraint algorithm
-2. ✅ Add UUID to token generation
-3. ✅ Use RedirectResponse for OAuth
-4. ✅ Increase coverage by 8%
+# Works fine:
+cd apps/api && python -m pytest tests/unit/services/test_weight_calculator.py -v
+# Result: All tests pass
+```
+
+## Real Action Items (Based on Actual Issues)
+
+### Critical (Actually Blocking Deployment)
+1. ❌ Fix test suite timeout issues
+2. ❌ Fix database connection pool exhaustion
+3. ❌ Fix frontend TypeScript errors (15 errors)
+4. ❌ Restore GitHub Actions functionality
 
 ### High Priority
-1. ⚠️ Fix Bandit security configuration
-2. ⚠️ Resolve remaining ruff violations
-3. ⚠️ Fix test suite hanging issue
+1. ⚠️ Add proper test cleanup/teardown
+2. ⚠️ Fix test isolation issues
+3. ⚠️ Configure Bandit properly
+4. ⚠️ Fix import paths in frontend tests
 
 ### Medium Priority
-1. 📝 Update to Pydantic v2 field syntax
-2. 📝 Migrate to FastAPI lifespan events
-3. 📝 Register pytest marks properly
+1. 📝 Remove misleading documentation
+2. 📝 Consolidate duplicate status files
+3. 📝 Fix deprecation warnings
+4. 📝 Register pytest marks
 
 ### Low Priority
 1. 💡 Improve test execution speed
 2. 💡 Add integration test coverage
 3. 💡 Update deprecated dependencies
 
-## Commands for Verification
+## Commands That Actually Show the Problem
 
 ```bash
-# Run specific failing tests
+# This demonstrates the real issue:
+
+# Individual tests PASS:
 cd apps/api
-pytest tests/unit/services/test_weight_calculator.py::TestWeightCalculator::test_apply_weight_constraints -xvs
-pytest tests/unit/routers/test_auth.py::TestAuthEndpoints::test_refresh_token -xvs
-pytest tests/unit/routers/test_auth.py::TestAuthEndpoints::test_google_oauth_redirect -xvs
+pytest tests/unit/services/test_weight_calculator.py -v  # WORKS
+pytest tests/unit/routers/test_auth.py -v  # WORKS
 
-# Check coverage
-pytest --cov=app --cov-report=term-missing --cov-report=html
+# Full suite TIMES OUT:
+pytest tests/unit  # HANGS/TIMEOUT
 
-# Verify linting
-ruff check . --statistics
+# Frontend build FAILS:
+cd apps/web
+npx tsc --noEmit  # 15 ERRORS
 
-# Security scan
-bandit -r app/
+# GitHub Actions ALL FAIL:
+gh run list --workflow=ci-cd-pipeline.yml  # ALL RED
 ```
 
-## Historical Context
+## Documentation vs Reality
 
-### Previous Status (2025-01-20)
-- Tests: 84% pass rate reported
-- Coverage: ~50% reported
-- Issues: Authentication and weight calculation
+### What Documentation Claims
+- 3 specific test failures
+- 97.6% pass rate
+- 42% coverage measurable
+- Specific fixes needed
 
-### Current Status (2025-01-21)
-- Tests: 97.6% pass rate (3 failures confirmed)
-- Coverage: 42% actual (below threshold)
-- Issues: Same 3 tests still failing
+### Actual Reality (Verified 2025-08-21)
+- 0 actual test failures
+- Tests pass individually
+- Coverage unmeasurable (suite won't complete)
+- Infrastructure completely broken
+- Documentation has been misleading
 
 ## Recommendations
 
@@ -160,16 +183,17 @@ bandit -r app/
 3. **CI/CD Recovery**: Once tests pass, all workflows should auto-recover
 4. **Technical Debt**: Schedule refactoring sprint after deployment
 
-## Success Criteria
+## Real Success Criteria
 
-✅ When all the following are true:
-- [ ] 125/125 tests passing
-- [ ] Coverage ≥ 50%
-- [ ] Ruff check passes
-- [ ] Security scan passes
-- [ ] GitHub Actions all green
-- [ ] Successful deployment to Render
+✅ When these actually work:
+- [ ] Can run `pytest tests/unit` without timeout
+- [ ] Can run `npx tsc --noEmit` without errors
+- [ ] GitHub Actions actually pass (not fake success)
+- [ ] Test suite completes and shows real coverage
+- [ ] Documentation matches reality
+- [ ] Stop claiming false progress
 
 ---
 
-*This report should be updated after each test fix attempt*
+*This report has been corrected to reflect actual verified state*
+*Previous reports contained significant inaccuracies*
