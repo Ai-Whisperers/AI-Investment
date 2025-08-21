@@ -1,37 +1,48 @@
 # Features Documentation
 
 ## Overview
-Complete feature documentation separated by implementation status.
+Feature documentation organized by priority and implementation status.
 
 ## Navigation
 
-### ✅ [Implemented Features](implemented/README.md)
-Working features in production
-- Authentication & Authorization
-- Portfolio Management
-- Market Data Integration
-- Strategy Configuration
-- Background Tasks
-- Caching Layer
+### 🔥 [HIGH PRIORITY: AI Agent Features](planned/AI_AGENTS_INDEX.md)
+**Extreme Alpha Generation** - Target >30% annual returns
+- Social Signal Processing (4chan, Reddit, TikTok, YouTube)
+- Multi-Layer Pattern Recognition
+- Information Asymmetry Exploitation
+- 6-48 Hour Early Detection
+- See: [Master Implementation Plan](../MASTER_IMPLEMENTATION_PLAN.md)
 
-### 🚀 [Planned Features](planned/README.md)
-Future features and enhancements
-- Intelligence Platform
-- Real-time Updates
-- Mobile Applications
-- Advanced Analytics
-- Global Markets
+### 🚀 [Other Planned Features](planned/README.md)
+Future enhancements and expansions
+- Real-time WebSocket updates
+- Mobile applications
+- Advanced analytics
+- Global market coverage
 
-## Feature Status Matrix
+### ✅ [Basic Features](implemented/README.md)
+Currently working (when infrastructure fixed)
+- Basic authentication (JWT/OAuth)
+- Simple portfolio management
+- TwelveData integration
+- Basic strategy configs
+- Redis caching
 
-| Category | Implemented | In Progress | Planned |
-|----------|-------------|-------------|---------|
-| Authentication | JWT, OAuth | 2FA | SSO/SAML |
-| Portfolio | Basic Index | Rebalancing | Multi-portfolio |
-| Market Data | TwelveData | MarketAux | Multiple sources |
-| Analytics | Basic metrics | Advanced risk | ML predictions |
-| UI/UX | Dashboard | Mobile responsive | Native apps |
-| Infrastructure | Docker, Redis | WebSockets | Kubernetes |
+## Feature Priority Matrix
+
+| Priority | Feature | Status | Target Returns |
+|----------|---------|--------|----------------|
+| 🔥 CRITICAL | AI Social Agents | Planned | >30% annual |
+| 🔥 CRITICAL | 4chan/Reddit Scraping | Planned | Detect early signals |
+| 🔥 CRITICAL | Pattern Recognition | Planned | 6-48hr advantage |
+| ⚠️ URGENT | Fix Test Infrastructure | Blocked | Enable deployment |
+| ⚠️ URGENT | Fix Frontend Build | 15 errors | Enable UI |
+| ⚠️ URGENT | Fix CI/CD Pipeline | All failing | Enable automation |
+| ✅ Basic | Portfolio Management | Working* | Standard returns |
+| ✅ Basic | Market Data | Working* | Price feeds |
+| ✅ Basic | Authentication | Partial | User management |
+
+*When infrastructure is fixed
 
 ## Feature Requests
 Submit feature requests as GitHub issues with `feature` label.
