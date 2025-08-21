@@ -1,12 +1,13 @@
-from typing import Optional
-from fastapi import Depends, HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import jwt, JWTError
-from sqlalchemy.orm import Session
-from ..core.database import get_db
-from ..core.config import settings
-from ..models.user import User
 import os
+
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jose import JWTError, jwt
+from sqlalchemy.orm import Session
+
+from ..core.config import settings
+from ..core.database import get_db
+from ..models.user import User
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
@@ -22,8 +23,8 @@ def get_current_user(
             token.credentials, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
         )
         user_id = int(payload.get("sub"))
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+    except JWTError as e:
+        raise HTTPException(status_code=401, detail="Invalid token") from e
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
@@ -31,9 +32,9 @@ def get_current_user(
 
 
 def get_current_user_optional(
-    token: Optional[HTTPAuthorizationCredentials] = Depends(bearer_scheme),
+    token: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
     db: Session = Depends(get_db),
-) -> Optional[User]:
+) -> User | None:
     """Optional authentication - returns None if no token provided, useful for backward compatibility"""
     if not token:
         # Check if auth should be enforced
@@ -70,5 +71,5 @@ def require_admin(token: HTTPAuthorizationCredentials = Depends(bearer_scheme)) 
         if not is_admin:
             raise HTTPException(status_code=403, detail="Admin privileges required")
         return True
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+    except JWTError as e:
+        raise HTTPException(status_code=401, detail="Invalid token") from e

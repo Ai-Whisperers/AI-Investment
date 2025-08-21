@@ -2,15 +2,16 @@
 Benchmark comparison schemas.
 """
 
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+
+from pydantic import BaseModel, ConfigDict, Field
+
 from .index import SeriesPoint
 
 
 class BenchmarkResponse(BaseModel):
     """Benchmark performance data response."""
 
-    series: List[SeriesPoint] = Field(
+    series: list[SeriesPoint] = Field(
         ..., description="Benchmark time series (base 100)"
     )
     benchmark_name: str = Field("S&P 500", description="Name of the benchmark")

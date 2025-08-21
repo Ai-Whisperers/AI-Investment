@@ -5,7 +5,8 @@ Market data provider interface and data models.
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Dict, List, Optional, Any
+from typing import Any
+
 import pandas as pd
 
 from ..base import BaseProvider
@@ -22,7 +23,7 @@ class PriceData:
     low: float
     close: float
     volume: int
-    adjusted_close: Optional[float] = None
+    adjusted_close: float | None = None
 
 
 @dataclass
@@ -39,13 +40,13 @@ class QuoteData:
     high: float
     low: float
     previous_close: float
-    bid: Optional[float] = None
-    ask: Optional[float] = None
-    bid_size: Optional[int] = None
-    ask_size: Optional[int] = None
-    market_cap: Optional[float] = None
+    bid: float | None = None
+    ask: float | None = None
+    bid_size: int | None = None
+    ask_size: int | None = None
+    market_cap: float | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "symbol": self.symbol,
@@ -88,7 +89,7 @@ class TechnicalIndicator:
     indicator: str
     value: float
     timestamp: datetime
-    parameters: Optional[Dict[str, Any]] = None
+    parameters: dict[str, Any] | None = None
 
 
 class MarketDataProvider(BaseProvider):
@@ -100,9 +101,9 @@ class MarketDataProvider(BaseProvider):
     @abstractmethod
     def fetch_historical_prices(
         self,
-        symbols: List[str],
+        symbols: list[str],
         start_date: date,
-        end_date: Optional[date] = None,
+        end_date: date | None = None,
         interval: str = "1day",
     ) -> pd.DataFrame:
         """
@@ -120,7 +121,7 @@ class MarketDataProvider(BaseProvider):
         pass
 
     @abstractmethod
-    def get_quotes(self, symbols: List[str]) -> Dict[str, QuoteData]:
+    def get_quotes(self, symbols: list[str]) -> dict[str, QuoteData]:
         """
         Get real-time quotes for multiple symbols.
 
@@ -135,7 +136,7 @@ class MarketDataProvider(BaseProvider):
     @abstractmethod
     def get_exchange_rate(
         self, from_currency: str, to_currency: str = "USD"
-    ) -> Optional[ExchangeRate]:
+    ) -> ExchangeRate | None:
         """
         Get currency exchange rate.
 
@@ -149,7 +150,7 @@ class MarketDataProvider(BaseProvider):
         pass
 
     @abstractmethod
-    def validate_symbols(self, symbols: List[str]) -> Dict[str, bool]:
+    def validate_symbols(self, symbols: list[str]) -> dict[str, bool]:
         """
         Validate if symbols are available from provider.
 
@@ -165,11 +166,11 @@ class MarketDataProvider(BaseProvider):
     def get_technical_indicators(
         self,
         symbol: str,
-        indicators: List[str],
-        start_date: Optional[date] = None,
-        end_date: Optional[date] = None,
+        indicators: list[str],
+        start_date: date | None = None,
+        end_date: date | None = None,
         **params
-    ) -> Dict[str, pd.Series]:
+    ) -> dict[str, pd.Series]:
         """
         Get technical indicators for a symbol.
 
@@ -185,7 +186,7 @@ class MarketDataProvider(BaseProvider):
         """
         pass
 
-    def get_api_usage(self) -> Optional[Dict[str, Any]]:
+    def get_api_usage(self) -> dict[str, Any] | None:
         """
         Get API usage statistics.
 

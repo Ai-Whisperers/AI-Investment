@@ -4,11 +4,12 @@ Handles low-level API communication with MarketAux news service.
 """
 
 import logging
-import requests
-from typing import Dict, List, Optional, Any
+from typing import Any
 
-from ...base import APIError, RateLimitError
+import requests
+
 from ....core.config import settings
+from ...base import APIError, RateLimitError
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,7 @@ class MarketAuxAPIClient:
 
     BASE_URL = "https://api.marketaux.com/v1"
 
-    def __init__(self, api_key: Optional[str] = None):
+    def __init__(self, api_key: str | None = None):
         """
         Initialize API client.
         
@@ -29,16 +30,16 @@ class MarketAuxAPIClient:
             api_key: MarketAux API key
         """
         self.api_key = api_key or settings.MARKETAUX_API_KEY
-        
+
         if not self.api_key:
             raise ValueError("MarketAux API key not configured")
 
     def make_request(
-        self, 
-        endpoint: str, 
-        params: Optional[Dict] = None, 
+        self,
+        endpoint: str,
+        params: dict | None = None,
         method: str = "GET"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Make API request to MarketAux.
         
@@ -68,7 +69,7 @@ class MarketAuxAPIClient:
             if response.status_code == 429:
                 retry_after = response.headers.get("Retry-After", 60)
                 raise RateLimitError(
-                    "MarketAux rate limit exceeded", 
+                    "MarketAux rate limit exceeded",
                     retry_after=int(retry_after)
                 )
 
@@ -85,7 +86,7 @@ class MarketAuxAPIClient:
             logger.error(f"Request failed: {e}")
             raise APIError(f"Failed to connect to MarketAux: {e}")
 
-    def search_news(self, params: Dict) -> Dict[str, Any]:
+    def search_news(self, params: dict) -> dict[str, Any]:
         """
         Search for news articles.
         
@@ -97,7 +98,7 @@ class MarketAuxAPIClient:
         """
         return self.make_request("/news/all", params)
 
-    def get_article(self, article_id: str) -> Optional[Dict[str, Any]]:
+    def get_article(self, article_id: str) -> dict[str, Any] | None:
         """
         Get specific article by ID.
         
@@ -113,7 +114,7 @@ class MarketAuxAPIClient:
         except APIError:
             return None
 
-    def get_trending_news(self, limit: int = 10) -> Dict[str, Any]:
+    def get_trending_news(self, limit: int = 10) -> dict[str, Any]:
         """
         Get trending news articles.
         
@@ -126,7 +127,7 @@ class MarketAuxAPIClient:
         params = {"limit": limit, "sort": "trending"}
         return self.make_request("/news/all", params)
 
-    def get_sentiment_analysis(self, text: str) -> Optional[Dict]:
+    def get_sentiment_analysis(self, text: str) -> dict | None:
         """
         Get sentiment analysis for text.
         

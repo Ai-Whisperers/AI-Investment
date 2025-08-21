@@ -3,11 +3,11 @@ News providers module.
 """
 
 from .interface import (
-    NewsProvider,
     NewsArticle,
-    NewsSentiment,
     NewsEntity,
+    NewsProvider,
     NewsSearchParams,
+    NewsSentiment,
     SentimentLabel,
 )
 from .marketaux import MarketauxProvider

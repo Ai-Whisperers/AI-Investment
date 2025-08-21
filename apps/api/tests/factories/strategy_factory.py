@@ -3,26 +3,27 @@ Strategy factory for test data generation.
 Single responsibility: Create strategy configuration test data.
 """
 
-from typing import Dict, Any, Optional, List
+from typing import Any
+
 from .base import BaseFactory
 
 
 class StrategyFactory(BaseFactory):
     """Factory for creating strategy test data."""
-    
+
     STRATEGIES = ["momentum", "value", "growth", "balanced", "defensive"]
     REBALANCE_FREQUENCIES = ["daily", "weekly", "monthly", "quarterly", "yearly"]
-    
+
     @staticmethod
     def create_strategy_config(
-        strategy_type: Optional[str] = None,
-        rebalance_frequency: Optional[str] = None,
+        strategy_type: str | None = None,
+        rebalance_frequency: str | None = None,
         min_weight: float = 0.01,
         max_weight: float = 0.30
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create strategy configuration for testing."""
         import random
-        
+
         return {
             "strategy_type": strategy_type or random.choice(StrategyFactory.STRATEGIES),
             "rebalance_frequency": rebalance_frequency or random.choice(StrategyFactory.REBALANCE_FREQUENCIES),
@@ -32,11 +33,11 @@ class StrategyFactory(BaseFactory):
             "max_drawdown": random.uniform(0.15, 0.30),
             "lookback_period": random.choice([20, 60, 120, 252])
         }
-    
+
     @staticmethod
     def create_risk_parameters(
         risk_tolerance: str = "moderate"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create risk parameters for testing."""
         risk_profiles = {
             "conservative": {
@@ -56,9 +57,9 @@ class StrategyFactory(BaseFactory):
             }
         }
         return risk_profiles.get(risk_tolerance, risk_profiles["moderate"])
-    
+
     @staticmethod
-    def create_constraint_set() -> Dict[str, Any]:
+    def create_constraint_set() -> dict[str, Any]:
         """Create portfolio constraints for testing."""
         return {
             "min_assets": 5,

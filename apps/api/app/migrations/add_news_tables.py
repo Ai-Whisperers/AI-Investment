@@ -3,16 +3,18 @@ Migration script to add news and sentiment tables.
 Run this after the initial database setup.
 """
 
-from sqlalchemy import text
-from ..core.database import engine
 import logging
+
+from sqlalchemy import text
+
+from ..core.database import engine
 
 logger = logging.getLogger(__name__)
 
 
 def create_news_tables():
     """Create news-related tables if they don't exist."""
-    
+
     # Skip migration for SQLite test database
     if "sqlite" in str(engine.url):
         logger.info("Skipping news tables migration for SQLite database")

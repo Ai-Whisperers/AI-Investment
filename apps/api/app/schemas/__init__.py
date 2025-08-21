@@ -3,24 +3,21 @@ Pydantic schemas for API request/response validation.
 Organized by domain for better modularity.
 """
 
-from .auth import RegisterRequest, LoginRequest, TokenResponse
-
+from .auth import LoginRequest, RegisterRequest, TokenResponse
+from .benchmark import BenchmarkResponse
 from .index import (
     AllocationItem,
     IndexCurrentResponse,
-    SeriesPoint,
     IndexHistoryResponse,
+    SeriesPoint,
     SimulationRequest,
     SimulationResponse,
 )
-
-from .benchmark import BenchmarkResponse
-
 from .strategy import (
-    StrategyConfigRequest,
-    StrategyConfigResponse,
     RiskMetric,
     RiskMetricsResponse,
+    StrategyConfigRequest,
+    StrategyConfigResponse,
 )
 
 __all__ = [

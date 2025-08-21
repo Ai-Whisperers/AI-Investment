@@ -3,10 +3,10 @@ Simple caching utility with Redis (optional) or in-memory fallback.
 """
 
 import json
-import os
-from typing import Optional, Any
-from datetime import datetime, timedelta
 import logging
+import os
+from datetime import datetime, timedelta
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ class CacheManager:
                 logger.warning(f"Could not connect to Redis: {e}. Using memory cache.")
                 self.redis_client = None
 
-    def get(self, key: str) -> Optional[Any]:
+    def get(self, key: str) -> Any | None:
         """Get value from cache."""
         if self.redis_client:
             try:

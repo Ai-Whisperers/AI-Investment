@@ -2,7 +2,7 @@
 Market data providers module.
 """
 
-from .interface import MarketDataProvider, PriceData, QuoteData, ExchangeRate
+from .interface import ExchangeRate, MarketDataProvider, PriceData, QuoteData
 from .twelvedata import TwelveDataProvider
 
 __all__ = [

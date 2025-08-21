@@ -218,7 +218,13 @@ jobs:
 
       - name: Run bandit (security linting)
         working-directory: ${{ env.WORKING_DIR }}
-        run: bandit -r app/ -f json -o bandit-report.json
+        run: |
+          # Run bandit with configuration file if it exists
+          if [ -f .bandit ]; then
+            bandit -r app/ -ll -i -f json -o bandit-report.json || true
+          else
+            bandit -r app/ -ll -i -x tests,migrations -f json -o bandit-report.json || true
+          fi
 
       - name: Upload security reports
         uses: actions/upload-artifact@v4

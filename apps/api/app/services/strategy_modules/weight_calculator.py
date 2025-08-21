@@ -500,28 +500,56 @@ class WeightCalculator:
         max_weight = constraints.get('max_weight', 0.25)
         max_positions = constraints.get('max_positions', 30)
 
-        # Filter by minimum weight first
-        weights_series = weights_series[weights_series >= min_weight]
-
-        # Limit number of positions
+        # Limit number of positions first
         if len(weights_series) > max_positions:
             weights_series = weights_series.nlargest(max_positions)
 
-        # Apply max weight constraint and renormalize iteratively
-        # to ensure both min and max constraints are met
-        for _ in range(10):  # Max 10 iterations to avoid infinite loop
-            # Apply max weight constraint
-            weights_series = weights_series.clip(upper=max_weight)
-            
-            # Renormalize
-            if weights_series.sum() > 0:
-                weights_series = weights_series / weights_series.sum()
-            else:
+        # Check if constraint is mathematically feasible for full allocation
+        n_assets = len(weights_series)
+        if n_assets * max_weight < 1.0:
+            # Cannot achieve full allocation with max_weight constraint
+            # We need to relax the min_weight constraint
+            required_min = 1.0 - (n_assets - 1) * max_weight
+            min_weight = max(required_min, 0.0)
+            logger.debug(f"Adjusting min_weight to {min_weight} for feasibility")
+
+        # Apply iterative constraint satisfaction
+        for iteration in range(20):  # More iterations for convergence
+            # First ensure min weight
+            weights_series = weights_series.clip(lower=min_weight)
+
+            # Normalize to sum to 1.0
+            current_sum = weights_series.sum()
+            if current_sum > 0:
+                weights_series = weights_series / current_sum
+
+            # Check if max weight is violated
+            max_violation = weights_series.max() - max_weight
+            if max_violation <= 1e-10:
+                # All constraints satisfied
                 break
-                
-            # Check if all weights respect max constraint after normalization
-            if (weights_series <= max_weight + 1e-10).all():
-                break
+
+            # If max weight is violated, clip and redistribute
+            over_max = weights_series > max_weight
+            if over_max.any():
+                # Calculate excess weight
+                excess = (weights_series[over_max] - max_weight).sum()
+                # Clip to max weight
+                weights_series[over_max] = max_weight
+                # Redistribute excess to assets under max weight
+                under_max = weights_series < max_weight
+                if under_max.any():
+                    # Distribute proportionally to current weights
+                    available_space = (max_weight - weights_series[under_max]).sum()
+                    if available_space > 0:
+                        redistribution = min(excess, available_space)
+                        weights_series[under_max] += redistribution * (
+                            (max_weight - weights_series[under_max]) / available_space
+                        )
+
+        # Final normalization to ensure sum to 1.0
+        if weights_series.sum() > 0:
+            weights_series = weights_series / weights_series.sum()
 
         # Return in the same format as input
         if return_dict:

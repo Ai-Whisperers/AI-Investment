@@ -4,7 +4,8 @@ Provides database session management and common task functionality.
 """
 
 import logging
-from typing import Dict, Any
+from typing import Any
+
 from celery import Task
 from celery.result import AsyncResult
 
@@ -40,7 +41,7 @@ class DatabaseTask(Task):
             db.close()
 
 
-def get_task_status(task_id: str) -> Dict[str, Any]:
+def get_task_status(task_id: str) -> dict[str, Any]:
     """
     Get the status of a background task.
 
@@ -80,7 +81,7 @@ def get_task_status(task_id: str) -> Dict[str, Any]:
         }
 
 
-def create_error_response(error: Exception) -> Dict[str, Any]:
+def create_error_response(error: Exception) -> dict[str, Any]:
     """
     Create standardized error response for failed tasks.
     
@@ -91,7 +92,7 @@ def create_error_response(error: Exception) -> Dict[str, Any]:
         Error response dictionary
     """
     from datetime import datetime
-    
+
     return {
         "status": "failed",
         "error": str(error),
@@ -104,7 +105,7 @@ def create_success_response(
     start_time,
     end_time,
     **kwargs
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Create standardized success response for completed tasks.
     

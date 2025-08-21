@@ -1,12 +1,12 @@
 """Cache utilities and decorators."""
 
-import hashlib
 import functools
+import hashlib
 import logging
-from typing import Optional, Callable
+from collections.abc import Callable
 
-from ..core.redis_client import get_redis_client
 from ..core.config import settings
+from ..core.redis_client import get_redis_client
 
 logger = logging.getLogger(__name__)
 
@@ -37,8 +37,8 @@ def generate_cache_key(*args, **kwargs) -> str:
 
 def cache_result(
     prefix: str,
-    expire: Optional[int] = None,
-    key_func: Optional[Callable] = None,
+    expire: int | None = None,
+    key_func: Callable | None = None,
     include_user: bool = True,
 ):
     """

@@ -4,9 +4,10 @@ Handles data transformation, validation, and normalization.
 """
 
 import logging
-import pandas as pd
-from typing import Dict, List, Optional, Any
 from datetime import datetime
+from typing import Any
+
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -60,9 +61,9 @@ class TwelveDataProcessor:
 
     @staticmethod
     def process_batch_response(
-        batch_data: Dict,
-        symbols: List[str]
-    ) -> Dict[str, pd.DataFrame]:
+        batch_data: dict,
+        symbols: list[str]
+    ) -> dict[str, pd.DataFrame]:
         """
         Process batch time series response.
         
@@ -74,14 +75,14 @@ class TwelveDataProcessor:
             Dictionary of symbol -> DataFrame
         """
         processed_data = {}
-        
+
         for symbol in symbols:
             if symbol not in batch_data:
                 logger.warning(f"Symbol {symbol} not in batch response")
                 continue
-            
+
             symbol_data = batch_data[symbol]
-            
+
             # Handle different response formats
             if isinstance(symbol_data, dict) and "values" in symbol_data:
                 # Standard format with "values" key
@@ -92,22 +93,22 @@ class TwelveDataProcessor:
             else:
                 logger.warning(f"Unexpected data format for {symbol}")
                 continue
-            
+
             # Process datetime index
             if "datetime" in df.columns:
                 df["datetime"] = pd.to_datetime(df["datetime"])
                 df.set_index("datetime", inplace=True)
-            
+
             # Process the data
             df = TwelveDataProcessor.process_price_data(df, symbol)
-            
+
             if not df.empty:
                 processed_data[symbol] = df
-        
+
         return processed_data
 
     @staticmethod
-    def process_quote_response(quote_data: Any) -> Optional[Dict]:
+    def process_quote_response(quote_data: Any) -> dict | None:
         """
         Process quote response from TwelveData.
         
@@ -122,38 +123,38 @@ class TwelveDataProcessor:
                 data = quote_data.as_json()
             else:
                 data = quote_data
-            
+
             if not data:
                 return None
-            
+
             # Ensure numeric fields
             numeric_fields = [
                 'open', 'high', 'low', 'close', 'volume',
                 'previous_close', 'change', 'percent_change',
-                'average_volume', 'fifty_two_week_low', 
+                'average_volume', 'fifty_two_week_low',
                 'fifty_two_week_high'
             ]
-            
+
             for field in numeric_fields:
                 if field in data:
                     try:
                         data[field] = float(data[field])
                     except (ValueError, TypeError):
                         pass
-            
+
             # Add timestamp if not present
             if 'timestamp' not in data:
                 data['timestamp'] = datetime.now().isoformat()
-            
+
             return data
-            
+
         except Exception as e:
             logger.error(f"Error processing quote response: {e}")
             return None
 
     @staticmethod
     def combine_dataframes(
-        dataframes: Dict[str, pd.DataFrame]
+        dataframes: dict[str, pd.DataFrame]
     ) -> pd.DataFrame:
         """
         Combine multiple symbol DataFrames into a single multi-index DataFrame.
@@ -166,7 +167,7 @@ class TwelveDataProcessor:
         """
         if not dataframes:
             return pd.DataFrame()
-        
+
         try:
             # Create multi-index columns
             combined = pd.concat(
@@ -175,9 +176,9 @@ class TwelveDataProcessor:
                 keys=dataframes.keys(),
                 names=['symbol', 'field']
             )
-            
+
             return combined
-            
+
         except Exception as e:
             logger.error(f"Error combining dataframes: {e}")
             return pd.DataFrame()
@@ -201,7 +202,7 @@ class TwelveDataProcessor:
         """
         if df.empty or len(df) < min_rows:
             return False
-        
+
         # Check null percentage for price columns
         price_cols = ['open', 'high', 'low', 'close']
         for col in price_cols:
@@ -210,5 +211,5 @@ class TwelveDataProcessor:
                 if null_pct > max_null_pct:
                     logger.warning(f"Column {col} has {null_pct:.1%} nulls")
                     return False
-        
+
         return True

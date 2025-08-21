@@ -5,8 +5,8 @@ News provider interface and data models.
 from abc import abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Dict, List, Optional, Any
 from enum import Enum
+from typing import Any
 
 from ..base import BaseProvider
 
@@ -28,11 +28,11 @@ class NewsEntity:
     symbol: str
     name: str
     type: str  # company, person, location, etc.
-    exchange: Optional[str] = None
-    country: Optional[str] = None
-    industry: Optional[str] = None
-    match_score: Optional[float] = None
-    sentiment_score: Optional[float] = None
+    exchange: str | None = None
+    country: str | None = None
+    industry: str | None = None
+    match_score: float | None = None
+    sentiment_score: float | None = None
 
 
 @dataclass
@@ -70,16 +70,16 @@ class NewsArticle:
     url: str
     source: str
     published_at: datetime
-    content: Optional[str] = None
-    image_url: Optional[str] = None
+    content: str | None = None
+    image_url: str | None = None
     language: str = "en"
-    country: Optional[str] = None
-    entities: List[NewsEntity] = field(default_factory=list)
-    sentiment: Optional[NewsSentiment] = None
-    keywords: List[str] = field(default_factory=list)
-    categories: List[str] = field(default_factory=list)
+    country: str | None = None
+    entities: list[NewsEntity] = field(default_factory=list)
+    sentiment: NewsSentiment | None = None
+    keywords: list[str] = field(default_factory=list)
+    categories: list[str] = field(default_factory=list)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "uuid": self.uuid,
@@ -120,17 +120,17 @@ class NewsArticle:
 class NewsSearchParams:
     """Parameters for news search."""
 
-    symbols: Optional[List[str]] = None
-    keywords: Optional[List[str]] = None
-    sources: Optional[List[str]] = None
-    countries: Optional[List[str]] = None
-    languages: Optional[List[str]] = None
-    categories: Optional[List[str]] = None
-    industries: Optional[List[str]] = None
-    sentiment_min: Optional[float] = None
-    sentiment_max: Optional[float] = None
-    published_after: Optional[datetime] = None
-    published_before: Optional[datetime] = None
+    symbols: list[str] | None = None
+    keywords: list[str] | None = None
+    sources: list[str] | None = None
+    countries: list[str] | None = None
+    languages: list[str] | None = None
+    categories: list[str] | None = None
+    industries: list[str] | None = None
+    sentiment_min: float | None = None
+    sentiment_max: float | None = None
+    published_after: datetime | None = None
+    published_before: datetime | None = None
     limit: int = 50
     offset: int = 0
 
@@ -142,7 +142,7 @@ class NewsProvider(BaseProvider):
     """
 
     @abstractmethod
-    def search_news(self, params: NewsSearchParams) -> List[NewsArticle]:
+    def search_news(self, params: NewsSearchParams) -> list[NewsArticle]:
         """
         Search for news articles based on parameters.
 
@@ -155,7 +155,7 @@ class NewsProvider(BaseProvider):
         pass
 
     @abstractmethod
-    def get_article(self, article_id: str) -> Optional[NewsArticle]:
+    def get_article(self, article_id: str) -> NewsArticle | None:
         """
         Get a specific article by ID.
 
@@ -170,7 +170,7 @@ class NewsProvider(BaseProvider):
     @abstractmethod
     def get_similar_articles(
         self, article_id: str, limit: int = 10
-    ) -> List[NewsArticle]:
+    ) -> list[NewsArticle]:
         """
         Get articles similar to a given article.
 
@@ -185,8 +185,8 @@ class NewsProvider(BaseProvider):
 
     @abstractmethod
     def get_trending_entities(
-        self, entity_type: Optional[str] = None, limit: int = 20
-    ) -> List[Dict[str, Any]]:
+        self, entity_type: str | None = None, limit: int = 20
+    ) -> list[dict[str, Any]]:
         """
         Get trending entities in news.
 
@@ -203,9 +203,9 @@ class NewsProvider(BaseProvider):
     def get_entity_sentiment(
         self,
         symbol: str,
-        start_date: Optional[datetime] = None,
-        end_date: Optional[datetime] = None,
-    ) -> Dict[str, Any]:
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+    ) -> dict[str, Any]:
         """
         Get sentiment analysis for a specific entity over time.
 
@@ -232,7 +232,7 @@ class NewsProvider(BaseProvider):
         # Default implementation - can be overridden
         return NewsSentiment(score=0.0, label=SentimentLabel.NEUTRAL, confidence=0.5)
 
-    def extract_entities(self, text: str) -> List[NewsEntity]:
+    def extract_entities(self, text: str) -> list[NewsEntity]:
         """
         Extract entities from text (if provider supports it).
 

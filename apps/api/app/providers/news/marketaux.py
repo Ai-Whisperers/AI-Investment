@@ -5,20 +5,15 @@ Implements NewsProvider interface using modularized components.
 
 import hashlib
 import logging
-from typing import Dict, List, Optional
 
+from ...core.config import settings
+from ..base import ProviderStatus
 from .interface import (
-    NewsProvider,
     NewsArticle,
+    NewsProvider,
     NewsSearchParams,
 )
-from ..base import ProviderStatus
-from ...core.config import settings
-from .marketaux_provider import (
-    MarketAuxAPIClient,
-    MarketAuxDataParser,
-    MarketAuxCacheManager
-)
+from .marketaux_provider import MarketAuxAPIClient, MarketAuxCacheManager, MarketAuxDataParser
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +24,7 @@ class MarketauxProvider(NewsProvider):
     Orchestrates news fetching using modular components.
     """
 
-    def __init__(self, api_key: Optional[str] = None, cache_enabled: bool = True):
+    def __init__(self, api_key: str | None = None, cache_enabled: bool = True):
         """
         Initialize MarketAux provider.
         
@@ -38,7 +33,7 @@ class MarketauxProvider(NewsProvider):
             cache_enabled: Whether to enable caching
         """
         super().__init__(api_key or settings.MARKETAUX_API_KEY, cache_enabled)
-        
+
         # Initialize components
         self.client = MarketAuxAPIClient(self.api_key)
         self.parser = MarketAuxDataParser()
@@ -63,7 +58,7 @@ class MarketauxProvider(NewsProvider):
             logger.error(f"Health check failed: {e}")
             return ProviderStatus.UNHEALTHY
 
-    def search_news(self, params: NewsSearchParams) -> List[NewsArticle]:
+    def search_news(self, params: NewsSearchParams) -> list[NewsArticle]:
         """
         Search for news articles.
         
@@ -75,32 +70,32 @@ class MarketauxProvider(NewsProvider):
         """
         # Convert search params to API parameters
         api_params = self.parser.parse_search_params(params)
-        
+
         # Check cache
         cached_articles = self.cache_manager.get_search_results(api_params)
         if cached_articles:
             return [self.parser.parse_article(a) for a in cached_articles]
-        
+
         # Make API request
         response = self.client.search_news(api_params)
-        
+
         if not response or "data" not in response:
             return []
-        
+
         # Parse articles
         articles = [
-            self.parser.parse_article(article_data) 
+            self.parser.parse_article(article_data)
             for article_data in response["data"]
         ]
-        
+
         # Cache results
         if articles:
             articles_data = [self._article_to_dict(a) for a in articles]
             self.cache_manager.set_search_results(api_params, articles_data)
-        
+
         return articles
 
-    def get_article(self, article_id: str) -> Optional[NewsArticle]:
+    def get_article(self, article_id: str) -> NewsArticle | None:
         """
         Get specific article by UUID.
         
@@ -114,20 +109,20 @@ class MarketauxProvider(NewsProvider):
         cached_article = self.cache_manager.get_article(article_id)
         if cached_article:
             return self.parser.parse_article(cached_article)
-        
+
         # Fetch from API
         article_data = self.client.get_article(article_id)
-        
+
         if not article_data:
             return None
-        
+
         # Parse and cache
         article = self.parser.parse_article(article_data)
         self.cache_manager.set_article(article_id, self._article_to_dict(article))
-        
+
         return article
 
-    def get_trending_news(self, limit: int = 10) -> List[NewsArticle]:
+    def get_trending_news(self, limit: int = 10) -> list[NewsArticle]:
         """
         Get trending news articles.
         
@@ -140,30 +135,30 @@ class MarketauxProvider(NewsProvider):
         # Check cache for trending
         cache_key_params = {"limit": limit, "sort": "trending"}
         cached_articles = self.cache_manager.get_search_results(cache_key_params)
-        
+
         if cached_articles:
             return [self.parser.parse_article(a) for a in cached_articles]
-        
+
         # Fetch from API
         response = self.client.get_trending_news(limit)
-        
+
         if not response or "data" not in response:
             return []
-        
+
         # Parse articles
         articles = [
-            self.parser.parse_article(article_data) 
+            self.parser.parse_article(article_data)
             for article_data in response["data"]
         ]
-        
+
         # Cache results
         if articles:
             articles_data = [self._article_to_dict(a) for a in articles]
             self.cache_manager.set_search_results(cache_key_params, articles_data)
-        
+
         return articles
 
-    def analyze_sentiment(self, text: str) -> Optional[Dict]:
+    def analyze_sentiment(self, text: str) -> dict | None:
         """
         Analyze sentiment of text.
         
@@ -175,21 +170,21 @@ class MarketauxProvider(NewsProvider):
         """
         # Create hash of text for caching
         text_hash = hashlib.md5(text.encode()).hexdigest()
-        
+
         # Check cache
         cached_sentiment = self.cache_manager.get_sentiment(text_hash)
         if cached_sentiment:
             return cached_sentiment
-        
+
         # Get from API
         sentiment_data = self.client.get_sentiment_analysis(text)
-        
+
         if sentiment_data:
             self.cache_manager.set_sentiment(text_hash, sentiment_data)
-        
+
         return sentiment_data
 
-    def _article_to_dict(self, article: NewsArticle) -> Dict:
+    def _article_to_dict(self, article: NewsArticle) -> dict:
         """
         Convert NewsArticle to dictionary for caching.
         

@@ -3,9 +3,11 @@ Script to create performance indexes on the database.
 Can be run manually or as part of deployment.
 """
 
-from sqlalchemy import text
-from ..core.database import engine
 import logging
+
+from sqlalchemy import text
+
+from ..core.database import engine
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

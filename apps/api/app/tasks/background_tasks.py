@@ -5,10 +5,10 @@ Re-exports tasks from modularized task modules.
 
 # Re-export all tasks for backward compatibility
 from .base import DatabaseTask, get_task_status
-from .market_refresh import refresh_market_data, refresh_specific_symbols
+from .cleanup import cleanup_old_data, cleanup_orphaned_records, optimize_database
 from .index_computation import compute_index, rebalance_portfolio
-from .report_generation import generate_report, generate_comprehensive_report
-from .cleanup import cleanup_old_data, optimize_database, cleanup_orphaned_records
+from .market_refresh import refresh_market_data, refresh_specific_symbols
+from .report_generation import generate_comprehensive_report, generate_report
 
 __all__ = [
     "DatabaseTask",

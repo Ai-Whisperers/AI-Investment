@@ -2,9 +2,11 @@
 User authentication and authorization models.
 """
 
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
-from sqlalchemy.orm import relationship
 from datetime import datetime
+
+from sqlalchemy import Boolean, Column, DateTime, Integer, String
+from sqlalchemy.orm import relationship
+
 from ..core.database import Base
 
 
@@ -19,7 +21,7 @@ class User(Base):
     is_google_user = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
-    
+
     # Relationships
     portfolios = relationship("Portfolio", back_populates="user")
 

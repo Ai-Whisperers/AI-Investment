@@ -3,12 +3,12 @@ Base classes and interfaces for data providers.
 Implements common functionality and error handling.
 """
 
-from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional, TypeVar, Generic
 import logging
 import time
-from functools import wraps
+from abc import ABC, abstractmethod
 from enum import Enum
+from functools import wraps
+from typing import Any, Generic, TypeVar
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ class ProviderError(Exception):
 class RateLimitError(ProviderError):
     """Raised when rate limit is exceeded."""
 
-    def __init__(self, message: str, retry_after: Optional[int] = None):
+    def __init__(self, message: str, retry_after: int | None = None):
         super().__init__(message)
         self.retry_after = retry_after
 
@@ -41,7 +41,7 @@ class RateLimitError(ProviderError):
 class APIError(ProviderError):
     """Raised when API returns an error."""
 
-    def __init__(self, message: str, status_code: Optional[int] = None):
+    def __init__(self, message: str, status_code: int | None = None):
         super().__init__(message)
         self.status_code = status_code
 
@@ -154,7 +154,7 @@ class BaseProvider(ABC, Generic[T]):
     Provides common functionality like caching, rate limiting, and error handling.
     """
 
-    def __init__(self, api_key: Optional[str] = None, cache_enabled: bool = True):
+    def __init__(self, api_key: str | None = None, cache_enabled: bool = True):
         self.api_key = api_key
         self.cache_enabled = cache_enabled
         self.circuit_breaker = CircuitBreaker()
@@ -178,7 +178,7 @@ class BaseProvider(ABC, Generic[T]):
         """Check provider health status."""
         pass
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Get provider statistics."""
         return {
             "provider": self.get_provider_name(),
@@ -204,7 +204,7 @@ class BaseProvider(ABC, Generic[T]):
         self._error_count += 1
 
     @retry_with_backoff(max_retries=3)
-    def make_request(self, endpoint: str, params: Optional[Dict] = None) -> Any:
+    def make_request(self, endpoint: str, params: dict | None = None) -> Any:
         """
         Make API request with retry logic and circuit breaker.
         Subclasses should implement _execute_request.
@@ -220,7 +220,7 @@ class BaseProvider(ABC, Generic[T]):
             raise
 
     @abstractmethod
-    def _execute_request(self, endpoint: str, params: Optional[Dict] = None) -> Any:
+    def _execute_request(self, endpoint: str, params: dict | None = None) -> Any:
         """
         Execute the actual API request.
         Must be implemented by subclasses.

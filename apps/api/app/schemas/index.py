@@ -2,9 +2,9 @@
 Index-related schemas for portfolio management.
 """
 
-from pydantic import BaseModel, Field, ConfigDict
 from datetime import date as DateType
-from typing import List, Optional
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class AllocationItem(BaseModel):
@@ -12,10 +12,10 @@ class AllocationItem(BaseModel):
 
     symbol: str = Field(..., description="Asset ticker symbol")
     weight: float = Field(..., ge=0, le=1, description="Weight in portfolio (0-1)")
-    name: Optional[str] = Field(None, description="Asset name")
-    sector: Optional[str] = Field(None, description="Asset sector")
-    daily_return: Optional[float] = Field(None, description="Daily return percentage")
-    ytd_return: Optional[float] = Field(
+    name: str | None = Field(None, description="Asset name")
+    sector: str | None = Field(None, description="Asset sector")
+    daily_return: float | None = Field(None, description="Daily return percentage")
+    ytd_return: float | None = Field(
         None, description="Year-to-date return percentage"
     )
 
@@ -37,10 +37,10 @@ class IndexCurrentResponse(BaseModel):
     """Current index composition response."""
 
     date: DateType = Field(..., description="Date of the allocation")
-    allocations: List[AllocationItem] = Field(
+    allocations: list[AllocationItem] = Field(
         ..., description="List of asset allocations"
     )
-    total_assets: Optional[int] = Field(None, description="Total number of assets")
+    total_assets: int | None = Field(None, description="Total number of assets")
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -74,9 +74,9 @@ class SeriesPoint(BaseModel):
 class IndexHistoryResponse(BaseModel):
     """Historical index performance response."""
 
-    series: List[SeriesPoint] = Field(..., description="Time series of index values")
-    start_date: Optional[DateType] = Field(None, description="Start date of the series")
-    end_date: Optional[DateType] = Field(None, description="End date of the series")
+    series: list[SeriesPoint] = Field(..., description="Time series of index values")
+    start_date: DateType | None = Field(None, description="Start date of the series")
+    end_date: DateType | None = Field(None, description="End date of the series")
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -117,7 +117,7 @@ class SimulationResponse(BaseModel):
     amount_final: float
     roi_pct: float = Field(..., description="Return on investment percentage")
     currency: str
-    series: List[SeriesPoint] = Field(..., description="Value progression over time")
+    series: list[SeriesPoint] = Field(..., description="Value progression over time")
 
     model_config = ConfigDict(
         json_schema_extra={

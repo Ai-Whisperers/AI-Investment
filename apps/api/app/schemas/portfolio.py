@@ -1,7 +1,9 @@
 """Portfolio schemas for API responses."""
-from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
 from datetime import datetime
+from typing import Any
+
+from pydantic import BaseModel
+
 
 class PositionResponse(BaseModel):
     """Position in a portfolio."""
@@ -12,7 +14,7 @@ class PositionResponse(BaseModel):
     total_value: float
     weight: float
     returns: float
-    
+
     class Config:
         from_attributes = True
 
@@ -20,19 +22,19 @@ class PortfolioResponse(BaseModel):
     """Portfolio response schema."""
     id: int
     name: str
-    description: Optional[str] = None
+    description: str | None = None
     total_value: float
     returns: float
-    positions: List[PositionResponse] = []
-    strategy_config: Optional[Dict[str, Any]] = None
+    positions: list[PositionResponse] = []
+    strategy_config: dict[str, Any] | None = None
     created_at: datetime
     updated_at: datetime
-    
+
     class Config:
         from_attributes = True
 
 class PortfolioCreateRequest(BaseModel):
     """Request to create a portfolio."""
     name: str
-    description: Optional[str] = None
-    strategy_config: Optional[Dict[str, Any]] = None
+    description: str | None = None
+    strategy_config: dict[str, Any] | None = None

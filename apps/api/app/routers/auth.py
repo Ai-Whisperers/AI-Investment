@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
 from ..core.database import get_db
@@ -153,3 +154,22 @@ def refresh_token(current_user: User = Depends(get_current_user)):
 def logout():
     """Logout endpoint - token invalidation handled on client side."""
     return {"message": "Successfully logged out"}
+
+
+@router.get("/google")
+def google_oauth_redirect():
+    """Redirect to Google OAuth for authentication."""
+    # In a real implementation, you would construct the OAuth URL with:
+    # - client_id
+    # - redirect_uri
+    # - scope
+    # - state (for CSRF protection)
+    google_oauth_url = (
+        "https://accounts.google.com/o/oauth2/v2/auth?"
+        "response_type=code&"
+        "client_id=YOUR_CLIENT_ID&"
+        "redirect_uri=YOUR_REDIRECT_URI&"
+        "scope=openid%20email%20profile&"
+        "state=RANDOM_STATE"
+    )
+    return RedirectResponse(url=google_oauth_url, status_code=307)

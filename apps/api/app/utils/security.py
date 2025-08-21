@@ -1,7 +1,7 @@
-from passlib.context import CryptContext
 from datetime import datetime, timedelta
-from jose import jwt, JWTError
-from typing import Union, Optional
+
+from jose import JWTError, jwt
+from passlib.context import CryptContext
 
 from ..core.config import settings
 
@@ -17,9 +17,9 @@ def get_password_hash(password: str) -> str:
 
 
 def create_access_token(
-    subject: str, 
-    expires_delta: Optional[timedelta] = None,
-    expires_minutes: Optional[int] = None
+    subject: str,
+    expires_delta: timedelta | None = None,
+    expires_minutes: int | None = None
 ) -> str:
     """Create a JWT access token."""
     if expires_delta:
@@ -28,16 +28,16 @@ def create_access_token(
         expire = datetime.utcnow() + timedelta(minutes=expires_minutes)
     else:
         expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    
+
     to_encode = {
-        "sub": subject, 
+        "sub": subject,
         "exp": expire,
         "iat": datetime.utcnow()
     }
     return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
 
-def decode_access_token(token: str) -> Optional[str]:
+def decode_access_token(token: str) -> str | None:
     """Decode a JWT access token and return the subject."""
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])

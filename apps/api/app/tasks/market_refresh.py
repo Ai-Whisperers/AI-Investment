@@ -5,20 +5,20 @@ Handles fetching and updating market data asynchronously.
 
 import logging
 from datetime import datetime
-from typing import Dict, Any
+from typing import Any
 
 from ..core.celery_app import celery_app
-from ..services.refresh import refresh_all
-from ..utils.cache_utils import CacheManager
 from ..models.asset import Price
 from ..models.index import IndexValue
-from .base import DatabaseTask, create_success_response, create_error_response
+from ..services.refresh import refresh_all
+from ..utils.cache_utils import CacheManager
+from .base import DatabaseTask, create_error_response, create_success_response
 
 logger = logging.getLogger(__name__)
 
 
 @celery_app.task(bind=True, base=DatabaseTask, name="refresh_market_data")
-def refresh_market_data(self, mode: str = "smart", db=None) -> Dict[str, Any]:
+def refresh_market_data(self, mode: str = "smart", db=None) -> dict[str, Any]:
     """
     Refresh market data in the background.
 
@@ -73,11 +73,11 @@ def refresh_market_data(self, mode: str = "smart", db=None) -> Dict[str, Any]:
 
 @celery_app.task(bind=True, base=DatabaseTask, name="refresh_specific_symbols")
 def refresh_specific_symbols(
-    self, 
-    symbols: list, 
+    self,
+    symbols: list,
     lookback_days: int = 30,
     db=None
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Refresh data for specific symbols only.
 
@@ -95,13 +95,14 @@ def refresh_specific_symbols(
 
         # Update task state
         self.update_state(
-            state="PROGRESS", 
+            state="PROGRESS",
             meta={"status": f"Fetching data for {len(symbols)} symbols..."}
         )
 
         # Import here to avoid circular dependency
-        from ..services.twelvedata import fetch_prices
         from datetime import date, timedelta
+
+        from ..services.twelvedata import fetch_prices
 
         # Calculate date range
         end_date = date.today()

@@ -1,7 +1,6 @@
 """Password validation utilities."""
 
 import re
-from typing import List, Tuple
 
 
 class PasswordValidator:
@@ -11,7 +10,7 @@ class PasswordValidator:
     MAX_LENGTH = 128
 
     @classmethod
-    def validate(cls, password: str) -> Tuple[bool, List[str]]:
+    def validate(cls, password: str) -> tuple[bool, list[str]]:
         """
         Validate password against security requirements.
 

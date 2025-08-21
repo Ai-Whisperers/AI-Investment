@@ -3,13 +3,12 @@ Rate limiting implementation for TwelveData API.
 Handles distributed rate limiting via Redis for multi-instance deployments.
 """
 
-import time
 import json
 import logging
-from typing import List
+import time
 
-from ....core.redis_client import get_redis_client
 from ....core.config import settings
+from ....core.redis_client import get_redis_client
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +27,7 @@ class TwelveDataRateLimiter:
             credits_per_minute: API credits per minute (defaults to settings)
         """
         self.credits_per_minute = credits_per_minute or settings.TWELVEDATA_RATE_LIMIT
-        self.credits_used: List[float] = []
+        self.credits_used: list[float] = []
         self.redis_client = get_redis_client()
         self.redis_key = "twelvedata:rate_limit"
 
@@ -59,7 +58,7 @@ class TwelveDataRateLimiter:
             wait_time = 60 - (now - oldest_credit) + 1
             logger.info(f"Rate limit: waiting {wait_time:.1f}s...")
             time.sleep(wait_time)
-            
+
             # Refresh timestamp and clean again
             now = time.time()
             self.credits_used = [t for t in self.credits_used if now - t < 60]
@@ -72,8 +71,8 @@ class TwelveDataRateLimiter:
         if self.redis_client.is_connected:
             try:
                 self.redis_client.set(
-                    self.redis_key, 
-                    json.dumps(self.credits_used), 
+                    self.redis_key,
+                    json.dumps(self.credits_used),
                     expire=120  # Keep for 2 minutes
                 )
             except Exception as e:
@@ -93,7 +92,7 @@ class TwelveDataRateLimiter:
     def reset(self) -> None:
         """Reset rate limiter state."""
         self.credits_used = []
-        
+
         if self.redis_client.is_connected:
             try:
                 self.redis_client.delete(self.redis_key)

@@ -5,9 +5,8 @@ Handles transformation of API responses into domain objects.
 
 import logging
 from datetime import datetime
-from typing import Dict, List, Optional
 
-from ..interface import NewsArticle, NewsSentiment, NewsEntity
+from ..interface import NewsArticle, NewsEntity, NewsSentiment
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +17,7 @@ class MarketAuxDataParser:
     """
 
     @staticmethod
-    def parse_article(data: Dict) -> NewsArticle:
+    def parse_article(data: dict) -> NewsArticle:
         """
         Parse API response into NewsArticle.
         
@@ -73,7 +72,7 @@ class MarketAuxDataParser:
             )
 
     @staticmethod
-    def _parse_entities(entities_data: List[Dict]) -> List[NewsEntity]:
+    def _parse_entities(entities_data: list[dict]) -> list[NewsEntity]:
         """
         Parse entity data from API response.
         
@@ -84,7 +83,7 @@ class MarketAuxDataParser:
             List of parsed NewsEntity objects
         """
         entities = []
-        
+
         for entity_data in entities_data:
             try:
                 entity = NewsEntity(
@@ -101,11 +100,11 @@ class MarketAuxDataParser:
             except Exception as e:
                 logger.warning(f"Failed to parse entity: {e}")
                 continue
-        
+
         return entities
 
     @staticmethod
-    def _parse_sentiment(sentiment_data: Optional[Dict]) -> Optional[NewsSentiment]:
+    def _parse_sentiment(sentiment_data: dict | None) -> NewsSentiment | None:
         """
         Parse sentiment data from API response.
         
@@ -117,7 +116,7 @@ class MarketAuxDataParser:
         """
         if not sentiment_data:
             return None
-        
+
         try:
             return NewsSentiment.from_score(
                 score=sentiment_data.get("score", 0),
@@ -128,7 +127,7 @@ class MarketAuxDataParser:
             return None
 
     @staticmethod
-    def _parse_datetime(datetime_str: Optional[str]) -> datetime:
+    def _parse_datetime(datetime_str: str | None) -> datetime:
         """
         Parse datetime string from API response.
         
@@ -140,19 +139,19 @@ class MarketAuxDataParser:
         """
         if not datetime_str:
             return datetime.now()
-        
+
         try:
             # Handle different datetime formats
             if datetime_str.endswith("Z"):
                 datetime_str = datetime_str.replace("Z", "+00:00")
-            
+
             return datetime.fromisoformat(datetime_str)
         except Exception as e:
             logger.warning(f"Failed to parse datetime '{datetime_str}': {e}")
             return datetime.now()
 
     @staticmethod
-    def parse_search_params(search_params) -> Dict:
+    def parse_search_params(search_params) -> dict:
         """
         Convert NewsSearchParams to API parameters.
         

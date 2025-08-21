@@ -2,7 +2,8 @@
 Index composition and value models.
 """
 
-from sqlalchemy import Column, Integer, Float, ForeignKey, Date
+from sqlalchemy import Column, Date, Float, ForeignKey, Integer
+
 from ..core.database import Base
 
 

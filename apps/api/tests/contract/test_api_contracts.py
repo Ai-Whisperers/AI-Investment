@@ -3,15 +3,13 @@ Contract tests to ensure frontend-backend API compatibility.
 These tests verify that API responses match expected schemas.
 """
 
-import pytest
-from pydantic import ValidationError
-from decimal import Decimal
 from datetime import datetime
 
-from app.schemas.portfolio import PortfolioResponse, PositionResponse
-from app.schemas.index import IndexValueResponse, AllocationResponse
+import pytest
+
+from app.schemas.index import AllocationResponse, IndexValueResponse
+from app.schemas.portfolio import PortfolioResponse
 from app.schemas.strategy import StrategyConfigResponse
-from app.schemas.user import UserResponse
 from app.schemas.validation import RefreshResponse
 
 
@@ -19,7 +17,7 @@ from app.schemas.validation import RefreshResponse
 @pytest.mark.critical
 class TestAPIContracts:
     """Ensure API contracts match frontend expectations."""
-    
+
     def test_portfolio_response_contract(self):
         """Test portfolio response matches frontend interface."""
         # This data structure must match frontend's PortfolioData interface
@@ -49,12 +47,12 @@ class TestAPIContracts:
             "created_at": "2024-01-01T00:00:00",
             "updated_at": "2024-01-19T12:00:00"
         }
-        
+
         # Should not raise ValidationError
         validated = PortfolioResponse(**response_data)
         assert validated.total_value == 100000.00
         assert len(validated.positions) == 1
-    
+
     def test_index_value_response_contract(self):
         """Test index value response for chart data."""
         # Must match frontend's ChartData interface
@@ -67,10 +65,10 @@ class TestAPIContracts:
             "benchmark_value": 1450.00,
             "benchmark_return": 0.0098
         }
-        
+
         validated = IndexValueResponse(**response_data)
         assert validated.value == 1523.45
-    
+
     def test_allocation_response_contract(self):
         """Test allocation response for pie charts."""
         # Must match frontend's AllocationData interface
@@ -97,11 +95,11 @@ class TestAPIContracts:
             "total_value": 100000.00,
             "rebalance_needed": False
         }
-        
+
         validated = AllocationResponse(**response_data)
         assert len(validated.allocations) == 2
         assert sum(a.weight for a in validated.allocations) == pytest.approx(0.45)
-    
+
     def test_strategy_config_response_contract(self):
         """Test strategy configuration response."""
         # Must match frontend's StrategyConfig interface
@@ -125,11 +123,11 @@ class TestAPIContracts:
                 "exclude_symbols": ["TSLA", "GME"]
             }
         }
-        
+
         validated = StrategyConfigResponse(**response_data)
         assert validated.risk_level == "medium"
         assert validated.constraints["max_weight"] == 0.40
-    
+
     def test_refresh_response_contract(self):
         """Test data refresh response."""
         # Must match frontend's RefreshStatus interface
@@ -144,11 +142,11 @@ class TestAPIContracts:
             "next_refresh": "2024-01-19T13:00:00",
             "warnings": []
         }
-        
+
         validated = RefreshResponse(**response_data)
         assert validated.status == "success"
         assert validated.assets_updated == 25
-    
+
     def test_diagnostics_response_contract(self):
         """Test diagnostics/health check response."""
         # Must match frontend's DiagnosticsData interface
@@ -176,11 +174,11 @@ class TestAPIContracts:
                 "rate_limit_remaining": 450
             }
         }
-        
+
         # Validate nested structure
         assert response_data["database"]["connected"] == True
         assert response_data["cache"]["hit_rate"] == 0.85
-    
+
     def test_error_response_contract(self):
         """Test error response format."""
         # Must match frontend's ErrorResponse interface
@@ -208,12 +206,12 @@ class TestAPIContracts:
                 "retry_after": 60
             }
         ]
-        
+
         # All error formats should be consistent
         for error in error_responses:
             assert "detail" in error
             assert "status_code" in error
-    
+
     def test_pagination_contract(self):
         """Test paginated response contract."""
         # Must match frontend's PaginatedResponse interface
@@ -229,10 +227,10 @@ class TestAPIContracts:
             "has_next": True,
             "has_previous": False
         }
-        
+
         assert response_data["total_pages"] == response_data["total"] // response_data["per_page"]
         assert response_data["has_next"] == (response_data["page"] < response_data["total_pages"])
-    
+
     def test_websocket_message_contract(self):
         """Test WebSocket message format."""
         # Must match frontend's WSMessage interface
@@ -263,12 +261,12 @@ class TestAPIContracts:
                 }
             }
         ]
-        
+
         for msg in ws_messages:
             assert "type" in msg
             assert "data" in msg
             assert isinstance(msg["data"], dict)
-    
+
     @pytest.mark.parametrize("field_type,test_value,should_pass", [
         ("decimal", "123.45", True),
         ("decimal", "123.456789", False),  # Too many decimal places
@@ -282,14 +280,14 @@ class TestAPIContracts:
     def test_field_format_contract(self, field_type, test_value, should_pass):
         """Test field format consistency across API."""
         # This ensures consistent data formats that frontend expects
-        
+
         if field_type == "decimal":
             # Decimal fields should have max 2 decimal places for display
             if should_pass:
                 assert len(str(test_value).split('.')[-1]) <= 2
             else:
                 assert len(str(test_value).split('.')[-1]) > 2
-        
+
         elif field_type == "date":
             # Dates should be ISO format YYYY-MM-DD
             if should_pass:
@@ -297,7 +295,7 @@ class TestAPIContracts:
             else:
                 with pytest.raises(ValueError):
                     datetime.strptime(test_value, "%Y-%m-%d")
-        
+
         elif field_type == "datetime":
             # Datetimes should be ISO format with T separator
             if should_pass:
@@ -305,28 +303,28 @@ class TestAPIContracts:
             else:
                 with pytest.raises(ValueError):
                     datetime.fromisoformat(test_value)
-        
+
         elif field_type == "percentage":
             # Percentages should be decimals (0.15 for 15%)
             if should_pass:
                 assert 0 <= test_value <= 1
             else:
                 assert test_value > 1
-    
+
     def test_enum_values_contract(self):
         """Test that enum values match between frontend and backend."""
         # These enums must match exactly with frontend TypeScript enums
-        
+
         risk_levels = ["low", "medium", "high"]
         asset_types = ["stock", "etf", "commodity", "crypto"]
         rebalance_frequencies = ["daily", "weekly", "monthly", "quarterly", "yearly"]
         order_types = ["market", "limit", "stop", "stop_limit"]
         order_status = ["pending", "executed", "cancelled", "failed"]
-        
+
         # Verify enum values are lowercase (frontend convention)
         for enum_list in [risk_levels, asset_types, rebalance_frequencies, order_types, order_status]:
             assert all(val.islower() for val in enum_list)
-    
+
     def test_null_handling_contract(self):
         """Test null/optional field handling."""
         # Test that optional fields can be null/undefined
@@ -342,7 +340,7 @@ class TestAPIContracts:
             "created_at": "2024-01-01T00:00:00",
             "updated_at": None  # Optional timestamp
         }
-        
+
         # Should handle None/null values gracefully
         validated = PortfolioResponse(**portfolio_data)
         assert validated.daily_return is None

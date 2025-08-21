@@ -5,24 +5,24 @@ Handles index value and allocation calculations asynchronously.
 
 import logging
 from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Any
 
 from ..core.celery_app import celery_app
-from ..services.strategy import compute_index_and_allocations
+from ..models.index import Allocation, IndexValue
 from ..services.performance import calculate_portfolio_metrics
+from ..services.strategy import compute_index_and_allocations
 from ..utils.cache_utils import CacheManager
-from ..models.index import IndexValue, Allocation
-from .base import DatabaseTask, create_success_response, create_error_response
+from .base import DatabaseTask, create_error_response, create_success_response
 
 logger = logging.getLogger(__name__)
 
 
 @celery_app.task(bind=True, base=DatabaseTask, name="compute_index")
 def compute_index(
-    self, 
-    strategy_config: Optional[Dict] = None, 
+    self,
+    strategy_config: dict | None = None,
     db=None
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Compute index and allocations in the background.
 
@@ -81,7 +81,7 @@ def rebalance_portfolio(
     self,
     force: bool = False,
     db=None
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Rebalance portfolio allocations.
 
@@ -98,27 +98,27 @@ def rebalance_portfolio(
 
         # Update task state
         self.update_state(
-            state="PROGRESS", 
+            state="PROGRESS",
             meta={"status": "Checking rebalancing conditions..."}
         )
 
         # Get current strategy config
         from ..models.strategy import StrategyConfig
         config = db.query(StrategyConfig).first()
-        
+
         if not config:
             raise ValueError("No strategy configuration found")
 
         # Check if rebalancing is needed
         needs_rebalancing = force
-        
+
         if not force:
             # Check based on frequency
             from datetime import date, timedelta
-            
+
             if config.last_rebalance:
                 days_since_rebalance = (date.today() - config.last_rebalance).days
-                
+
                 if config.rebalance_frequency == "daily":
                     needs_rebalancing = days_since_rebalance >= 1
                 elif config.rebalance_frequency == "weekly":
@@ -133,17 +133,17 @@ def rebalance_portfolio(
                 "status": "skipped",
                 "reason": "Rebalancing not yet due",
                 "next_rebalance": config.last_rebalance + timedelta(
-                    days=7 if config.rebalance_frequency == "weekly" else 
+                    days=7 if config.rebalance_frequency == "weekly" else
                     30 if config.rebalance_frequency == "monthly" else 1
                 )
             }
 
         # Perform rebalancing
         self.update_state(state="PROGRESS", meta={"status": "Rebalancing portfolio..."})
-        
+
         # Recompute with current config
         compute_index_and_allocations(db)
-        
+
         # Update last rebalance date
         config.last_rebalance = date.today()
         db.add(config)
@@ -169,7 +169,7 @@ def rebalance_portfolio(
             forced=force,
             allocations_updated=len(latest_allocations),
             next_rebalance=config.last_rebalance + timedelta(
-                days=7 if config.rebalance_frequency == "weekly" else 
+                days=7 if config.rebalance_frequency == "weekly" else
                 30 if config.rebalance_frequency == "monthly" else 1
             )
         )

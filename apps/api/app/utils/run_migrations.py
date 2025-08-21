@@ -4,8 +4,10 @@ This can be called from the application startup or manually.
 """
 
 import logging
-from sqlalchemy import text, inspect
+
+from sqlalchemy import inspect, text
 from sqlalchemy.exc import SQLAlchemyError
+
 from ..core.database import engine
 
 logger = logging.getLogger(__name__)
@@ -165,7 +167,7 @@ def run_google_auth_migration():
         if "sqlite" in str(engine.url):
             logger.info("Skipping Google auth migration for SQLite database")
             return True
-            
+
         from ..migrations.add_google_auth import upgrade
         upgrade(engine)
         return True

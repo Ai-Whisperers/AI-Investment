@@ -1,9 +1,10 @@
 """Enhanced validation schemas with security constraints."""
 
-from pydantic import BaseModel, Field, field_validator, model_validator
-from typing import Optional, Self
-from datetime import date
 import re
+from datetime import date
+from typing import Self
+
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class SecureStrategyConfig(BaseModel):
@@ -130,7 +131,7 @@ class SecureSimulationRequest(BaseModel):
         default="USD", min_length=3, max_length=3, description="Currency code"
     )
 
-    start_date: Optional[date] = Field(
+    start_date: date | None = Field(
         default=None, description="Simulation start date"
     )
 

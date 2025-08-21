@@ -4,11 +4,11 @@ Provides news data through modularized components.
 """
 
 from .api_client import MarketAuxAPIClient
-from .data_parser import MarketAuxDataParser
 from .cache_manager import MarketAuxCacheManager
+from .data_parser import MarketAuxDataParser
 
 __all__ = [
     "MarketAuxAPIClient",
-    "MarketAuxDataParser", 
+    "MarketAuxDataParser",
     "MarketAuxCacheManager"
 ]

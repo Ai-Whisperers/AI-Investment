@@ -1,0 +1,136 @@
+```mermaid
+flowchart TB
+    %% =====================
+    %% DATA-SOURCE ALPHA MAP
+    %% =====================
+
+    %% -------- Legend / Keys --------
+    subgraph META[Legend & Keys]
+      direction TB
+      L1[Risk Colors:\nGreen=Low, Yellow=Med, Red=High]
+      L2[Alpha Border:\nThick=High, Medium=Med, Dashed=Low]
+      L3[Origin/Method shown in each node label]
+    end
+
+    %% -------- Long-Term --------
+    subgraph LT[Long-Term Alpha Sources]
+      direction TB
+      YT[YouTube
+      ---
+      • Weight: 30%
+      • Alpha: Medium
+      • Risk: Low
+      • Origin: Public
+      • Method: API/HTML
+      • Use: Thematic research, sector deep-dives, slow cycles]
+
+      SR[Sectoral Reddit (r/stocks, r/investing)
+      ---
+      • Weight: 20%
+      • Alpha: Medium
+      • Risk: Medium
+      • Origin: Public
+      • Method: API/HTML
+      • Use: Retail positioning, early adoption trends]
+    end
+
+    %% -------- Swing / Mid-Term --------
+    subgraph ST[Swing / Mid-Term Alpha Sources]
+      direction TB
+      RWSB[Reddit (WSB/options/crypto)
+      ---
+      • Weight: 25%
+      • Alpha: High
+      • Risk: Medium
+      • Origin: Public
+      • Method: API/HTML/WebSocket
+      • Use: Meme ignition, retail bursts, options flow hints]
+
+      TW[Twitter/X
+      ---
+      • Weight: 20%
+      • Alpha: High
+      • Risk: Medium
+      • Origin: Public
+      • Method: API/HTML/WebSocket
+      • Use: Real-time flow, market-moving tweets]
+
+      CHAN[4chan /biz/
+      ---
+      • Weight: 10%
+      • Alpha: Med-High
+      • Risk: High
+      • Origin: Public
+      • Method: HTML
+      • Use: Early crypto leaks, penny stock rumors]
+
+      TT[TikTok
+      ---
+      • Weight: 10%
+      • Alpha: Medium
+      • Risk: Medium
+      • Origin: Public
+      • Method: HTML
+      • Use: Retail FOMO, contrarian timing]
+
+      DT[Discord/Telegram
+      ---
+      • Weight: 10%
+      • Alpha: Medium
+      • Risk: High
+      • Origin: Closed (prefer public channels)
+      • Method: API/HTML
+      • Use: Microcap signals, coordinated flows]
+    end
+
+    %% -------- Ingestion & Compliance Pipeline --------
+    subgraph PIPE[Ingestion & Compliance Pipeline]
+      direction LR
+      GW[Ingestion Gateway\n(API / HTML / WS collectors)]
+      POL[Policy Guard\n(TOS, robots.txt, consent checks)]
+      PII[PII & Secrets Filter\n(hash/scrub emails, phones, keys)]
+      DEDUP[Dedup & Canonicalize\n(source canonical IDs)]
+      META[Provenance Tagger\n{source, url, timestamp, author, method}]
+      STORE[Data Lake (immutable)\n+ verifiable hashes]
+      FEAT[Feature Engineering\n(NLP, sentiment, topic, entities)]
+      SCORE[Alpha Scoring\n(signal strength, confidence, risk)]
+      ROUTE[Routing\n(Long-Term vs Swing queues)]
+      EXPORT[Signal Bus\n→ Research, Backtests, PM, Alerts]
+
+      GW --> POL --> PII --> DEDUP --> META --> STORE --> FEAT --> SCORE --> ROUTE --> EXPORT
+    end
+
+    %% -------- Edges from Sources to Pipeline --------
+    YT --> GW
+    SR --> GW
+    RWSB --> GW
+    TW --> GW
+    CHAN --> GW
+    TT --> GW
+    DT --> GW
+
+    %% -------- Weights Summary (optional visual) --------
+    subgraph WEIGHTS[Weights Overview]
+      WLT[Long-Term focus ≈ 50%]
+      WST[Swing/Mid-term focus ≈ 75%]
+    end
+
+    %% -------- Class Definitions (Risk colors & Alpha borders) --------
+    classDef risk-low fill:#c6f6d5,stroke:#1a7f37,color:#0b4221;           %% green
+    classDef risk-med fill:#fff3bf,stroke:#915c00,color:#553700;           %% yellow
+    classDef risk-high fill:#ffd6d6,stroke:#a00000,color:#4a0000;          %% red
+
+    classDef alpha-high stroke-width:4px;
+    classDef alpha-med stroke-width:2px;
+    classDef alpha-low stroke-dasharray: 6 3, stroke-width:1px;
+
+    %% -------- Assign Classes --------
+    class YT risk-low,alpha-med;
+    class SR risk-med,alpha-med;
+
+    class RWSB risk-med,alpha-high;
+    class TW risk-med,alpha-high;
+    class CHAN risk-high,alpha-high;
+    class TT risk-med,alpha-med;
+    class DT risk-high,alpha-med;
+```

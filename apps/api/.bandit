@@ -1,0 +1,22 @@
+[bandit]
+# Exclude test directories and migrations
+exclude_dirs = tests,migrations,test_*.py,*_test.py
+recursive = true
+targets = app
+
+# Skip specific test IDs that are false positives
+skips = B101,B601,B104
+
+# B101: assert_used - OK in tests
+# B601: shell_with_params - False positives on SQL
+# B104: hardcoded_bind_all_interfaces - OK for development
+
+# Test severity level (LOW, MEDIUM, HIGH)
+severity = MEDIUM
+
+# Confidence level (LOW, MEDIUM, HIGH)
+confidence = MEDIUM
+
+# Output format
+format = json
+output = bandit-report.json

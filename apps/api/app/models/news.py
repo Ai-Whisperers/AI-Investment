@@ -2,27 +2,27 @@
 Database models for news and sentiment data.
 """
 
+import uuid
+from datetime import datetime
+
 from sqlalchemy import (
-    Column,
-    String,
-    Float,
-    DateTime,
-    Text,
-    ForeignKey,
-    Table,
-    Boolean,
-    Integer,
     JSON,
+    Boolean,
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
     Index,
+    Integer,
+    String,
+    Table,
+    Text,
     UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-import uuid
-from datetime import datetime
 
 from ..core.database import Base
-
 
 # Association table for many-to-many relationship between articles and assets
 asset_news_association = Table(

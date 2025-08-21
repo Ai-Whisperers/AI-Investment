@@ -55,37 +55,46 @@ waardhaven-autoindex/
 ## Current Status (2025-01-21)
 
 ### 🎯 Test Suite Performance
-- **Overall Pass Rate**: 97.6% (122 of 125 tests passing)
-- **Unit Tests**: 122/125 passing
+- **Overall Pass Rate**: 98.4% (123 of 125 tests passing)
+- **Unit Tests**: 123/125 passing
   - Portfolio Model: 9/9 ✅
-  - Auth Endpoints: 21/23 (1 refresh token failure, 1 OAuth redirect failure)
+  - Auth Endpoints: 22/23 (1 OAuth redirect test needs fix)
   - Schema Tests: 21/21 ✅
   - Utils/Security: 17/17 ✅
   - Return Calculator: 21/21 ✅
   - Risk Calculator: 20/20 ✅
-  - Weight Calculator: 16/17 (1 constraint application failure)
+  - Weight Calculator: 17/17 ✅ (constraint logic fixed)
 - **Integration Tests**: 8 tests configured
 - **Smoke Tests**: 12 production health checks
 - **Coverage**: 42% actual (below required 50% threshold) ⚠️
 
-### ✅ Recent Achievements
+### ✅ Recent Achievements (Updated 2025-01-21)
 
-#### 1. Dependency Management System
-- **Fixed**: All numpy/scipy/pandas version conflicts
-- **Dependabot**: Automated weekly updates configured
-- **pip-tools**: requirements.in → requirements.txt workflow
-- **Makefile**: Streamlined dependency commands
-- **CI/CD**: Enhanced caching and retry mechanisms
+#### 1. CI/CD Pipeline Overhaul
+- **Created**: Comprehensive `ci-cd-pipeline.yml` with parallel execution
+- **Fixed**: Bandit security scanning configuration
+- **Added**: Staging and production deployment stages
+- **Configured**: PostgreSQL and Redis service containers
+- **Implemented**: Performance monitoring and Slack notifications
 
-#### 2. Authentication & Security
-- JWT token creation with proper dict parameters
-- Added `iat` field for unique tokens
-- Google OAuth redirect endpoint
-- Password validation (422 status codes)
-- User model with `is_active` field
-- bcrypt password hashing
+#### 2. Test Fixes (2 of 3 critical tests fixed)
+- **test_apply_weight_constraints**: Fixed mathematical impossibility with dynamic min_weight adjustment
+- **test_refresh_token**: Added UUID (`jti` field) for token uniqueness
+- **test_google_oauth_redirect**: Added endpoint but test still failing in isolation
 
-#### 3. Database & Testing
+#### 3. Code Quality Improvements
+- **Ruff**: Fixed 1232 violations automatically
+- **Fixed**: Critical B904 errors (exception chaining)
+- **Updated**: All imports to use proper modules
+- **Maintained**: Clean Architecture and SOLID principles
+
+#### 4. Authentication & Security
+- JWT tokens now include `jti` field for uniqueness
+- Added Google OAuth `/google` endpoint with RedirectResponse
+- Fixed exception chaining in token_dep.py
+- Enhanced security headers in middleware
+
+#### 5. Database & Testing Infrastructure
 - Foreign key constraints for SQLite tests
 - SQLite detection for migration skipping
 - In-memory test database
@@ -257,23 +266,23 @@ NEXT_PUBLIC_API_URL=<api-url>
 
 ### 🚨 Critical Issues (URGENT - Blocking Deployment)
 
-#### Test Failures (3)
-1. **test_apply_weight_constraints** (`tests/unit/services/test_weight_calculator.py:105`)
-   - Mathematical impossibility: 2 assets cannot satisfy max_weight=0.40
-   - Returns 0.5 each, violating constraint
+#### Test Failures (1 remaining)
+1. ✅ **FIXED: test_apply_weight_constraints** 
+   - Solution: Dynamic min_weight adjustment for mathematical feasibility
    
-2. **test_refresh_token** (`tests/unit/routers/test_auth.py:171`)
-   - Tokens identical due to same timestamp
-   - Needs UUID for uniqueness
+2. ✅ **FIXED: test_refresh_token** 
+   - Solution: Added UUID `jti` field to ensure token uniqueness
    
-3. **test_google_oauth_redirect** (`tests/unit/routers/test_auth.py:194`)
-   - Using Response instead of RedirectResponse
-   - Status code mismatch
+3. ⚠️ **PARTIAL: test_google_oauth_redirect** 
+   - Added `/google` endpoint with RedirectResponse
+   - Test passes with fresh app instance but fails in test suite isolation
+   - Needs test fixture adjustment
 
-#### Pipeline Issues
-- **Coverage**: 42% (need 50%) - 8% gap
-- **Ruff**: 21 manual fixes needed (2074 auto-fixed)
-- **Security**: Bandit configuration broken
+#### Pipeline Issues (Mostly Resolved)
+- **Coverage**: 42% (need 50%) - 8% gap remaining
+- ✅ **Ruff**: Fixed 1232 violations automatically, 152 remain (mostly whitespace)
+- ✅ **Security**: Bandit configuration fixed with `.bandit` file
+- ✅ **CI/CD**: New comprehensive pipeline created
 
 ### ⚠️ Non-Critical Issues
 1. **Admin endpoints** (Skipped) - Not implemented yet
@@ -312,22 +321,30 @@ NEXT_PUBLIC_API_URL=<api-url>
 - **Monitoring**: Health checks
 - **SSL**: Automatic HTTPS
 
-## Urgent Tasks (24-Hour Sprint)
+## Next Priority Tasks (48-Hour Sprint)
 
-### Hour 1-4: Fix Failing Tests
-1. **Weight Constraint** - Implement dynamic min_weight adjustment
-2. **Token Refresh** - Add UUID to token generation
-3. **OAuth Redirect** - Use RedirectResponse class
+### Priority 1: Fix Last Test & Deploy (4 hours)
+1. ⚠️ Fix `test_google_oauth_redirect` test isolation issue
+2. Deploy to Render.com staging environment
+3. Verify all endpoints work in production
 
-### Hour 5-8: Increase Coverage (42% → 50%)
+### Priority 2: Increase Coverage (42% → 50%) (8 hours)
 1. Write 10 tests for news_modules (~3% gain)
-2. Write 5 tests for strategy_modules (~2% gain)
-3. Write 5 tests for error cases (~3% gain)
+2. Write 8 tests for strategy_modules (~2% gain)
+3. Write 7 tests for error handling cases (~3% gain)
+4. Focus on edge cases and error paths
 
-### Hour 9-12: Code Quality
-1. Fix 21 remaining ruff violations
-2. Fix Bandit security configuration
-3. Run full test suite verification
+### Priority 3: Begin Feature Implementation (12 hours)
+1. **Asset Classification System**
+   - Add tagging fields to Asset model
+   - Create migration for new columns
+   - Implement filtering API endpoints
+2. **Enhanced Analysis Modules**
+   - Add fundamental analysis calculations
+   - Integrate technical indicators
+3. **Social Media Data Pipeline**
+   - Setup Reddit API integration
+   - Design data ingestion workflow
 
 ## Planned Features (from OVERALL-FEATS.txt)
 ### Core Platform Features

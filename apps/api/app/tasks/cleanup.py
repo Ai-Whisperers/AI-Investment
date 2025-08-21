@@ -4,24 +4,24 @@ Handles removing old data and maintaining database health.
 """
 
 import logging
-from datetime import datetime, date, timedelta
-from typing import Dict, Any
+from datetime import date, datetime, timedelta
+from typing import Any
 
 from ..core.celery_app import celery_app
-from ..utils.cache_utils import CacheManager
 from ..models.asset import Price
-from ..models.index import IndexValue, Allocation
-from .base import DatabaseTask, create_success_response, create_error_response
+from ..models.index import Allocation, IndexValue
+from ..utils.cache_utils import CacheManager
+from .base import DatabaseTask, create_error_response, create_success_response
 
 logger = logging.getLogger(__name__)
 
 
 @celery_app.task(bind=True, base=DatabaseTask, name="cleanup_old_data")
 def cleanup_old_data(
-    self, 
-    days_to_keep: int = 365, 
+    self,
+    days_to_keep: int = 365,
     db=None
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Clean up old data from the database.
 
@@ -37,7 +37,7 @@ def cleanup_old_data(
         logger.info(f"Starting data cleanup, keeping {days_to_keep} days")
 
         self.update_state(
-            state="PROGRESS", 
+            state="PROGRESS",
             meta={"status": "Cleaning up old data..."}
         )
 
@@ -94,7 +94,7 @@ def cleanup_old_data(
 
 
 @celery_app.task(bind=True, base=DatabaseTask, name="optimize_database")
-def optimize_database(self, db=None) -> Dict[str, Any]:
+def optimize_database(self, db=None) -> dict[str, Any]:
     """
     Optimize database by running maintenance operations.
 
@@ -115,7 +115,7 @@ def optimize_database(self, db=None) -> Dict[str, Any]:
 
         # Run ANALYZE on tables for better query planning
         tables = ["prices", "index_values", "allocations", "assets"]
-        
+
         for table in tables:
             try:
                 db.execute(f"ANALYZE {table}")
@@ -156,7 +156,7 @@ def optimize_database(self, db=None) -> Dict[str, Any]:
 
 
 @celery_app.task(bind=True, base=DatabaseTask, name="cleanup_orphaned_records")
-def cleanup_orphaned_records(self, db=None) -> Dict[str, Any]:
+def cleanup_orphaned_records(self, db=None) -> dict[str, Any]:
     """
     Clean up orphaned records that have no parent references.
 
@@ -179,14 +179,14 @@ def cleanup_orphaned_records(self, db=None) -> Dict[str, Any]:
 
         # Clean orphaned prices (prices for non-existent assets)
         from ..models.asset import Asset
-        
+
         orphaned_prices = (
             db.query(Price)
             .outerjoin(Asset, Price.asset_id == Asset.id)
             .filter(Asset.id.is_(None))
             .count()
         )
-        
+
         if orphaned_prices > 0:
             db.query(Price).filter(
                 ~Price.asset_id.in_(db.query(Asset.id))
@@ -200,7 +200,7 @@ def cleanup_orphaned_records(self, db=None) -> Dict[str, Any]:
             .filter(Asset.id.is_(None))
             .count()
         )
-        
+
         if orphaned_allocations > 0:
             db.query(Allocation).filter(
                 ~Allocation.asset_id.in_(db.query(Asset.id))

@@ -1,29 +1,30 @@
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from fastapi.exceptions import RequestValidationError
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.exceptions import HTTPException as StarletteHTTPException
-from .routers import (
-    root,
-    auth,
-    index,
-    benchmark,
-    tasks,
-    diagnostics,
-    manual_refresh,
-    strategy,
-    background,
-    news,
-    portfolio_calculations,
-)
-from .core.config import settings
-import time
-from typing import Dict
-from collections import defaultdict
 import logging
 import os
+import time
 import traceback
+from collections import defaultdict
+
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.middleware.base import BaseHTTPMiddleware
+
+from .core.config import settings
+from .routers import (
+    auth,
+    background,
+    benchmark,
+    diagnostics,
+    index,
+    manual_refresh,
+    news,
+    portfolio_calculations,
+    root,
+    strategy,
+    tasks,
+)
 
 # Import models to ensure they're registered with SQLAlchemy
 
@@ -106,7 +107,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self.calls = calls
         self.period = period
-        self.clients: Dict[str, list] = defaultdict(list)
+        self.clients: dict[str, list] = defaultdict(list)
 
     async def dispatch(self, request: Request, call_next):
         # Get client IP
@@ -187,13 +188,13 @@ async def general_exception_handler(request: Request, exc: Exception):
     """Handle general exceptions and ensure CORS headers are added."""
     logger.error(f"Unhandled exception: {exc}", exc_info=True)
     logger.error(f"Traceback: {traceback.format_exc()}")
-    
+
     # In production, don't expose internal error details
     if os.getenv("RENDER"):
         error_detail = "Internal server error"
     else:
         error_detail = str(exc)
-    
+
     response = JSONResponse(
         status_code=500,
         content={"detail": error_detail},

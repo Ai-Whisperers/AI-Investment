@@ -11,7 +11,7 @@ def upgrade(engine):
     if "sqlite" in str(engine.url):
         print("Skipping Google auth migration for SQLite database")
         return
-        
+
     with engine.connect() as conn:
         # Check if column already exists
         result = conn.execute(

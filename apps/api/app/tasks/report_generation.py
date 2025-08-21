@@ -4,25 +4,25 @@ Handles creating various reports and analytics asynchronously.
 """
 
 import logging
-from datetime import datetime, date, timedelta
-from typing import Dict, Any
+from datetime import date, datetime, timedelta
+from typing import Any
 
 from ..core.celery_app import celery_app
-from ..services.performance import calculate_portfolio_metrics
-from ..models.index import IndexValue, Allocation
+from ..models.index import Allocation, IndexValue
 from ..models.strategy import RiskMetrics
-from .base import DatabaseTask, create_success_response, create_error_response
+from ..services.performance import calculate_portfolio_metrics
+from .base import DatabaseTask, create_error_response, create_success_response
 
 logger = logging.getLogger(__name__)
 
 
 @celery_app.task(bind=True, base=DatabaseTask, name="generate_report")
 def generate_report(
-    self, 
-    report_type: str = "performance", 
-    period_days: int = 30, 
+    self,
+    report_type: str = "performance",
+    period_days: int = 30,
     db=None
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Generate various reports in the background.
 
@@ -39,7 +39,7 @@ def generate_report(
         logger.info(f"Generating {report_type} report for {period_days} days")
 
         self.update_state(
-            state="PROGRESS", 
+            state="PROGRESS",
             meta={"status": f"Generating {report_type} report..."}
         )
 
@@ -71,11 +71,11 @@ def generate_report(
         return create_error_response(e)
 
 
-def _generate_performance_report(db, period_days: int) -> Dict[str, Any]:
+def _generate_performance_report(db, period_days: int) -> dict[str, Any]:
     """Generate performance report."""
     end_date = date.today()
     start_date = end_date - timedelta(days=period_days)
-    
+
     report_data = {
         "type": "performance",
         "period_days": period_days,
@@ -110,19 +110,19 @@ def _generate_performance_report(db, period_days: int) -> Dict[str, Any]:
     return report_data
 
 
-def _generate_allocation_report(db) -> Dict[str, Any]:
+def _generate_allocation_report(db) -> dict[str, Any]:
     """Generate allocation report."""
     report_data = {
         "type": "allocation"
     }
-    
+
     # Get latest allocations
     latest_date = (
         db.query(Allocation.date)
         .order_by(Allocation.date.desc())
         .first()
     )
-    
+
     if latest_date:
         allocations = (
             db.query(Allocation)
@@ -132,7 +132,7 @@ def _generate_allocation_report(db) -> Dict[str, Any]:
 
         # Get asset details
         from ..models.asset import Asset
-        
+
         allocation_details = []
         for alloc in allocations:
             asset = db.query(Asset).filter(Asset.id == alloc.asset_id).first()
@@ -154,12 +154,12 @@ def _generate_allocation_report(db) -> Dict[str, Any]:
     return report_data
 
 
-def _generate_risk_report(db) -> Dict[str, Any]:
+def _generate_risk_report(db) -> dict[str, Any]:
     """Generate risk report."""
     report_data = {
         "type": "risk"
     }
-    
+
     # Get latest risk metrics
     latest_risk = (
         db.query(RiskMetrics)
@@ -189,7 +189,7 @@ def _generate_risk_report(db) -> Dict[str, Any]:
             risk_level = "High"
         elif latest_risk.volatility > 0.15:
             risk_level = "Medium"
-        
+
         report_data["risk_assessment"] = {
             "level": risk_level,
             "volatility_percentile": latest_risk.volatility * 100,
@@ -204,7 +204,7 @@ def generate_comprehensive_report(
     self,
     period_days: int = 30,
     db=None
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Generate a comprehensive report combining all report types.
 

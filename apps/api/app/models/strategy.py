@@ -3,17 +3,18 @@ Strategy configuration and risk metrics models.
 """
 
 from sqlalchemy import (
+    JSON,
+    Boolean,
     Column,
+    Date,
+    DateTime,
+    Float,
+    ForeignKey,
     Integer,
     String,
-    Float,
-    Boolean,
-    DateTime,
-    Date,
-    JSON,
-    ForeignKey,
 )
 from sqlalchemy.sql import func
+
 from ..core.database import Base
 
 

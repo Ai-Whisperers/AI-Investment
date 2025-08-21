@@ -4,14 +4,15 @@ Asset and pricing models.
 
 from sqlalchemy import (
     Column,
-    Integer,
-    String,
+    Date,
     Float,
     ForeignKey,
-    Date,
+    Integer,
+    String,
     UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
+
 from ..core.database import Base
 
 

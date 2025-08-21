@@ -2,24 +2,26 @@
 Strategy configuration and risk management schemas.
 """
 
-from pydantic import BaseModel, Field, field_validator, ConfigDict
-from typing import Optional, List, Literal
-from datetime import datetime, date as DateType
+from datetime import date as DateType
+from datetime import datetime
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class StrategyConfigRequest(BaseModel):
     """Strategy configuration update request."""
 
-    momentum_weight: Optional[float] = Field(None, ge=0, le=1)
-    market_cap_weight: Optional[float] = Field(None, ge=0, le=1)
-    risk_parity_weight: Optional[float] = Field(None, ge=0, le=1)
-    min_price_threshold: Optional[float] = Field(None, gt=0)
-    max_daily_return: Optional[float] = Field(None, gt=0)
-    min_daily_return: Optional[float] = Field(None, lt=0)
-    max_forward_fill_days: Optional[int] = Field(None, ge=0, le=5)
-    outlier_std_threshold: Optional[float] = Field(None, gt=0)
-    rebalance_frequency: Optional[Literal["daily", "weekly", "monthly"]] = None
-    daily_drop_threshold: Optional[float] = Field(None, lt=0)
+    momentum_weight: float | None = Field(None, ge=0, le=1)
+    market_cap_weight: float | None = Field(None, ge=0, le=1)
+    risk_parity_weight: float | None = Field(None, ge=0, le=1)
+    min_price_threshold: float | None = Field(None, gt=0)
+    max_daily_return: float | None = Field(None, gt=0)
+    min_daily_return: float | None = Field(None, lt=0)
+    max_forward_fill_days: int | None = Field(None, ge=0, le=5)
+    outlier_std_threshold: float | None = Field(None, gt=0)
+    rebalance_frequency: Literal["daily", "weekly", "monthly"] | None = None
+    daily_drop_threshold: float | None = Field(None, lt=0)
 
     @field_validator("momentum_weight", "market_cap_weight", "risk_parity_weight")
     def validate_weights(cls, v, values):
@@ -52,10 +54,10 @@ class StrategyConfigResponse(BaseModel):
     rebalance_frequency: str
     daily_drop_threshold: float
     ai_adjusted: bool = False
-    ai_adjustment_reason: Optional[str] = None
-    ai_confidence_score: Optional[float] = None
-    last_rebalance: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    ai_adjustment_reason: str | None = None
+    ai_confidence_score: float | None = None
+    last_rebalance: datetime | None = None
+    updated_at: datetime | None = None
 
 
 class RiskMetric(BaseModel):
@@ -63,16 +65,16 @@ class RiskMetric(BaseModel):
 
     date: DateType
     total_return: float
-    annualized_return: Optional[float] = None
+    annualized_return: float | None = None
     sharpe_ratio: float
     sortino_ratio: float
     max_drawdown: float
     current_drawdown: float
-    volatility: Optional[float] = None
-    var_95: Optional[float] = Field(None, description="95% Value at Risk")
-    var_99: Optional[float] = Field(None, description="99% Value at Risk")
-    beta_sp500: Optional[float] = Field(None, description="Beta relative to S&P 500")
-    correlation_sp500: Optional[float] = Field(
+    volatility: float | None = None
+    var_95: float | None = Field(None, description="95% Value at Risk")
+    var_99: float | None = Field(None, description="99% Value at Risk")
+    beta_sp500: float | None = Field(None, description="Beta relative to S&P 500")
+    correlation_sp500: float | None = Field(
         None, description="Correlation with S&P 500"
     )
 
@@ -80,8 +82,8 @@ class RiskMetric(BaseModel):
 class RiskMetricsResponse(BaseModel):
     """Risk metrics response."""
 
-    metrics: List[RiskMetric]
-    message: Optional[str] = None
+    metrics: list[RiskMetric]
+    message: str | None = None
 
     model_config = ConfigDict(
         json_schema_extra={

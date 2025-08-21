@@ -5,7 +5,8 @@ Handles caching of prices, quotes, and forex data to reduce API calls.
 
 import json
 import logging
-from typing import Any, Optional, Dict
+from typing import Any
+
 import pandas as pd
 
 from ....core.redis_client import get_redis_client
@@ -33,7 +34,7 @@ class TwelveDataCacheManager:
         """
         self.cache_enabled = cache_enabled
         self.redis_client = get_redis_client()
-        
+
         # TTL settings
         self.price_cache_ttl = self.DEFAULT_PRICE_TTL
         self.quote_cache_ttl = self.DEFAULT_QUOTE_TTL
@@ -56,7 +57,7 @@ class TwelveDataCacheManager:
                 parts.append(f"{k}:{v}")
         return ":".join(parts)
 
-    def get(self, cache_key: str) -> Optional[Any]:
+    def get(self, cache_key: str) -> Any | None:
         """
         Get data from cache.
         
@@ -79,7 +80,7 @@ class TwelveDataCacheManager:
 
         return None
 
-    def set(self, cache_key: str, data: Any, ttl: Optional[int] = None) -> None:
+    def set(self, cache_key: str, data: Any, ttl: int | None = None) -> None:
         """
         Store data in cache.
         
@@ -99,12 +100,12 @@ class TwelveDataCacheManager:
             logger.debug(f"Cache set failed: {e}")
 
     def get_price_data(
-        self, 
-        symbol: str, 
-        start_date: str, 
-        end_date: str, 
+        self,
+        symbol: str,
+        start_date: str,
+        end_date: str,
         interval: str
-    ) -> Optional[pd.DataFrame]:
+    ) -> pd.DataFrame | None:
         """
         Get cached price data for a symbol.
         
@@ -124,14 +125,14 @@ class TwelveDataCacheManager:
             end=end_date,
             interval=interval
         )
-        
+
         cached_data = self.get(cache_key)
         if cached_data:
             df = pd.DataFrame(cached_data)
             if not df.empty:
                 df.index = pd.to_datetime(df.index)
                 return df
-        
+
         return None
 
     def set_price_data(
@@ -159,10 +160,10 @@ class TwelveDataCacheManager:
             end=end_date,
             interval=interval
         )
-        
+
         self.set(cache_key, data.to_json(), self.price_cache_ttl)
 
-    def get_quote(self, symbol: str) -> Optional[Dict]:
+    def get_quote(self, symbol: str) -> dict | None:
         """
         Get cached quote for a symbol.
         
@@ -175,7 +176,7 @@ class TwelveDataCacheManager:
         cache_key = self.generate_cache_key("quote", symbol=symbol)
         return self.get(cache_key)
 
-    def set_quote(self, symbol: str, quote_data: Dict) -> None:
+    def set_quote(self, symbol: str, quote_data: dict) -> None:
         """
         Cache quote data for a symbol.
         
@@ -186,7 +187,7 @@ class TwelveDataCacheManager:
         cache_key = self.generate_cache_key("quote", symbol=symbol)
         self.set(cache_key, quote_data, self.quote_cache_ttl)
 
-    def get_forex_rate(self, from_currency: str, to_currency: str) -> Optional[float]:
+    def get_forex_rate(self, from_currency: str, to_currency: str) -> float | None:
         """
         Get cached forex exchange rate.
         
@@ -205,9 +206,9 @@ class TwelveDataCacheManager:
         return self.get(cache_key)
 
     def set_forex_rate(
-        self, 
-        from_currency: str, 
-        to_currency: str, 
+        self,
+        from_currency: str,
+        to_currency: str,
         rate: float
     ) -> None:
         """
@@ -237,12 +238,12 @@ class TwelveDataCacheManager:
         """
         if not self.redis_client.is_connected:
             return 0
-        
+
         try:
             keys = self.redis_client.client.keys(f"twelvedata:{pattern}")
             if keys:
                 return self.redis_client.client.delete(*keys)
         except Exception as e:
             logger.error(f"Cache clear failed: {e}")
-        
+
         return 0

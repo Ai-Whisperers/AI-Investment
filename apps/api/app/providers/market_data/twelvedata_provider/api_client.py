@@ -4,14 +4,14 @@ Handles low-level API communication and response processing.
 """
 
 import logging
-from typing import Dict, List, Optional, Any
-from datetime import date
+from typing import Any
+
 import pandas as pd
 from twelvedata import TDClient
 from twelvedata.exceptions import TwelveDataError
 
-from ...base import APIError, retry_with_backoff
 from ....core.config import settings
+from ...base import APIError, retry_with_backoff
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ class TwelveDataAPIClient:
     Handles direct API communication.
     """
 
-    def __init__(self, api_key: Optional[str] = None):
+    def __init__(self, api_key: str | None = None):
         """
         Initialize API client.
         
@@ -30,16 +30,16 @@ class TwelveDataAPIClient:
             api_key: TwelveData API key
         """
         self.api_key = api_key or settings.TWELVEDATA_API_KEY
-        
+
         if not self.api_key:
             raise ValueError("TwelveData API key not configured")
-        
+
         self.client = TDClient(apikey=self.api_key)
 
     @retry_with_backoff(max_retries=3)
     def get_time_series(
         self,
-        symbols: List[str],
+        symbols: list[str],
         start_date: str,
         end_date: str,
         interval: str = "1day",
@@ -83,9 +83,9 @@ class TwelveDataAPIClient:
                     order="asc",
                     dp=4
                 )
-            
+
             return ts
-            
+
         except TwelveDataError as e:
             logger.error(f"TwelveData API error: {e}")
             raise APIError(f"TwelveData API error: {e}")
@@ -94,7 +94,7 @@ class TwelveDataAPIClient:
             raise
 
     @retry_with_backoff(max_retries=3)
-    def get_quote(self, symbols: List[str]) -> Any:
+    def get_quote(self, symbols: list[str]) -> Any:
         """
         Get real-time quotes.
         
@@ -109,17 +109,17 @@ class TwelveDataAPIClient:
                 return self.client.quote(symbol=symbols[0])
             else:
                 return self.client.quote(symbol=symbols)
-                
+
         except TwelveDataError as e:
             logger.error(f"Quote fetch error: {e}")
             raise APIError(f"Failed to fetch quotes: {e}")
 
     @retry_with_backoff(max_retries=3)
     def get_exchange_rate(
-        self, 
-        from_currency: str, 
+        self,
+        from_currency: str,
         to_currency: str
-    ) -> Optional[float]:
+    ) -> float | None:
         """
         Get forex exchange rate.
         
@@ -134,15 +134,15 @@ class TwelveDataAPIClient:
             result = self.client.exchange_rate(
                 symbol=f"{from_currency}/{to_currency}"
             )
-            
+
             if result:
                 data = result.as_json()
                 if data and "rate" in data:
                     return float(data["rate"])
-                    
+
         except Exception as e:
             logger.error(f"Exchange rate fetch error: {e}")
-            
+
         return None
 
     @retry_with_backoff(max_retries=2)
@@ -175,28 +175,28 @@ class TwelveDataAPIClient:
                 'bollinger': 'bbands',
                 'stochastic': 'stoch'
             }
-            
+
             td_indicator = indicator_map.get(indicator.lower(), indicator.lower())
-            
+
             # Get indicator function
             indicator_func = getattr(self.client, td_indicator, None)
             if not indicator_func:
                 raise ValueError(f"Unknown indicator: {indicator}")
-            
+
             # Call indicator
             result = indicator_func(
                 symbol=symbol,
                 interval=interval,
                 **kwargs
             )
-            
+
             return result.as_pandas() if result else pd.DataFrame()
-            
+
         except Exception as e:
             logger.error(f"Technical indicator error: {e}")
             return pd.DataFrame()
 
-    def get_api_usage(self) -> Dict:
+    def get_api_usage(self) -> dict:
         """
         Get API usage statistics.
         
@@ -209,5 +209,5 @@ class TwelveDataAPIClient:
                 return usage.as_json()
         except Exception as e:
             logger.error(f"Failed to get API usage: {e}")
-        
+
         return {}

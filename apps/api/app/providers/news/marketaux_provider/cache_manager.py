@@ -5,7 +5,7 @@ Handles caching of articles, searches, and sentiment analysis.
 
 import json
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from ....core.redis_client import get_redis_client
 
@@ -32,7 +32,7 @@ class MarketAuxCacheManager:
         """
         self.cache_enabled = cache_enabled
         self.redis_client = get_redis_client()
-        
+
         # TTL settings
         self.news_cache_ttl = self.DEFAULT_NEWS_TTL
         self.sentiment_cache_ttl = self.DEFAULT_SENTIMENT_TTL
@@ -57,7 +57,7 @@ class MarketAuxCacheManager:
                 parts.append(f"{k}:{v}")
         return ":".join(parts)
 
-    def get(self, cache_key: str) -> Optional[Any]:
+    def get(self, cache_key: str) -> Any | None:
         """
         Get data from cache.
         
@@ -80,7 +80,7 @@ class MarketAuxCacheManager:
 
         return None
 
-    def set(self, cache_key: str, data: Any, ttl: Optional[int] = None) -> None:
+    def set(self, cache_key: str, data: Any, ttl: int | None = None) -> None:
         """
         Store data in cache.
         
@@ -99,7 +99,7 @@ class MarketAuxCacheManager:
         except Exception as e:
             logger.debug(f"Cache set failed: {e}")
 
-    def get_search_results(self, search_params: Dict) -> Optional[List[Dict]]:
+    def get_search_results(self, search_params: dict) -> list[dict] | None:
         """
         Get cached search results.
         
@@ -113,9 +113,9 @@ class MarketAuxCacheManager:
         return self.get(cache_key)
 
     def set_search_results(
-        self, 
-        search_params: Dict, 
-        articles: List[Dict]
+        self,
+        search_params: dict,
+        articles: list[dict]
     ) -> None:
         """
         Cache search results.
@@ -127,7 +127,7 @@ class MarketAuxCacheManager:
         cache_key = self.generate_cache_key("search", **search_params)
         self.set(cache_key, articles, self.news_cache_ttl)
 
-    def get_article(self, article_id: str) -> Optional[Dict]:
+    def get_article(self, article_id: str) -> dict | None:
         """
         Get cached article.
         
@@ -140,7 +140,7 @@ class MarketAuxCacheManager:
         cache_key = self.generate_cache_key("article", uuid=article_id)
         return self.get(cache_key)
 
-    def set_article(self, article_id: str, article_data: Dict) -> None:
+    def set_article(self, article_id: str, article_data: dict) -> None:
         """
         Cache article data.
         
@@ -151,7 +151,7 @@ class MarketAuxCacheManager:
         cache_key = self.generate_cache_key("article", uuid=article_id)
         self.set(cache_key, article_data, self.news_cache_ttl)
 
-    def get_sentiment(self, text_hash: str) -> Optional[Dict]:
+    def get_sentiment(self, text_hash: str) -> dict | None:
         """
         Get cached sentiment analysis.
         
@@ -164,7 +164,7 @@ class MarketAuxCacheManager:
         cache_key = self.generate_cache_key("sentiment", hash=text_hash)
         return self.get(cache_key)
 
-    def set_sentiment(self, text_hash: str, sentiment_data: Dict) -> None:
+    def set_sentiment(self, text_hash: str, sentiment_data: dict) -> None:
         """
         Cache sentiment analysis.
         
@@ -187,12 +187,12 @@ class MarketAuxCacheManager:
         """
         if not self.redis_client.is_connected:
             return 0
-        
+
         try:
             keys = self.redis_client.client.keys(f"marketaux:{pattern}")
             if keys:
                 return self.redis_client.client.delete(*keys)
         except Exception as e:
             logger.error(f"Cache clear failed: {e}")
-        
+
         return 0

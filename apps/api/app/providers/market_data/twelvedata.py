@@ -5,17 +5,17 @@ Implements MarketDataProvider interface using modularized components.
 
 import logging
 from datetime import date, datetime
-from typing import Dict, List, Optional
+
 import pandas as pd
 
-from .interface import MarketDataProvider, QuoteData, ExchangeRate
-from ..base import ProviderStatus
 from ...core.config import settings
+from ..base import ProviderStatus
+from .interface import ExchangeRate, MarketDataProvider, QuoteData
 from .twelvedata_provider import (
-    TwelveDataRateLimiter,
-    TwelveDataCacheManager,
     TwelveDataAPIClient,
-    TwelveDataProcessor
+    TwelveDataCacheManager,
+    TwelveDataProcessor,
+    TwelveDataRateLimiter,
 )
 
 logger = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ class TwelveDataProvider(MarketDataProvider):
     Orchestrates data fetching using modular components.
     """
 
-    def __init__(self, api_key: Optional[str] = None, cache_enabled: bool = True):
+    def __init__(self, api_key: str | None = None, cache_enabled: bool = True):
         """
         Initialize TwelveData provider.
         
@@ -36,7 +36,7 @@ class TwelveDataProvider(MarketDataProvider):
             cache_enabled: Whether to enable caching
         """
         super().__init__(api_key or settings.TWELVEDATA_API_KEY, cache_enabled)
-        
+
         # Initialize components
         self.client = TwelveDataAPIClient(self.api_key)
         self.rate_limiter = TwelveDataRateLimiter()
@@ -56,7 +56,7 @@ class TwelveDataProvider(MarketDataProvider):
         try:
             self.rate_limiter.wait_if_needed(1)
             usage = self.client.get_api_usage()
-            
+
             if usage:
                 return ProviderStatus.HEALTHY
             else:
@@ -67,9 +67,9 @@ class TwelveDataProvider(MarketDataProvider):
 
     def fetch_historical_prices(
         self,
-        symbols: List[str],
+        symbols: list[str],
         start_date: date,
-        end_date: Optional[date] = None,
+        end_date: date | None = None,
         interval: str = "1day"
     ) -> pd.DataFrame:
         """
@@ -86,16 +86,16 @@ class TwelveDataProvider(MarketDataProvider):
         """
         if not symbols:
             return pd.DataFrame()
-        
+
         end_date = end_date or date.today()
         all_data = {}
-        
+
         # Process in batches
         batch_size = min(8, settings.TWELVEDATA_RATE_LIMIT)
-        
+
         for i in range(0, len(symbols), batch_size):
             batch = symbols[i:i + batch_size]
-            
+
             # Check cache for each symbol
             uncached_symbols = []
             for symbol in batch:
@@ -105,28 +105,28 @@ class TwelveDataProvider(MarketDataProvider):
                     end_date.isoformat(),
                     interval
                 )
-                
+
                 if cached_df is not None:
                     all_data[symbol] = cached_df
                 else:
                     uncached_symbols.append(symbol)
-            
+
             if not uncached_symbols:
                 continue
-            
+
             # Rate limit
             self.rate_limiter.wait_if_needed(len(uncached_symbols))
-            
+
             # Fetch from API
             logger.info(f"Fetching prices for {','.join(uncached_symbols)}")
-            
+
             ts = self.client.get_time_series(
                 uncached_symbols,
                 start_date.strftime("%Y-%m-%d"),
                 end_date.strftime("%Y-%m-%d"),
                 interval
             )
-            
+
             # Process response
             if len(uncached_symbols) == 1:
                 # Single symbol
@@ -148,10 +148,10 @@ class TwelveDataProvider(MarketDataProvider):
                 batch_data = ts.as_json()
                 if batch_data:
                     processed = self.processor.process_batch_response(
-                        batch_data, 
+                        batch_data,
                         uncached_symbols
                     )
-                    
+
                     for symbol, df in processed.items():
                         all_data[symbol] = df
                         # Cache it
@@ -162,14 +162,14 @@ class TwelveDataProvider(MarketDataProvider):
                             interval,
                             df
                         )
-        
+
         if not all_data:
             return pd.DataFrame()
-        
+
         # Combine all data
         return self.processor.combine_dataframes(all_data)
 
-    def get_quote(self, symbols: List[str]) -> List[QuoteData]:
+    def get_quote(self, symbols: list[str]) -> list[QuoteData]:
         """
         Get real-time quotes for symbols.
         
@@ -180,7 +180,7 @@ class TwelveDataProvider(MarketDataProvider):
             List of quote data
         """
         quotes = []
-        
+
         # Check cache first
         uncached_symbols = []
         for symbol in symbols:
@@ -189,16 +189,16 @@ class TwelveDataProvider(MarketDataProvider):
                 quotes.append(QuoteData(**cached_quote))
             else:
                 uncached_symbols.append(symbol)
-        
+
         if not uncached_symbols:
             return quotes
-        
+
         # Rate limit
         self.rate_limiter.wait_if_needed(len(uncached_symbols))
-        
+
         # Fetch from API
         quote_response = self.client.get_quote(uncached_symbols)
-        
+
         if quote_response:
             if len(uncached_symbols) == 1:
                 # Single quote
@@ -218,14 +218,14 @@ class TwelveDataProvider(MarketDataProvider):
                             if processed:
                                 quotes.append(QuoteData(**processed))
                                 self.cache_manager.set_quote(symbol, processed)
-        
+
         return quotes
 
     def get_exchange_rate(
-        self, 
-        from_currency: str, 
+        self,
+        from_currency: str,
         to_currency: str
-    ) -> Optional[ExchangeRate]:
+    ) -> ExchangeRate | None:
         """
         Get forex exchange rate.
         
@@ -245,30 +245,30 @@ class TwelveDataProvider(MarketDataProvider):
                 rate=cached_rate,
                 timestamp=datetime.now()
             )
-        
+
         # Rate limit
         self.rate_limiter.wait_if_needed(1)
-        
+
         # Fetch from API
         rate = self.client.get_exchange_rate(from_currency, to_currency)
-        
+
         if rate:
             # Cache it
             self.cache_manager.set_forex_rate(from_currency, to_currency, rate)
-            
+
             return ExchangeRate(
                 from_currency=from_currency,
                 to_currency=to_currency,
                 rate=rate,
                 timestamp=datetime.now()
             )
-        
+
         return None
 
     def get_technical_indicators(
         self,
         symbol: str,
-        indicators: List[str],
+        indicators: list[str],
         interval: str = "1day",
         **kwargs
     ) -> pd.DataFrame:
@@ -285,28 +285,28 @@ class TwelveDataProvider(MarketDataProvider):
             DataFrame with indicator values
         """
         results = {}
-        
+
         for indicator in indicators:
             # Rate limit
             self.rate_limiter.wait_if_needed(1)
-            
+
             # Fetch indicator
             df = self.client.get_technical_indicator(
-                symbol, 
-                indicator, 
+                symbol,
+                indicator,
                 interval,
                 **kwargs
             )
-            
+
             if not df.empty:
                 results[indicator] = df
-        
+
         if results:
             return pd.concat(results, axis=1)
-        
+
         return pd.DataFrame()
 
-    def get_api_usage(self) -> Dict:
+    def get_api_usage(self) -> dict:
         """
         Get API usage statistics.
         
@@ -314,13 +314,13 @@ class TwelveDataProvider(MarketDataProvider):
             API usage information including rate limits
         """
         usage = self.client.get_api_usage()
-        
+
         # Add rate limiter info
         usage["rate_limit"] = {
             "credits_per_minute": self.rate_limiter.credits_per_minute,
             "credits_available": self.rate_limiter.get_available_credits()
         }
-        
+
         return usage
 
 

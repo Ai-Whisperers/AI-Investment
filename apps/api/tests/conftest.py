@@ -2,33 +2,27 @@
 Global pytest configuration and fixtures.
 """
 
-import pytest
 import asyncio
-from typing import Generator, AsyncGenerator
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy.pool import StaticPool
-from fastapi.testclient import TestClient
+from collections.abc import Generator
 from datetime import datetime, timedelta
 from decimal import Decimal
 
+import pytest
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.pool import StaticPool
+
 from app.core.database import Base
-from app.main import app
 from app.core.dependencies import get_db
-from app.core.security import get_password_hash, create_access_token
-from app.models.user import User
+from app.core.security import create_access_token, get_password_hash
+from app.main import app
 from app.models.asset import Asset, Price
-from app.models.index import IndexValue, Allocation
 from app.models.portfolio import Portfolio
+from app.models.user import User
 
 # Import modular test factories
-from tests.factories import (
-    UserFactory,
-    AssetFactory,
-    PortfolioFactory,
-    StrategyFactory
-)
-
+from tests.factories import AssetFactory, PortfolioFactory, StrategyFactory, UserFactory
 
 # Test database configuration
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
@@ -50,7 +44,7 @@ def test_db_engine():
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
     )
-    
+
     # Enable foreign key constraints for SQLite
     if "sqlite" in SQLALCHEMY_DATABASE_URL:
         from sqlalchemy import event
@@ -59,7 +53,7 @@ def test_db_engine():
             cursor = dbapi_connection.cursor()
             cursor.execute("PRAGMA foreign_keys=ON")
             cursor.close()
-    
+
     Base.metadata.create_all(bind=engine)
     yield engine
     Base.metadata.drop_all(bind=engine)
@@ -84,12 +78,12 @@ def client(test_db_session) -> Generator[TestClient, None, None]:
             yield test_db_session
         finally:
             pass
-    
+
     app.dependency_overrides[get_db] = override_get_db
-    
+
     with TestClient(app) as test_client:
         yield test_client
-    
+
     app.dependency_overrides.clear()
 
 
@@ -146,15 +140,15 @@ def admin_auth_headers(admin_user) -> dict:
 def sample_assets(test_db_session) -> list[Asset]:
     """Create sample assets using factory."""
     assets = []
-    test_symbols = [("AAPL", "Apple Inc."), ("GOOGL", "Alphabet Inc."), 
+    test_symbols = [("AAPL", "Apple Inc."), ("GOOGL", "Alphabet Inc."),
                     ("MSFT", "Microsoft Corp."), ("SPY", "SPDR S&P 500 ETF")]
-    
+
     for symbol, name in test_symbols:
         asset_data = AssetFactory.create_asset_data(symbol=symbol, name=name)
         asset = Asset(**asset_data)
         test_db_session.add(asset)
         assets.append(asset)
-    
+
     test_db_session.commit()
     return assets
 
@@ -164,15 +158,15 @@ def sample_prices(test_db_session, sample_assets) -> list[Price]:
     """Create sample price data for testing."""
     prices = []
     base_date = datetime.now().date() - timedelta(days=30)
-    
+
     for asset in sample_assets:
         for i in range(30):
             price_date = base_date + timedelta(days=i)
             base_price = {"AAPL": 150, "GOOGL": 2800, "MSFT": 400, "SPY": 450}[asset.symbol]
-            
+
             # Add some realistic variation
             variation = 1 + (i % 5 - 2) * 0.01  # +/- 2% variation
-            
+
             price = Price(
                 asset_id=asset.id,
                 date=price_date,
@@ -184,7 +178,7 @@ def sample_prices(test_db_session, sample_assets) -> list[Price]:
             )
             prices.append(price)
             test_db_session.add(price)
-    
+
     test_db_session.commit()
     return prices
 
@@ -199,7 +193,7 @@ def sample_portfolio(test_db_session, test_user, sample_assets) -> Portfolio:
     )
     # Add strategy config from factory
     portfolio_data["strategy_config"] = StrategyFactory.create_strategy_config()
-    
+
     portfolio = Portfolio(**portfolio_data)
     test_db_session.add(portfolio)
     test_db_session.commit()
@@ -273,7 +267,7 @@ def large_dataset(test_db_session, sample_assets):
     """Create a large dataset for performance testing."""
     prices = []
     base_date = datetime.now().date() - timedelta(days=365)
-    
+
     for asset in sample_assets:
         for i in range(365):
             price_date = base_date + timedelta(days=i)
@@ -284,7 +278,7 @@ def large_dataset(test_db_session, sample_assets):
                 volume=1000000
             )
             prices.append(price)
-    
+
     test_db_session.bulk_insert_mappings(Price, [p.__dict__ for p in prices])
     test_db_session.commit()
     return len(prices)
