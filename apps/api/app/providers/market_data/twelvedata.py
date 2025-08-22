@@ -30,7 +30,7 @@ class TwelveDataProvider(MarketDataProvider):
     def __init__(self, api_key: str | None = None, cache_enabled: bool = True):
         """
         Initialize TwelveData provider.
-        
+
         Args:
             api_key: TwelveData API key
             cache_enabled: Whether to enable caching
@@ -74,13 +74,13 @@ class TwelveDataProvider(MarketDataProvider):
     ) -> pd.DataFrame:
         """
         Fetch historical prices with caching and batching.
-        
+
         Args:
             symbols: List of stock symbols
             start_date: Start date for historical data
             end_date: End date (defaults to today)
             interval: Data interval
-            
+
         Returns:
             DataFrame with price data
         """
@@ -172,10 +172,10 @@ class TwelveDataProvider(MarketDataProvider):
     def get_quote(self, symbols: list[str]) -> list[QuoteData]:
         """
         Get real-time quotes for symbols.
-        
+
         Args:
             symbols: List of stock symbols
-            
+
         Returns:
             List of quote data
         """
@@ -228,11 +228,11 @@ class TwelveDataProvider(MarketDataProvider):
     ) -> ExchangeRate | None:
         """
         Get forex exchange rate.
-        
+
         Args:
             from_currency: Source currency
             to_currency: Target currency
-            
+
         Returns:
             Exchange rate data or None
         """
@@ -274,13 +274,13 @@ class TwelveDataProvider(MarketDataProvider):
     ) -> pd.DataFrame:
         """
         Get technical indicators for a symbol.
-        
+
         Args:
             symbol: Stock symbol
             indicators: List of indicator names
             interval: Data interval
             **kwargs: Additional indicator parameters
-            
+
         Returns:
             DataFrame with indicator values
         """
@@ -309,7 +309,7 @@ class TwelveDataProvider(MarketDataProvider):
     def get_api_usage(self) -> dict:
         """
         Get API usage statistics.
-        
+
         Returns:
             API usage information including rate limits
         """

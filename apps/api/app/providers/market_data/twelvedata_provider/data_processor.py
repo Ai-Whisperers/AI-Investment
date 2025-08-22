@@ -21,11 +21,11 @@ class TwelveDataProcessor:
     def process_price_data(df: pd.DataFrame, symbol: str) -> pd.DataFrame:
         """
         Process raw price data from TwelveData.
-        
+
         Args:
             df: Raw price DataFrame
             symbol: Stock symbol for logging
-            
+
         Returns:
             Processed DataFrame
         """
@@ -66,11 +66,11 @@ class TwelveDataProcessor:
     ) -> dict[str, pd.DataFrame]:
         """
         Process batch time series response.
-        
+
         Args:
             batch_data: Raw batch response from TwelveData
             symbols: List of requested symbols
-            
+
         Returns:
             Dictionary of symbol -> DataFrame
         """
@@ -111,10 +111,10 @@ class TwelveDataProcessor:
     def process_quote_response(quote_data: Any) -> dict | None:
         """
         Process quote response from TwelveData.
-        
+
         Args:
             quote_data: Raw quote response
-            
+
         Returns:
             Processed quote dictionary
         """
@@ -158,10 +158,10 @@ class TwelveDataProcessor:
     ) -> pd.DataFrame:
         """
         Combine multiple symbol DataFrames into a single multi-index DataFrame.
-        
+
         Args:
             dataframes: Dictionary of symbol -> DataFrame
-            
+
         Returns:
             Combined multi-index DataFrame
         """
@@ -191,12 +191,12 @@ class TwelveDataProcessor:
     ) -> bool:
         """
         Validate data quality.
-        
+
         Args:
             df: DataFrame to validate
             min_rows: Minimum required rows
             max_null_pct: Maximum allowed null percentage
-            
+
         Returns:
             True if data passes quality checks
         """

@@ -17,8 +17,8 @@ def upgrade(engine):
         result = conn.execute(
             text(
                 """
-            SELECT column_name 
-            FROM information_schema.columns 
+            SELECT column_name
+            FROM information_schema.columns
             WHERE table_name='users' AND column_name='is_google_user'
         """
             )
@@ -29,7 +29,7 @@ def upgrade(engine):
             conn.execute(
                 text(
                     """
-                ALTER TABLE users 
+                ALTER TABLE users
                 ADD COLUMN is_google_user BOOLEAN DEFAULT FALSE
             """
                 )
@@ -46,7 +46,7 @@ def downgrade(engine):
         conn.execute(
             text(
                 """
-            ALTER TABLE users 
+            ALTER TABLE users
             DROP COLUMN IF EXISTS is_google_user
         """
             )

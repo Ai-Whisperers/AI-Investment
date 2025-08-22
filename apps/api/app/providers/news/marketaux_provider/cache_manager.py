@@ -26,7 +26,7 @@ class MarketAuxCacheManager:
     def __init__(self, cache_enabled: bool = True):
         """
         Initialize cache manager.
-        
+
         Args:
             cache_enabled: Whether caching is enabled
         """
@@ -41,11 +41,11 @@ class MarketAuxCacheManager:
     def generate_cache_key(self, prefix: str, **kwargs) -> str:
         """
         Generate a consistent cache key.
-        
+
         Args:
             prefix: Cache key prefix (e.g., 'search', 'article')
             **kwargs: Key components
-            
+
         Returns:
             Generated cache key
         """
@@ -60,10 +60,10 @@ class MarketAuxCacheManager:
     def get(self, cache_key: str) -> Any | None:
         """
         Get data from cache.
-        
+
         Args:
             cache_key: Cache key to retrieve
-            
+
         Returns:
             Cached data or None if not found
         """
@@ -83,7 +83,7 @@ class MarketAuxCacheManager:
     def set(self, cache_key: str, data: Any, ttl: int | None = None) -> None:
         """
         Store data in cache.
-        
+
         Args:
             cache_key: Cache key to store under
             data: Data to cache
@@ -102,10 +102,10 @@ class MarketAuxCacheManager:
     def get_search_results(self, search_params: dict) -> list[dict] | None:
         """
         Get cached search results.
-        
+
         Args:
             search_params: Search parameters
-            
+
         Returns:
             List of cached articles or None
         """
@@ -119,7 +119,7 @@ class MarketAuxCacheManager:
     ) -> None:
         """
         Cache search results.
-        
+
         Args:
             search_params: Search parameters
             articles: Articles to cache
@@ -130,10 +130,10 @@ class MarketAuxCacheManager:
     def get_article(self, article_id: str) -> dict | None:
         """
         Get cached article.
-        
+
         Args:
             article_id: Article UUID
-            
+
         Returns:
             Cached article data or None
         """
@@ -143,7 +143,7 @@ class MarketAuxCacheManager:
     def set_article(self, article_id: str, article_data: dict) -> None:
         """
         Cache article data.
-        
+
         Args:
             article_id: Article UUID
             article_data: Article data to cache
@@ -154,10 +154,10 @@ class MarketAuxCacheManager:
     def get_sentiment(self, text_hash: str) -> dict | None:
         """
         Get cached sentiment analysis.
-        
+
         Args:
             text_hash: Hash of the analyzed text
-            
+
         Returns:
             Cached sentiment data or None
         """
@@ -167,7 +167,7 @@ class MarketAuxCacheManager:
     def set_sentiment(self, text_hash: str, sentiment_data: dict) -> None:
         """
         Cache sentiment analysis.
-        
+
         Args:
             text_hash: Hash of the analyzed text
             sentiment_data: Sentiment analysis result
@@ -178,10 +178,10 @@ class MarketAuxCacheManager:
     def clear_cache(self, pattern: str = "*") -> int:
         """
         Clear cache entries matching pattern.
-        
+
         Args:
             pattern: Redis key pattern to match
-            
+
         Returns:
             Number of keys deleted
         """

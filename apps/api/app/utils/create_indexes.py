@@ -18,7 +18,7 @@ def create_performance_indexes():
 
     indexes = [
         # Composite index for price queries
-        """CREATE INDEX IF NOT EXISTS idx_prices_asset_date 
+        """CREATE INDEX IF NOT EXISTS idx_prices_asset_date
            ON prices(asset_id, date DESC)""",
         # Date-based indexes
         "CREATE INDEX IF NOT EXISTS idx_allocations_date ON allocations(date DESC)",

@@ -26,7 +26,7 @@ def create_news_tables():
             text(
                 """
             SELECT EXISTS (
-                SELECT FROM information_schema.tables 
+                SELECT FROM information_schema.tables
                 WHERE table_name = 'news_articles'
             );
         """
@@ -54,7 +54,7 @@ def create_news_tables():
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
             );
-            
+
             CREATE INDEX IF NOT EXISTS ix_news_sources_name ON news_sources(name);
             CREATE INDEX IF NOT EXISTS ix_news_sources_domain ON news_sources(domain);
         """
@@ -83,7 +83,7 @@ def create_news_tables():
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
             );
-            
+
             CREATE INDEX IF NOT EXISTS ix_news_articles_published_at ON news_articles(published_at);
             CREATE INDEX IF NOT EXISTS ix_news_articles_source_id ON news_articles(source_id);
             CREATE INDEX IF NOT EXISTS ix_news_articles_external_id ON news_articles(external_id);
@@ -110,7 +110,7 @@ def create_news_tables():
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
             );
-            
+
             CREATE INDEX IF NOT EXISTS ix_news_sentiment_article_id ON news_sentiment(article_id);
             CREATE INDEX IF NOT EXISTS ix_news_sentiment_score ON news_sentiment(sentiment_score);
             CREATE INDEX IF NOT EXISTS ix_news_sentiment_label ON news_sentiment(sentiment_label);
@@ -136,7 +136,7 @@ def create_news_tables():
                 mention_count INTEGER DEFAULT 1,
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
             );
-            
+
             CREATE INDEX IF NOT EXISTS ix_news_entities_article_id ON news_entities(article_id);
             CREATE INDEX IF NOT EXISTS ix_news_entities_symbol ON news_entities(symbol);
             CREATE INDEX IF NOT EXISTS ix_news_entities_type ON news_entities(type);
@@ -180,7 +180,7 @@ def create_news_tables():
                 updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                 CONSTRAINT uq_entity_sentiment_history_symbol_date UNIQUE (symbol, date)
             );
-            
+
             CREATE INDEX IF NOT EXISTS ix_entity_sentiment_history_symbol_date ON entity_sentiment_history(symbol, date);
         """
             )

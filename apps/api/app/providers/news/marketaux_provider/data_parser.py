@@ -20,10 +20,10 @@ class MarketAuxDataParser:
     def parse_article(data: dict) -> NewsArticle:
         """
         Parse API response into NewsArticle.
-        
+
         Args:
             data: Raw article data from API
-            
+
         Returns:
             Parsed NewsArticle object
         """
@@ -75,10 +75,10 @@ class MarketAuxDataParser:
     def _parse_entities(entities_data: list[dict]) -> list[NewsEntity]:
         """
         Parse entity data from API response.
-        
+
         Args:
             entities_data: Raw entities data
-            
+
         Returns:
             List of parsed NewsEntity objects
         """
@@ -107,10 +107,10 @@ class MarketAuxDataParser:
     def _parse_sentiment(sentiment_data: dict | None) -> NewsSentiment | None:
         """
         Parse sentiment data from API response.
-        
+
         Args:
             sentiment_data: Raw sentiment data
-            
+
         Returns:
             Parsed NewsSentiment object or None
         """
@@ -130,10 +130,10 @@ class MarketAuxDataParser:
     def _parse_datetime(datetime_str: str | None) -> datetime:
         """
         Parse datetime string from API response.
-        
+
         Args:
             datetime_str: ISO datetime string
-            
+
         Returns:
             Parsed datetime object
         """
@@ -154,10 +154,10 @@ class MarketAuxDataParser:
     def parse_search_params(search_params) -> dict:
         """
         Convert NewsSearchParams to API parameters.
-        
+
         Args:
             search_params: NewsSearchParams object
-            
+
         Returns:
             Dictionary of API parameters
         """

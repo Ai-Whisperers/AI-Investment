@@ -22,7 +22,7 @@ class TwelveDataRateLimiter:
     def __init__(self, credits_per_minute: int = None):
         """
         Initialize rate limiter.
-        
+
         Args:
             credits_per_minute: API credits per minute (defaults to settings)
         """
@@ -34,7 +34,7 @@ class TwelveDataRateLimiter:
     def wait_if_needed(self, credits_required: int = 1) -> None:
         """
         Wait if rate limit would be exceeded.
-        
+
         Args:
             credits_required: Number of API credits required for the request
         """
@@ -81,7 +81,7 @@ class TwelveDataRateLimiter:
     def get_available_credits(self) -> int:
         """
         Get number of available API credits.
-        
+
         Returns:
             Number of credits available in current minute
         """

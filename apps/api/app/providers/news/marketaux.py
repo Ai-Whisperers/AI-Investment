@@ -27,7 +27,7 @@ class MarketauxProvider(NewsProvider):
     def __init__(self, api_key: str | None = None, cache_enabled: bool = True):
         """
         Initialize MarketAux provider.
-        
+
         Args:
             api_key: MarketAux API key
             cache_enabled: Whether to enable caching
@@ -61,10 +61,10 @@ class MarketauxProvider(NewsProvider):
     def search_news(self, params: NewsSearchParams) -> list[NewsArticle]:
         """
         Search for news articles.
-        
+
         Args:
             params: Search parameters
-            
+
         Returns:
             List of news articles
         """
@@ -98,10 +98,10 @@ class MarketauxProvider(NewsProvider):
     def get_article(self, article_id: str) -> NewsArticle | None:
         """
         Get specific article by UUID.
-        
+
         Args:
             article_id: Article UUID
-            
+
         Returns:
             NewsArticle or None if not found
         """
@@ -125,10 +125,10 @@ class MarketauxProvider(NewsProvider):
     def get_trending_news(self, limit: int = 10) -> list[NewsArticle]:
         """
         Get trending news articles.
-        
+
         Args:
             limit: Number of articles to fetch
-            
+
         Returns:
             List of trending articles
         """
@@ -161,10 +161,10 @@ class MarketauxProvider(NewsProvider):
     def analyze_sentiment(self, text: str) -> dict | None:
         """
         Analyze sentiment of text.
-        
+
         Args:
             text: Text to analyze
-            
+
         Returns:
             Sentiment analysis result or None
         """
@@ -187,10 +187,10 @@ class MarketauxProvider(NewsProvider):
     def _article_to_dict(self, article: NewsArticle) -> dict:
         """
         Convert NewsArticle to dictionary for caching.
-        
+
         Args:
             article: NewsArticle object
-            
+
         Returns:
             Article data as dictionary
         """

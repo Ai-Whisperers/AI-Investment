@@ -28,7 +28,7 @@ class TwelveDataCacheManager:
     def __init__(self, cache_enabled: bool = True):
         """
         Initialize cache manager.
-        
+
         Args:
             cache_enabled: Whether caching is enabled
         """
@@ -43,11 +43,11 @@ class TwelveDataCacheManager:
     def generate_cache_key(self, prefix: str, **kwargs) -> str:
         """
         Generate a consistent cache key.
-        
+
         Args:
             prefix: Cache key prefix (e.g., 'prices', 'quote')
             **kwargs: Key components
-            
+
         Returns:
             Generated cache key
         """
@@ -60,10 +60,10 @@ class TwelveDataCacheManager:
     def get(self, cache_key: str) -> Any | None:
         """
         Get data from cache.
-        
+
         Args:
             cache_key: Cache key to retrieve
-            
+
         Returns:
             Cached data or None if not found
         """
@@ -83,7 +83,7 @@ class TwelveDataCacheManager:
     def set(self, cache_key: str, data: Any, ttl: int | None = None) -> None:
         """
         Store data in cache.
-        
+
         Args:
             cache_key: Cache key to store under
             data: Data to cache
@@ -108,13 +108,13 @@ class TwelveDataCacheManager:
     ) -> pd.DataFrame | None:
         """
         Get cached price data for a symbol.
-        
+
         Args:
             symbol: Stock symbol
             start_date: Start date ISO format
             end_date: End date ISO format
             interval: Data interval
-            
+
         Returns:
             DataFrame of price data or None if not cached
         """
@@ -145,7 +145,7 @@ class TwelveDataCacheManager:
     ) -> None:
         """
         Cache price data for a symbol.
-        
+
         Args:
             symbol: Stock symbol
             start_date: Start date ISO format
@@ -166,10 +166,10 @@ class TwelveDataCacheManager:
     def get_quote(self, symbol: str) -> dict | None:
         """
         Get cached quote for a symbol.
-        
+
         Args:
             symbol: Stock symbol
-            
+
         Returns:
             Quote data or None if not cached
         """
@@ -179,7 +179,7 @@ class TwelveDataCacheManager:
     def set_quote(self, symbol: str, quote_data: dict) -> None:
         """
         Cache quote data for a symbol.
-        
+
         Args:
             symbol: Stock symbol
             quote_data: Quote data to cache
@@ -190,11 +190,11 @@ class TwelveDataCacheManager:
     def get_forex_rate(self, from_currency: str, to_currency: str) -> float | None:
         """
         Get cached forex exchange rate.
-        
+
         Args:
             from_currency: Source currency
             to_currency: Target currency
-            
+
         Returns:
             Exchange rate or None if not cached
         """
@@ -213,7 +213,7 @@ class TwelveDataCacheManager:
     ) -> None:
         """
         Cache forex exchange rate.
-        
+
         Args:
             from_currency: Source currency
             to_currency: Target currency
@@ -229,10 +229,10 @@ class TwelveDataCacheManager:
     def clear_cache(self, pattern: str = "*") -> int:
         """
         Clear cache entries matching pattern.
-        
+
         Args:
             pattern: Redis key pattern to match
-            
+
         Returns:
             Number of keys deleted
         """

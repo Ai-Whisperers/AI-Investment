@@ -25,7 +25,7 @@ class MarketAuxAPIClient:
     def __init__(self, api_key: str | None = None):
         """
         Initialize API client.
-        
+
         Args:
             api_key: MarketAux API key
         """
@@ -42,12 +42,12 @@ class MarketAuxAPIClient:
     ) -> dict[str, Any]:
         """
         Make API request to MarketAux.
-        
+
         Args:
             endpoint: API endpoint
             params: Request parameters
             method: HTTP method
-            
+
         Returns:
             API response data
         """
@@ -89,10 +89,10 @@ class MarketAuxAPIClient:
     def search_news(self, params: dict) -> dict[str, Any]:
         """
         Search for news articles.
-        
+
         Args:
             params: Search parameters
-            
+
         Returns:
             API response with articles
         """
@@ -101,10 +101,10 @@ class MarketAuxAPIClient:
     def get_article(self, article_id: str) -> dict[str, Any] | None:
         """
         Get specific article by ID.
-        
+
         Args:
             article_id: Article UUID
-            
+
         Returns:
             Article data or None
         """
@@ -117,10 +117,10 @@ class MarketAuxAPIClient:
     def get_trending_news(self, limit: int = 10) -> dict[str, Any]:
         """
         Get trending news articles.
-        
+
         Args:
             limit: Number of articles to fetch
-            
+
         Returns:
             Trending articles response
         """
@@ -130,10 +130,10 @@ class MarketAuxAPIClient:
     def get_sentiment_analysis(self, text: str) -> dict | None:
         """
         Get sentiment analysis for text.
-        
+
         Args:
             text: Text to analyze
-            
+
         Returns:
             Sentiment analysis result
         """
@@ -147,7 +147,7 @@ class MarketAuxAPIClient:
     def health_check(self) -> bool:
         """
         Check API health.
-        
+
         Returns:
             True if API is healthy
         """

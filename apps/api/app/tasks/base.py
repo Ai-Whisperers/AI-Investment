@@ -84,10 +84,10 @@ def get_task_status(task_id: str) -> dict[str, Any]:
 def create_error_response(error: Exception) -> dict[str, Any]:
     """
     Create standardized error response for failed tasks.
-    
+
     Args:
         error: Exception that occurred
-        
+
     Returns:
         Error response dictionary
     """
@@ -108,13 +108,13 @@ def create_success_response(
 ) -> dict[str, Any]:
     """
     Create standardized success response for completed tasks.
-    
+
     Args:
         duration: Task duration in seconds
         start_time: Task start time
         end_time: Task end time
         **kwargs: Additional response fields
-        
+
     Returns:
         Success response dictionary
     """

@@ -11,7 +11,7 @@ from .config import settings
 # Use faster bcrypt rounds for testing to prevent timeouts
 bcrypt_rounds = 4 if os.getenv("TESTING") == "true" else 12
 pwd_context = CryptContext(
-    schemes=["bcrypt"], 
+    schemes=["bcrypt"],
     deprecated="auto",
     bcrypt__rounds=bcrypt_rounds
 )

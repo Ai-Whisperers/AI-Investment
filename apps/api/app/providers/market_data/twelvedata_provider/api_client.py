@@ -25,7 +25,7 @@ class TwelveDataAPIClient:
     def __init__(self, api_key: str | None = None):
         """
         Initialize API client.
-        
+
         Args:
             api_key: TwelveData API key
         """
@@ -47,14 +47,14 @@ class TwelveDataAPIClient:
     ) -> Any:
         """
         Fetch time series data from TwelveData.
-        
+
         Args:
             symbols: List of symbols or single symbol
             start_date: Start date (YYYY-MM-DD)
             end_date: End date (YYYY-MM-DD)
             interval: Data interval
             outputsize: Maximum number of data points
-            
+
         Returns:
             Time series response
         """
@@ -97,10 +97,10 @@ class TwelveDataAPIClient:
     def get_quote(self, symbols: list[str]) -> Any:
         """
         Get real-time quotes.
-        
+
         Args:
             symbols: List of symbols
-            
+
         Returns:
             Quote data
         """
@@ -122,11 +122,11 @@ class TwelveDataAPIClient:
     ) -> float | None:
         """
         Get forex exchange rate.
-        
+
         Args:
             from_currency: Source currency
             to_currency: Target currency
-            
+
         Returns:
             Exchange rate or None
         """
@@ -155,13 +155,13 @@ class TwelveDataAPIClient:
     ) -> pd.DataFrame:
         """
         Get technical indicator data.
-        
+
         Args:
             symbol: Stock symbol
             indicator: Indicator name (e.g., 'sma', 'rsi')
             interval: Data interval
             **kwargs: Additional indicator parameters
-            
+
         Returns:
             DataFrame with indicator values
         """
@@ -199,7 +199,7 @@ class TwelveDataAPIClient:
     def get_api_usage(self) -> dict:
         """
         Get API usage statistics.
-        
+
         Returns:
             API usage information
         """

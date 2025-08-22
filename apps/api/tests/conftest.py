@@ -68,7 +68,7 @@ def test_db_engine():
 
     Base.metadata.create_all(bind=engine)
     yield engine
-    
+
     # Proper cleanup
     Base.metadata.drop_all(bind=engine)
     engine.dispose()  # Critical: dispose engine to free connections
@@ -79,10 +79,10 @@ def test_db_session(test_db_engine) -> Generator[Session, None, None]:
     """Create a test database session with transaction rollback."""
     connection = test_db_engine.connect()
     transaction = connection.begin()
-    
+
     TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=connection)
     session = TestSessionLocal()
-    
+
     try:
         yield session
     except Exception:

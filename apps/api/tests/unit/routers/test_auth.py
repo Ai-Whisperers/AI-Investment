@@ -196,11 +196,11 @@ class TestAuthEndpoints:
     def test_google_oauth_redirect(self, client):
         """Test Google OAuth initiation."""
         response = client.get("/api/v1/auth/google")
-        
+
         # Should redirect to Google OAuth
         assert response.status_code == status.HTTP_307_TEMPORARY_REDIRECT
         assert "accounts.google.com" in response.headers.get("location", "")
-        
+
         # NOTE: This test passes when run with a fresh app instance
         # but fails in test suite due to router registration timing
 
