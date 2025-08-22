@@ -7,7 +7,7 @@ from sqlalchemy import and_, or_, func
 
 from ..core.database import get_db
 from ..models import Asset, User
-from ..utils.auth import get_current_user
+from ..utils.token_dep import get_current_user
 from ..schemas.asset import (
     AssetResponse,
     AssetClassificationUpdate,

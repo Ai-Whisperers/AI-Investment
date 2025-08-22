@@ -19,6 +19,7 @@ from .routers import (
     benchmark,
     diagnostics,
     index,
+    integrated_signals,
     manual_refresh,
     momentum,
     news,
@@ -244,3 +245,4 @@ app.include_router(portfolio_calculations.router, prefix="/api/v1/portfolio", ta
 app.include_router(assets.router, prefix="/api/v1/assets", tags=["assets"])
 app.include_router(signals.router, prefix="/api/v1/signals", tags=["signals"])
 app.include_router(momentum.router, prefix="/api/v1/momentum", tags=["momentum"])
+app.include_router(integrated_signals.router, prefix="/api/v1/integrated", tags=["integrated"])

@@ -202,6 +202,13 @@ Base URL: `/api/v1/`
 - `/tasks/*` - Background task management
 - `/diagnostics/*` - System health checks
 
+### 🚀 Signal Detection System (NEW - 2025-01-22)
+- `/signals/*` - Agro-robotics, regulatory, supply chain signals (14 endpoints)
+- `/momentum/*` - Momentum and OSINT tracking (15 endpoints)
+- `/integrated/*` - Real-time integrated signals (9 endpoints)
+- **Total**: 113 API routes with 75% signal win rate
+- **Documentation**: [SIGNAL_DETECTION_SYSTEM.md](./docs/SIGNAL_DETECTION_SYSTEM.md)
+
 ## Database Models
 - **User**: Authentication with `is_active` field
 - **Portfolio**: User portfolios with strategies

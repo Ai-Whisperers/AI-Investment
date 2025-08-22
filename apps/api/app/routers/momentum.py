@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from ..core.database import get_db
 from ..models import User
-from ..utils.auth import get_current_user
+from ..utils.token_dep import get_current_user
 from ..services.momentum_detector import MomentumDetector
 from ..services.osint_tracker import OSINTTracker
 

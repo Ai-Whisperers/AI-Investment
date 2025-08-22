@@ -24,7 +24,7 @@ class AssetClassificationUpdate(BaseModel):
     """Schema for updating asset classification."""
     sector: Optional[str] = Field(None, max_length=50)
     industry: Optional[str] = Field(None, max_length=100)
-    market_cap_category: Optional[str] = Field(None, regex="^(micro|small|mid|large|mega)$")
+    market_cap_category: Optional[str] = Field(None, pattern="^(micro|small|mid|large|mega)$")
     tags: Optional[List[str]] = None
     esg_score: Optional[float] = Field(None, ge=0, le=100)
     environmental_score: Optional[float] = Field(None, ge=0, le=100)
