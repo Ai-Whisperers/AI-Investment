@@ -226,12 +226,12 @@ class NewsProcessor:
             try:
                 # Try ISO format
                 return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
-            except:
+            except (ValueError, TypeError):
                 try:
                     # Try other common formats
                     from dateutil import parser
                     return parser.parse(date_str)
-                except:
+                except (ImportError, ValueError, TypeError):
                     logger.warning(f"Could not parse date: {date_str}")
                     return None
 

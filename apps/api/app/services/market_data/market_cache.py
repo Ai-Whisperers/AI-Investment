@@ -4,7 +4,7 @@ Caching module for market data.
 
 import json
 import logging
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 
 from ...core.redis_client import get_redis_client

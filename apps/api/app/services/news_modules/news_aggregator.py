@@ -71,7 +71,7 @@ class NewsAggregator:
                 if isinstance(published_at, str):
                     try:
                         published_at = datetime.fromisoformat(published_at.replace('Z', '+00:00'))
-                    except:
+                    except (ValueError, TypeError):
                         continue
 
                 date_key = published_at.strftime(date_format)
@@ -294,7 +294,7 @@ class NewsAggregator:
         # Sort by score and return top results
         scored_articles.sort(key=lambda x: x[0], reverse=True)
 
-        for score, article in scored_articles[:max_results]:
+        for _, article in scored_articles[:max_results]:
             related.append(article)
 
         return related
@@ -351,7 +351,7 @@ class NewsAggregator:
                 if isinstance(published_at, str):
                     try:
                         published_at = datetime.fromisoformat(published_at.replace('Z', '+00:00'))
-                    except:
+                    except (ValueError, TypeError):
                         continue
                 dates.append(published_at)
 

@@ -225,7 +225,7 @@ class EntityExtractor:
             word_positions = []
             current_pos = 0
 
-            for i, word in enumerate(words):
+            for _, word in enumerate(words):
                 word_positions.append((current_pos, current_pos + len(word)))
                 current_pos += len(word) + 1
 

@@ -3,8 +3,8 @@ Unit tests for news processing orchestrator module.
 """
 
 import pytest
-from unittest.mock import Mock, MagicMock, patch
-from datetime import datetime, timedelta
+from unittest.mock import Mock
+from datetime import datetime
 from app.services.news_modules.news_processor import NewsProcessor
 from app.services.news_modules.entity_extractor import ExtractedEntity
 

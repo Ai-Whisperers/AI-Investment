@@ -514,7 +514,7 @@ class WeightCalculator:
             logger.debug(f"Adjusting min_weight to {min_weight} for feasibility")
 
         # Apply iterative constraint satisfaction
-        for iteration in range(20):  # More iterations for convergence
+        for _iteration in range(20):  # More iterations for convergence
             # First ensure min weight
             weights_series = weights_series.clip(lower=min_weight)
 
