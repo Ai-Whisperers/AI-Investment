@@ -5,7 +5,7 @@
 
 import React from 'react'
 import { render, screen } from '../../utils/test-utils'
-import { DashboardMetrics } from '@/dashboard/components/DashboardMetrics'
+import { DashboardMetrics } from '@/app/dashboard/components/DashboardMetrics'
 import { mockPortfolio } from '../../utils/mock-data'
 
 describe('DashboardMetrics', () => {
@@ -24,6 +24,9 @@ describe('DashboardMetrics', () => {
       sortino_ratio: 1.8,
       max_drawdown: -0.15,
       volatility: 0.18,
+      beta: 1.0,
+      alpha: 0.02,
+      correlation_with_market: 0.85,
     },
     simResult: {
       amount_final: 120000,

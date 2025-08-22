@@ -4,7 +4,7 @@
  */
 
 import { renderHook, act, waitFor } from '@testing-library/react'
-import { useAuth } from '@/core/presentation/hooks/useAuth'
+import { useAuth } from '@/app/core/presentation/contexts/AuthContext'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React from 'react'
 
@@ -61,7 +61,7 @@ describe('useAuth', () => {
       const { result } = renderHook(() => useAuth(), { wrapper })
 
       await act(async () => {
-        await result.current.login('test@example.com', 'password')
+        await result.current.login({ email: 'test@example.com', password: 'password' })
       })
 
       await waitFor(() => {
@@ -78,7 +78,7 @@ describe('useAuth', () => {
 
       await act(async () => {
         try {
-          await result.current.login('test@example.com', 'wrong-password')
+          await result.current.login({ email: 'test@example.com', password: 'wrong-password' })
         } catch (error) {
           expect(error).toEqual(new Error('Invalid credentials'))
         }
@@ -98,7 +98,13 @@ describe('useAuth', () => {
 
       // Set initial authenticated state
       act(() => {
-        result.current.user = { id: 1, email: 'test@example.com' }
+        result.current.user = { 
+          id: '1', 
+          email: 'test@example.com',
+          role: 'user' as any,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
         result.current.isAuthenticated = true
       })
 

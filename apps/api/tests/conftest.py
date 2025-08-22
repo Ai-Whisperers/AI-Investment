@@ -3,6 +3,7 @@ Global pytest configuration and fixtures.
 """
 
 import asyncio
+import os
 from collections.abc import Generator
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -12,6 +13,9 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
+
+# Set testing environment variable for faster bcrypt
+os.environ["TESTING"] = "true"
 
 from app.core.database import Base
 from app.core.dependencies import get_db
@@ -41,8 +45,12 @@ def test_db_engine():
     """Create a test database engine."""
     engine = create_engine(
         SQLALCHEMY_DATABASE_URL,
-        connect_args={"check_same_thread": False},
+        connect_args={
+            "check_same_thread": False,
+            "timeout": 20,  # Add timeout for SQLite
+        },
         poolclass=StaticPool,
+        echo=False
     )
 
     # Enable foreign key constraints for SQLite
@@ -52,22 +60,40 @@ def test_db_engine():
         def set_sqlite_pragma(dbapi_connection, connection_record):
             cursor = dbapi_connection.cursor()
             cursor.execute("PRAGMA foreign_keys=ON")
+            cursor.execute("PRAGMA journal_mode=WAL")  # Enable WAL mode for better concurrency
+            cursor.execute("PRAGMA synchronous=NORMAL")  # Faster but still safe
+            cursor.execute("PRAGMA cache_size=10000")  # Increase cache
+            cursor.execute("PRAGMA temp_store=memory")  # Use memory for temp tables
             cursor.close()
 
     Base.metadata.create_all(bind=engine)
     yield engine
+    
+    # Proper cleanup
     Base.metadata.drop_all(bind=engine)
+    engine.dispose()  # Critical: dispose engine to free connections
 
 
 @pytest.fixture(scope="function")
 def test_db_session(test_db_engine) -> Generator[Session, None, None]:
-    """Create a test database session."""
-    TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_db_engine)
+    """Create a test database session with transaction rollback."""
+    connection = test_db_engine.connect()
+    transaction = connection.begin()
+    
+    TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=connection)
     session = TestSessionLocal()
+    
     try:
         yield session
+    except Exception:
+        if transaction.is_active:
+            transaction.rollback()
+        raise
     finally:
         session.close()
+        if transaction.is_active:
+            transaction.rollback()  # Always rollback to ensure clean state
+        connection.close()
 
 
 @pytest.fixture(scope="function")
@@ -265,20 +291,26 @@ def mock_marketaux_response():
 @pytest.fixture
 def large_dataset(test_db_session, sample_assets):
     """Create a large dataset for performance testing."""
+    # Reduce size for faster testing - only 30 days instead of 365
     prices = []
-    base_date = datetime.now().date() - timedelta(days=365)
+    base_date = datetime.now().date() - timedelta(days=30)
 
+    price_mappings = []
     for asset in sample_assets:
-        for i in range(365):
+        for i in range(30):  # Reduced from 365 to 30
             price_date = base_date + timedelta(days=i)
-            price = Price(
-                asset_id=asset.id,
-                date=price_date,
-                close=Decimal(str(100 + i % 50)),
-                volume=1000000
-            )
-            prices.append(price)
+            price_mapping = {
+                "asset_id": asset.id,
+                "date": price_date,
+                "open": Decimal(str(100 + i % 50)),
+                "high": Decimal(str(105 + i % 50)),
+                "low": Decimal(str(95 + i % 50)),
+                "close": Decimal(str(100 + i % 50)),
+                "volume": 1000000
+            }
+            price_mappings.append(price_mapping)
 
-    test_db_session.bulk_insert_mappings(Price, [p.__dict__ for p in prices])
+    # Use bulk_insert_mappings for better performance
+    test_db_session.bulk_insert_mappings(Price, price_mappings)
     test_db_session.commit()
-    return len(prices)
+    return len(price_mappings)

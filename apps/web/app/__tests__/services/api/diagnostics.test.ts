@@ -3,7 +3,7 @@
  * Single responsibility: Test API communication
  */
 
-import { diagnosticsService } from '@/services/api/diagnostics'
+import { diagnosticsService } from '@/app/services/api/diagnostics'
 import { mockDiagnostics, createMockPriceData } from '../../utils/mock-data'
 import { createMockFetch } from '../../utils/mock-api'
 
@@ -24,7 +24,7 @@ describe('DiagnosticsService', () => {
         getSystemHealth: mockDiagnostics,
       }) as any
 
-      const result = await diagnosticsService.getSystemHealth()
+      const result = await diagnosticsService.getDatabaseStatus()
 
       expect(result).toEqual(mockDiagnostics)
       expect(global.fetch).toHaveBeenCalledWith(
@@ -36,7 +36,7 @@ describe('DiagnosticsService', () => {
     it('should handle API errors gracefully', async () => {
       global.fetch = jest.fn().mockRejectedValue(new Error('Network error'))
 
-      await expect(diagnosticsService.getSystemHealth()).rejects.toThrow('Network error')
+      await expect(diagnosticsService.getDatabaseStatus()).rejects.toThrow('Network error')
     })
   })
 

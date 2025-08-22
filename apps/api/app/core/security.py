@@ -1,4 +1,5 @@
 """Security utilities for authentication and password handling."""
+import os
 import uuid
 from datetime import datetime, timedelta
 
@@ -7,7 +8,13 @@ from passlib.context import CryptContext
 
 from .config import settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Use faster bcrypt rounds for testing to prevent timeouts
+bcrypt_rounds = 4 if os.getenv("TESTING") == "true" else 12
+pwd_context = CryptContext(
+    schemes=["bcrypt"], 
+    deprecated="auto",
+    bcrypt__rounds=bcrypt_rounds
+)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a plain password against a hashed password."""
