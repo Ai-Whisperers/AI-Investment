@@ -192,10 +192,10 @@ class TestAuthEndpoints:
         # Token should be invalidated (in real implementation)
         # This would check token blacklist or session invalidation
 
-    @pytest.mark.skip(reason="OAuth endpoint works in production but test isolation issue")
     def test_google_oauth_redirect(self, client):
         """Test Google OAuth initiation."""
-        response = client.get("/api/v1/auth/google")
+        # Disable redirect following to test the redirect response
+        response = client.get("/api/v1/auth/google", follow_redirects=False)
 
         # Should redirect to Google OAuth
         assert response.status_code == status.HTTP_307_TEMPORARY_REDIRECT
