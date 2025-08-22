@@ -132,17 +132,13 @@ jobs:
       - name: Run ruff
         working-directory: ${{ env.BACKEND_DIR }}
         run: |
-          # Run ruff with auto-fix first
-          ruff check . --fix
-          # Then check if any issues remain
+          # Check for linting issues without auto-fixing in CI
           ruff check . --output-format=github
 
       - name: Run black
         working-directory: ${{ env.BACKEND_DIR }}
         run: |
-          # Format code first
-          black .
-          # Then check if formatted correctly
+          # Check code formatting without modifying files
           black --check --diff .
 
       - name: Run mypy
@@ -286,8 +282,14 @@ jobs:
           JWT_SECRET_KEY: test-secret-key
           JWT_ALGORITHM: HS256
           ENVIRONMENT: test
+          TESTING: true
         run: |
-          python -m pytest tests/integration -v --tb=short || true
+          # Run integration tests if they exist
+          if [ -d "tests/integration" ]; then
+            python -m pytest tests/integration -v --tb=short
+          else
+            echo "No integration tests found, skipping"
+          fi
 
       - name: Run smoke tests
         working-directory: ${{ env.BACKEND_DIR }}
@@ -295,9 +297,17 @@ jobs:
           DATABASE_URL: postgresql://test:test@localhost:5432/test_db
           REDIS_URL: redis://localhost:6379/0
           SECRET_KEY: test-secret-key
+          JWT_SECRET_KEY: test-secret-key
+          JWT_ALGORITHM: HS256
           ENVIRONMENT: test
+          TESTING: true
         run: |
-          python -m pytest tests/smoke -v --tb=short || true
+          # Run smoke tests if they exist
+          if [ -d "tests/smoke" ]; then
+            python -m pytest tests/smoke -v --tb=short
+          else
+            echo "No smoke tests found, skipping"
+          fi
 
   # ============================================
   # Deploy to Staging (on develop branch)

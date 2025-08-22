@@ -16,7 +16,3 @@ severity = MEDIUM
 
 # Confidence level (LOW, MEDIUM, HIGH)
 confidence = MEDIUM
-
-# Output format
-format = json
-output = bandit-report.json
