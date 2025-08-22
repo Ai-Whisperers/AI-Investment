@@ -9,19 +9,22 @@ This master plan integrates all existing documentation to create a **zero-budget
 
 ## 🎯 Core Thesis: Information Asymmetry = Extreme Alpha
 
-### The Opportunity
+### The Opportunity (Updated with Stakeholder Insights)
 ```python
 class AlphaThesis:
     """
     Institutions can't/won't monitor: 4chan, TikTok, Discord, small subreddits
     We process 1M+ posts daily through AI, extract <100 signals
     6-48 hour advantage = 30%+ annual returns
+    NEW: Agro-robotics and regulatory catalysts as primary alpha sources
     """
     
     information_sources = {
         'ignored_by_institutions': ['4chan /biz/', 'TikTok FinTok', 'Discord servers', 'Telegram groups'],
         'processed_poorly': ['Reddit micro-subs', 'YouTube comments', 'Twitter replies'],
-        'missed_patterns': ['Cross-platform correlation', 'Influencer networks', 'Meme velocity']
+        'missed_patterns': ['Cross-platform correlation', 'Influencer networks', 'Meme velocity'],
+        'regulatory_signals': ['EU mandates', 'Government spending', 'Policy calendars'],
+        'supply_chain_intel': ['Ukraine ag-tech', 'Dependency mapping', 'Disruption patterns']
     }
     
     expected_returns = {
@@ -32,6 +35,11 @@ class AlphaThesis:
             'GME_early_detection': '400%',
             'NVDA_AI_pivot': '85%',
             'SMCI_momentum': '127%'
+        },
+        'emerging_opportunities': {
+            'agro_robotics': '45% CAGR',     # Labor shortage driven
+            'ukraine_agtech': '150M+ funding', # FAO investment
+            'space_sector': 'Imminent boom'    # Stakeholder prediction
         }
     }
 ```
