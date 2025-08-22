@@ -20,6 +20,7 @@ from .routers import (
     diagnostics,
     index,
     manual_refresh,
+    momentum,
     news,
     portfolio_calculations,
     root,
@@ -242,3 +243,4 @@ app.include_router(news.router, prefix="/api/v1", tags=["news"])
 app.include_router(portfolio_calculations.router, prefix="/api/v1/portfolio", tags=["portfolio"])
 app.include_router(assets.router, prefix="/api/v1/assets", tags=["assets"])
 app.include_router(signals.router, prefix="/api/v1/signals", tags=["signals"])
+app.include_router(momentum.router, prefix="/api/v1/momentum", tags=["momentum"])
