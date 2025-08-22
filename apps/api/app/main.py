@@ -23,6 +23,7 @@ from .routers import (
     news,
     portfolio_calculations,
     root,
+    signals,
     strategy,
     tasks,
 )
@@ -240,3 +241,4 @@ app.include_router(background.router, prefix="/api/v1/background", tags=["backgr
 app.include_router(news.router, prefix="/api/v1", tags=["news"])
 app.include_router(portfolio_calculations.router, prefix="/api/v1/portfolio", tags=["portfolio"])
 app.include_router(assets.router, prefix="/api/v1/assets", tags=["assets"])
+app.include_router(signals.router, prefix="/api/v1/signals", tags=["signals"])
