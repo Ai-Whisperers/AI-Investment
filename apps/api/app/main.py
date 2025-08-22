@@ -13,6 +13,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from .core.config import settings
 from .routers import (
+    assets,
     auth,
     background,
     benchmark,
@@ -238,3 +239,4 @@ app.include_router(strategy.router, prefix="/api/v1/strategy", tags=["strategy"]
 app.include_router(background.router, prefix="/api/v1/background", tags=["background"])
 app.include_router(news.router, prefix="/api/v1", tags=["news"])
 app.include_router(portfolio_calculations.router, prefix="/api/v1/portfolio", tags=["portfolio"])
+app.include_router(assets.router, prefix="/api/v1/assets", tags=["assets"])
