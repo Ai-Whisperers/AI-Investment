@@ -239,7 +239,7 @@ def trigger_rebalance(
         return {"message": "Rebalancing completed successfully"}
     except Exception as e:
         logger.error(f"Rebalancing failed: {e}")
-        raise HTTPException(status_code=500, detail=f"Rebalancing failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Rebalancing failed: {str(e)}") from e
     finally:
         # Reset force flag
         if force:

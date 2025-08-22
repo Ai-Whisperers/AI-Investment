@@ -146,7 +146,7 @@ async def refresh_news(
             "symbols_processed": result["symbols_processed"],
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.get("/stats")

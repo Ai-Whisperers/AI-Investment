@@ -84,7 +84,7 @@ class MarketAuxAPIClient:
 
         except requests.RequestException as e:
             logger.error(f"Request failed: {e}")
-            raise APIError(f"Failed to connect to MarketAux: {e}")
+            raise APIError(f"Failed to connect to MarketAux: {e}") from e
 
     def search_news(self, params: dict) -> dict[str, Any]:
         """

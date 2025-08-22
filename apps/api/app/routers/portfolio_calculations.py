@@ -104,7 +104,7 @@ def calculate_returns(
         return CalculateReturnsResponse(returns=returns.tolist())
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Calculation error: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Calculation error: {str(e)}") from e
 
 
 @router.post("/total-return", response_model=CalculateTotalReturnResponse)
@@ -122,7 +122,7 @@ def calculate_total_return(
         return CalculateTotalReturnResponse(total_return=total_return)
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Calculation error: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Calculation error: {str(e)}") from e
 
 
 @router.post("/annualized-return", response_model=CalculateAnnualizedReturnResponse)
@@ -141,7 +141,7 @@ def calculate_annualized_return(
         return CalculateAnnualizedReturnResponse(annualized_return=annualized_return)
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Calculation error: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Calculation error: {str(e)}") from e
 
 
 @router.post("/volatility", response_model=CalculateVolatilityResponse)
@@ -160,7 +160,7 @@ def calculate_volatility(
         return CalculateVolatilityResponse(volatility=volatility * 100)  # Convert to percentage
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Calculation error: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Calculation error: {str(e)}") from e
 
 
 @router.post("/sharpe-ratio", response_model=CalculateSharpeRatioResponse)
@@ -183,7 +183,7 @@ def calculate_sharpe_ratio(
         return CalculateSharpeRatioResponse(sharpe_ratio=sharpe_ratio)
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Calculation error: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Calculation error: {str(e)}") from e
 
 
 @router.post("/max-drawdown", response_model=CalculateMaxDrawdownResponse)
@@ -206,7 +206,7 @@ def calculate_max_drawdown(
         )
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Calculation error: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Calculation error: {str(e)}") from e
 
 
 @router.post("/portfolio-metrics", response_model=CalculatePortfolioMetricsResponse)
@@ -264,4 +264,4 @@ def calculate_portfolio_metrics(
         return CalculatePortfolioMetricsResponse(metrics=metrics)
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Calculation error: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Calculation error: {str(e)}") from e

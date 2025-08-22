@@ -116,7 +116,7 @@ def retry_with_backoff(max_retries: int = 3, base_delay: float = 1.0):
             delay = base_delay
             last_exception = None
 
-            for attempt in range(max_retries):
+            for _attempt in range(max_retries):
                 try:
                     return func(*args, **kwargs)
                 except RateLimitError as e:

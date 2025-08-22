@@ -87,7 +87,7 @@ class TwelveDataProcessor:
             if isinstance(symbol_data, dict) and "values" in symbol_data:
                 # Standard format with "values" key
                 df = pd.DataFrame(symbol_data["values"])
-            elif isinstance(symbol_data, (list, tuple)):
+            elif isinstance(symbol_data, list | tuple):
                 # Batch format returns tuple/list of dicts
                 df = pd.DataFrame(symbol_data)
             else:

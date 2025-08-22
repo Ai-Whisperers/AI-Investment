@@ -68,7 +68,7 @@ def trigger_refresh_task(
             message=f"Market data refresh started in {request.mode} mode",
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to start task: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to start task: {str(e)}") from e
 
 
 @router.post("/compute", response_model=TaskResponse)
@@ -101,7 +101,7 @@ def trigger_compute_task(
             task_id=task.id, status="started", message="Index computation started"
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to start task: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to start task: {str(e)}") from e
 
 
 @router.post("/report", response_model=TaskResponse)
@@ -121,7 +121,7 @@ def trigger_report_task(
             message=f"Report generation started for {request.report_type}",
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to start task: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to start task: {str(e)}") from e
 
 
 @router.post("/cleanup", response_model=TaskResponse)
@@ -139,7 +139,7 @@ def trigger_cleanup_task(
             message=f"Data cleanup started, keeping {request.days_to_keep} days",
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to start task: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to start task: {str(e)}") from e
 
 
 @router.get("/status/{task_id}")

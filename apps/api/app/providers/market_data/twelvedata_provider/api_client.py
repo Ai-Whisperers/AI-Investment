@@ -88,7 +88,7 @@ class TwelveDataAPIClient:
 
         except TwelveDataError as e:
             logger.error(f"TwelveData API error: {e}")
-            raise APIError(f"TwelveData API error: {e}")
+            raise APIError(f"TwelveData API error: {e}") from e
         except Exception as e:
             logger.error(f"Unexpected error fetching time series: {e}")
             raise
@@ -112,7 +112,7 @@ class TwelveDataAPIClient:
 
         except TwelveDataError as e:
             logger.error(f"Quote fetch error: {e}")
-            raise APIError(f"Failed to fetch quotes: {e}")
+            raise APIError(f"Failed to fetch quotes: {e}") from e
 
     @retry_with_backoff(max_retries=3)
     def get_exchange_rate(
