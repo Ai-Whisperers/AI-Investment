@@ -70,7 +70,7 @@ class RedditCollector(SocialCollector):
         
         # Sentiment indicators specific to Reddit culture
         self.bullish_indicators = [
-            'moon', 'rocket', '🚀', 'diamond hands', '💎', '🙌',
+            'moon', 'rocket', '', 'diamond hands', '', '',
             'hold', 'buy the dip', 'squeeze', 'gamma', 'calls',
             'yolo', 'to the moon', 'tendies', 'bullish', 'long'
         ]
@@ -309,8 +309,8 @@ class RedditCollector(SocialCollector):
             'bullish_indicators': bullish_count,
             'bearish_indicators': bearish_count,
             'net_sentiment': sentiment_score,
-            'has_rockets': '🚀' in text or 'rocket' in text_lower,
-            'has_diamond_hands': '💎' in text or 'diamond hands' in text_lower,
+            'has_rockets': '' in text or 'rocket' in text_lower,
+            'has_diamond_hands': '' in text or 'diamond hands' in text_lower,
             'has_yolo': 'yolo' in text_lower,
             'sentiment_strength': min(total_indicators / 3.0, 1.0)  # Normalize to 0-1
         }

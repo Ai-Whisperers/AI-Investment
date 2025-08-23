@@ -100,7 +100,7 @@ export default function AdminPage() {
                 <p className={`font-medium ${
                   databaseStatus.simulation_ready ? 'text-green-400' : 'text-yellow-400'
                 }`}>
-                  {databaseStatus.simulation_ready ? '✓ ' : '⚠ '}
+                  {databaseStatus.simulation_ready ? ' ' : ' '}
                   {databaseStatus.message}
                 </p>
               </div>
@@ -150,7 +150,7 @@ export default function AdminPage() {
           
           <div className="space-y-4">
             <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
-              <h3 className="font-medium text-yellow-400 mb-2">⚠️ Fix AutoIndex Normalization</h3>
+              <h3 className="font-medium text-yellow-400 mb-2">️ Fix AutoIndex Normalization</h3>
               <p className="text-sm text-yellow-300 mb-3">
                 If AutoIndex values appear extremely large compared to individual assets, 
                 this indicates a normalization issue that can be fixed by recalculating.

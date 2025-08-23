@@ -1,10 +1,10 @@
 # CI/CD Pipeline Architecture
 
-## 🏗️ Clean Modular Design
+## ️ Clean Modular Design
 
 This CI/CD architecture follows clean principles with separation of concerns, making it portable across platforms (GitHub Actions → Azure DevOps → GitLab CI).
 
-## 📂 Workflow Structure
+##  Workflow Structure
 
 ```
 .github/workflows/
@@ -16,7 +16,7 @@ This CI/CD architecture follows clean principles with separation of concerns, ma
 └── deploy.yml           # Manual deployment (existing)
 ```
 
-## 🔄 Pipeline Flow
+##  Pipeline Flow
 
 ### 1. **Test Workflows** (Parallel Execution)
 - **Backend Tests** (`test-backend.yml`)
@@ -46,7 +46,7 @@ This CI/CD architecture follows clean principles with separation of concerns, ma
 - Manual promotion to production
 - Automated rollback on failure
 
-## 🎯 Quality Standards
+##  Quality Standards
 
 ### Backend Requirements
 - **Unit Tests**: 50%+ coverage (expandable)
@@ -62,7 +62,7 @@ This CI/CD architecture follows clean principles with separation of concerns, ma
 - **Build**: Production build success
 - **Security**: Dependency audit clean
 
-## 🚀 Platform Portability
+##  Platform Portability
 
 ### GitHub Actions → Azure DevOps
 ```yaml
@@ -89,7 +89,7 @@ variables:
   PYTHON_VERSION: '3.11'
 ```
 
-## 📋 Environment Configuration
+##  Environment Configuration
 
 ### Required Secrets
 ```
@@ -106,7 +106,7 @@ REDIS_URL            # Redis connection
 JWT_SECRET_KEY       # Authentication secret
 ```
 
-## 🔧 Local Testing
+##  Local Testing
 
 ### Backend
 ```bash
@@ -122,12 +122,12 @@ npm test -- --ci --coverage --maxWorkers=2
 npm run build
 ```
 
-## 🏥 Health Checks
+##  Health Checks
 
 ### Pipeline Health Indicators
-- ✅ **Green**: All tests passing, ready for deployment
-- ⚠️ **Yellow**: Non-critical failures, manual review needed
-- ❌ **Red**: Critical failures, deployment blocked
+-  **Green**: All tests passing, ready for deployment
+- ️ **Yellow**: Non-critical failures, manual review needed
+-  **Red**: Critical failures, deployment blocked
 
 ### Monitoring Dashboards
 - **Test Results**: GitHub Actions summary
@@ -135,7 +135,7 @@ npm run build
 - **Security Reports**: GitHub Security tab
 - **Deployment Status**: Environment status pages
 
-## 🔄 Migration Path
+##  Migration Path
 
 To migrate to other platforms:
 
@@ -144,7 +144,7 @@ To migrate to other platforms:
 3. **Adapt Syntax**: Update platform-specific syntax only
 4. **Test Incrementally**: Migrate one workflow at a time
 
-## 📈 Continuous Improvement
+##  Continuous Improvement
 
 ### Metrics to Track
 - Test execution time (target: < 10 min total)

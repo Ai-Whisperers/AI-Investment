@@ -7,7 +7,7 @@ last-updated: 2025-01-19
 owner: frontend-team
 ---
 
-# 🎨 Frontend Testing Specification
+#  Frontend Testing Specification
 
 ## Overview
 

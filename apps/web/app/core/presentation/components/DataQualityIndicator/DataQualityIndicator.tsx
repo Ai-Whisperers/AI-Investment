@@ -125,7 +125,7 @@ export default function DataQualityIndicator({
           onClick={assess}
           className={actionStyles.assessButton}
         >
-          ✓
+          
         </button>
       </div>
 
@@ -137,7 +137,7 @@ export default function DataQualityIndicator({
           className={warningStyles.container}
         >
           <p className={warningStyles.text}>
-            ⚠️ Data quality is below acceptable thresholds. Consider refreshing market data.
+            ️ Data quality is below acceptable thresholds. Consider refreshing market data.
           </p>
         </motion.div>
       )}
@@ -210,7 +210,7 @@ function RefreshButton({
       disabled={isRefreshing}
       className={`${actionStyles.refreshButton.base} ${buttonStyle}`}
     >
-      {isRefreshing ? '🔄 Refreshing...' : '🔄 Refresh Data'}
+      {isRefreshing ? ' Refreshing...' : ' Refresh Data'}
     </button>
   );
 }

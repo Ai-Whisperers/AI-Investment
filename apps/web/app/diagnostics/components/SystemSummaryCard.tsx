@@ -58,11 +58,11 @@ export const SystemSummaryCard: React.FC<SystemSummaryCardProps> = ({
   const getHealthIcon = () => {
     switch (health) {
       case 'healthy':
-        return '✓';
+        return '';
       case 'degraded':
-        return '⚠';
+        return '';
       case 'critical':
-        return '✗';
+        return '';
       default:
         return '?';
     }

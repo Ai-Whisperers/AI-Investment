@@ -518,11 +518,11 @@ Base path: `/api/v1/portfolio/calculations`
 ```
 
 **Features**:
-- ✅ **Production Algorithms**: Using scipy for accurate financial calculations
-- ✅ **Error Handling**: Comprehensive validation and graceful error responses
-- ✅ **Consistency**: Same algorithms used across all client applications
-- ✅ **Performance**: Server-side calculations with optimized algorithms
-- ✅ **Validation**: Input validation and business rule enforcement
+-  **Production Algorithms**: Using scipy for accurate financial calculations
+-  **Error Handling**: Comprehensive validation and graceful error responses
+-  **Consistency**: Same algorithms used across all client applications
+-  **Performance**: Server-side calculations with optimized algorithms
+-  **Validation**: Input validation and business rule enforcement
 
 ### Benchmark Endpoints
 

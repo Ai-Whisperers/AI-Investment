@@ -387,7 +387,7 @@ class RedditCollector:
         """Fetch all comments from a thread."""
         # Placeholder - would fetch actual comments
         return [
-            {"body": "$NVDA to the moon! 🚀", "score": 50},
+            {"body": "$NVDA to the moon!", "score": 50},
             {"body": "Loading up on TSLA calls", "score": 30},
             {"body": "PLTR is the play boys", "score": 25}
         ]

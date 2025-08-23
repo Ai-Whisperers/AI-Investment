@@ -34,7 +34,7 @@ def create_performance_indexes():
                 logger.info(f"Creating index: {index_sql[:50]}...")
                 conn.execute(text(index_sql))
                 conn.commit()
-                logger.info("✓ Index created successfully")
+                logger.info(" Index created successfully")
             except Exception as e:
                 logger.warning(f"Could not create index: {e}")
 
@@ -46,7 +46,7 @@ def create_performance_indexes():
             conn.execute(text("ANALYZE index_values"))
             conn.execute(text("ANALYZE assets"))
             conn.commit()
-            logger.info("✓ Statistics updated")
+            logger.info(" Statistics updated")
         except Exception as e:
             logger.warning(f"Could not update statistics: {e}")
 

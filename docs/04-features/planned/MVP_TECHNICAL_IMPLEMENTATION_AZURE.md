@@ -1,7 +1,7 @@
 # MVP Technical Implementation on Azure
 *Connecting Social Signals to Your Existing Infrastructure*
 
-## 🏗️ Architecture Overview
+## ️ Architecture Overview
 
 ### Integration with Existing Waardhaven Infrastructure
 ```mermaid
@@ -38,7 +38,7 @@ graph TB
     FastAPI --> NextJS
 ```
 
-## 📂 Project Structure Integration
+##  Project Structure Integration
 
 ### New Directories to Add
 ```
@@ -68,7 +68,7 @@ waardhaven-autoindex/
 │               └── function.json
 ```
 
-## 🔧 Implementation Steps
+##  Implementation Steps
 
 ### Week 1: Backtesting System (Prove It Works)
 
@@ -911,13 +911,13 @@ export default function PerformanceChart() {
 }
 ```
 
-## 🚀 Deployment Script
+##  Deployment Script
 
 ```bash
 # deploy-mvp.sh
 #!/bin/bash
 
-echo "🚀 Deploying Waardhaven MVP to Azure..."
+echo " Deploying Waardhaven MVP to Azure..."
 
 # 1. Deploy Azure Functions
 cd apps/agents/azure_functions
@@ -946,10 +946,10 @@ az functionapp config appsettings set \
   --settings "SCHEDULE_LONG_TERM=0 0 6 * * *" \
              "SCHEDULE_SWING=0 */30 * * * *"
 
-echo "✅ MVP Deployment complete!"
+echo " MVP Deployment complete!"
 ```
 
-## 📊 Success Metrics
+##  Success Metrics
 
 ```yaml
 Week 1 Deliverables:

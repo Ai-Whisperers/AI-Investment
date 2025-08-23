@@ -1,12 +1,12 @@
-# 📋 Comprehensive TODO List - Waardhaven AutoIndex
+#  Comprehensive TODO List - Waardhaven AutoIndex
 *Following the "Throw Spaghetti at the Wall" Approach*
 
-## 🎯 Mission Status
+##  Mission Status
 **Goal**: >30% annual returns through information asymmetry
 **Current**: 75% MVP complete, 113 API endpoints operational
 **Philosophy**: Build fast, test later, kill what doesn't work
 
-## ✅ Completed (What Stuck to the Wall)
+##  Completed (What Stuck to the Wall)
 - [x] Signal Detection System (6 modules, 33 endpoints in 90 minutes!)
 - [x] OSINT Framework (50+ sources, 10M+ data points daily capability)
 - [x] Social Media Collectors (Reddit, YouTube, 4chan, Twitter, Discord)
@@ -15,7 +15,7 @@
 - [x] Entity resolution and signal fusion
 - [x] Rate limiting for all free APIs
 
-## 🔥 IMMEDIATE PRIORITIES (Next 48 Hours)
+##  IMMEDIATE PRIORITIES (Next 48 Hours)
 *These will make the platform actually work with real data*
 
 ### 1. Real Data Connection (Day 1)
@@ -50,7 +50,7 @@
   - Show notification for high-priority signals
   - Auto-reconnect on disconnect
 
-## 📅 WEEK 2 PRIORITIES (Core Functionality)
+##  WEEK 2 PRIORITIES (Core Functionality)
 *Making it actually useful for trading*
 
 ### 3. Portfolio Management
@@ -96,7 +96,7 @@
   - Market open/close summaries
   - Error notifications
 
-## 🍝 SPAGHETTI TO THROW (Week 3-4)
+##  SPAGHETTI TO THROW (Week 3-4)
 *Build fast, see what sticks*
 
 ### 6. AI Features
@@ -173,7 +173,7 @@
   - Schedule automated screens
   - Export results
 
-## 🚀 PRODUCTION DEPLOYMENT (Week 4)
+##  PRODUCTION DEPLOYMENT (Week 4)
 *Ship it and iterate*
 
 ### 10. Deployment Tasks
@@ -201,7 +201,7 @@
 - [ ] **Rate limiting per user**
 - [ ] **API key rotation system**
 
-## 🔮 FUTURE FEATURES (Month 2+)
+##  FUTURE FEATURES (Month 2+)
 *After we prove the concept works*
 
 ### 12. Advanced Trading
@@ -242,7 +242,7 @@
 - [ ] **TimescaleDB** - Time-series optimization
 - [ ] **Kubernetes** - Container orchestration
 
-## 📊 Success Metrics
+##  Success Metrics
 
 ### Week 1 Goals
 - [ ] Process 100K+ social posts daily
@@ -262,7 +262,7 @@
 - [ ] Process 1M+ posts daily
 - [ ] First profitable real money trade
 
-## 🧪 Testing Strategy (End of Week ONLY!)
+##  Testing Strategy (End of Week ONLY!)
 Following the "Don't Test Too Early" principle:
 
 ### What NOT to Test Yet
@@ -277,7 +277,7 @@ Following the "Don't Test Too Early" principle:
 - [ ] Payment processing (when added)
 - [ ] Data integrity checks
 
-## 💡 Remember the Principles
+##  Remember the Principles
 
 1. **"Throw spaghetti at the wall"** - Build 10 features, keep 3
 2. **"Don't test too early"** - Tests slow down rapid iteration
@@ -285,7 +285,7 @@ Following the "Don't Test Too Early" principle:
 4. **"Cognitive offloading"** - Let AI handle boilerplate
 5. **"6-48 hour advantage"** - Speed is our edge
 
-## 🎯 Current Sprint Focus (Do These First!)
+##  Current Sprint Focus (Do These First!)
 
 ### TODAY:
 1. Connect TwelveData API (2 hours)
@@ -303,9 +303,9 @@ Following the "Don't Test Too Early" principle:
 3. Alert system (2 hours)
 4. BATCH TEST everything (2 hours)
 
-## 📝 Notes
+##  Notes
 
-- **Priority**: Items marked 🔥 are blocking production use
+- **Priority**: Items marked  are blocking production use
 - **Time estimates**: Based on "throw spaghetti" approach (build fast, refine later)
 - **Dependencies**: Real data APIs must work before other features matter
 - **Testing**: Only test at week end, not during development

@@ -1,7 +1,7 @@
 # MVP Social Sources Implementation Guide
 *Detailed Code for Each Platform*
 
-## 🔴 Reddit Implementation (Day 1-2)
+##  Reddit Implementation (Day 1-2)
 
 ### Setup & Authentication
 ```python
@@ -128,9 +128,9 @@ class RedditCollector:
     def _extract_sentiment_indicators(self, post) -> Dict:
         """Extract sentiment indicators from post"""
         bullish_words = ['moon', 'squeeze', 'gamma', 'calls', 'buy', 'long', 'hold', 
-                        'diamond hands', '🚀', '💎', '🙌', 'yolo', 'tendies', 'gains']
+                        'diamond hands', '', '', '', 'yolo', 'tendies', 'gains']
         bearish_words = ['puts', 'short', 'sell', 'dump', 'crash', 'bear', 'red', 
-                        'loss', 'down', '📉', '🐻', 'bankruptcy', 'overvalued']
+                        'loss', 'down', '', '', 'bankruptcy', 'overvalued']
         
         text = (post.title + " " + post.selftext).lower()
         
@@ -141,8 +141,8 @@ class RedditCollector:
             'bullish_indicators': bullish_count,
             'bearish_indicators': bearish_count,
             'net_sentiment': bullish_count - bearish_count,
-            'has_rockets': '🚀' in text,  # Strong bullish signal in WSB culture
-            'has_diamond_hands': '💎' in text or 'diamond hands' in text
+            'has_rockets': '' in text,  # Strong bullish signal in WSB culture
+            'has_diamond_hands': '' in text or 'diamond hands' in text
         }
     
     def _get_top_comments(self, post, limit=5) -> List[Dict]:
@@ -230,7 +230,7 @@ class RedditCollector:
         return 0
 ```
 
-## 📺 YouTube Implementation (Day 3)
+##  YouTube Implementation (Day 3)
 
 ```python
 # youtube_collector.py
@@ -443,7 +443,7 @@ class YouTubeCollector:
         return 0
 ```
 
-## 🎭 TikTok Implementation (Day 4)
+##  TikTok Implementation (Day 4)
 
 ```python
 # tiktok_collector.py
@@ -577,7 +577,7 @@ class TikTokCollector:
         return video_data.get('description', '')
 ```
 
-## 🍀 4chan /biz/ Implementation (Day 5)
+##  4chan /biz/ Implementation (Day 5)
 
 ```python
 # chan_collector.py
@@ -826,7 +826,7 @@ class ChanCollector:
         return min(score, 0.9)
 ```
 
-## 🔗 Integration Layer
+##  Integration Layer
 
 ```python
 # social_aggregator.py
@@ -847,7 +847,7 @@ class SocialAggregator:
     async def collect_all_sources(self) -> Dict[str, Any]:
         """Collect data from all social sources"""
         
-        print("📊 Starting social data collection...")
+        print(" Starting social data collection...")
         
         # Collect in parallel where possible
         tasks = [
@@ -881,29 +881,29 @@ class SocialAggregator:
         
         aggregated['unique_tickers'] = list(all_tickers)
         
-        print(f"✅ Collected {aggregated['total_items']} items")
-        print(f"📈 Found {len(all_tickers)} unique tickers")
+        print(f" Collected {aggregated['total_items']} items")
+        print(f" Found {len(all_tickers)} unique tickers")
         
         return aggregated
     
     async def _collect_reddit(self) -> List[Dict]:
         """Collect Reddit data"""
-        print("🔴 Collecting from Reddit...")
+        print(" Collecting from Reddit...")
         return self.reddit.collect_hot_posts(limit=50)
     
     async def _collect_youtube(self) -> List[Dict]:
         """Collect YouTube data"""
-        print("📺 Collecting from YouTube...")
+        print(" Collecting from YouTube...")
         return self.youtube.collect_videos(max_results=20)
     
     async def _collect_tiktok(self) -> List[Dict]:
         """Collect TikTok data"""
-        print("🎵 Collecting from TikTok...")
+        print(" Collecting from TikTok...")
         return self.tiktok.collect_fintok_content()
     
     async def _collect_chan(self) -> List[Dict]:
         """Collect 4chan data"""
-        print("🍀 Collecting from 4chan /biz/...")
+        print(" Collecting from 4chan /biz/...")
         return self.chan.collect_biz_threads(pages=2)
     
     def prioritize_for_analysis(self, data: Dict) -> List[Dict]:

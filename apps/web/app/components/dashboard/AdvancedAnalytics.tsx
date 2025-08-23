@@ -360,7 +360,7 @@ export default function AdvancedAnalytics({ allocations, onRefresh }: AdvancedAn
             onClick={() => strategyService.rebalance()}
             className="p-4 bg-purple-600/20 hover:bg-purple-600/30 rounded-lg border border-purple-500/30 transition-all group"
           >
-            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">⚖️</div>
+            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">️</div>
             <p className="text-sm font-medium text-white">Rebalance</p>
             <p className="text-xs text-gray-400">Optimize weights</p>
           </button>
@@ -369,7 +369,7 @@ export default function AdvancedAnalytics({ allocations, onRefresh }: AdvancedAn
             onClick={onRefresh}
             className="p-4 bg-blue-600/20 hover:bg-blue-600/30 rounded-lg border border-blue-500/30 transition-all group"
           >
-            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">🔄</div>
+            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform"></div>
             <p className="text-sm font-medium text-white">Refresh</p>
             <p className="text-xs text-gray-400">Update data</p>
           </button>
@@ -378,7 +378,7 @@ export default function AdvancedAnalytics({ allocations, onRefresh }: AdvancedAn
             onClick={() => console.log('Export analytics')}
             className="p-4 bg-green-600/20 hover:bg-green-600/30 rounded-lg border border-green-500/30 transition-all group"
           >
-            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">📊</div>
+            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform"></div>
             <p className="text-sm font-medium text-white">Export</p>
             <p className="text-xs text-gray-400">Download report</p>
           </button>
@@ -387,7 +387,7 @@ export default function AdvancedAnalytics({ allocations, onRefresh }: AdvancedAn
             onClick={() => window.open('/strategy', '_blank')}
             className="p-4 bg-orange-600/20 hover:bg-orange-600/30 rounded-lg border border-orange-500/30 transition-all group"
           >
-            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">⚙️</div>
+            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">️</div>
             <p className="text-sm font-medium text-white">Configure</p>
             <p className="text-xs text-gray-400">Strategy settings</p>
           </button>

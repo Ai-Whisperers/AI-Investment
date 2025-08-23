@@ -1,12 +1,12 @@
-# 📡 Signal Detection System Documentation
+#  Signal Detection System Documentation
 
-## 🚀 Overview
+##  Overview
 
 The Waardhaven Signal Detection System is a comprehensive alpha generation platform that processes multiple data sources to identify >30% annual return opportunities. Built following the "throw spaghetti at the wall" philosophy for rapid iteration and maximum efficiency.
 
-**Current Status**: ✅ OPERATIONAL (113 API endpoints, 6 signal detection modules)
+**Current Status**:  OPERATIONAL (113 API endpoints, 6 signal detection modules)
 
-## 🎯 Signal Detection Modules
+##  Signal Detection Modules
 
 ### 1. Agro-Robotics Tracker (45% CAGR Opportunity)
 **Conviction**: HIGHEST ⭐⭐⭐⭐⭐
@@ -77,7 +77,7 @@ The Waardhaven Signal Detection System is a comprehensive alpha generation platf
   - `/api/v1/integrated/signal-convergence` - Multi-signal plays
   - `/api/v1/integrated/market-regime` - Market analysis
 
-## 📊 Current High-Conviction Opportunities
+##  Current High-Conviction Opportunities
 
 ### Immediate Actions (This Week)
 1. **AGCO** - Agro-robotics + Ukraine exposure (40%)
@@ -95,7 +95,7 @@ The Waardhaven Signal Detection System is a comprehensive alpha generation platf
    - Target: +30% in 6 months
    - Signal: Multiple billionaires buying
 
-## 🔄 API Usage Examples
+##  API Usage Examples
 
 ### Get Daily Alpha Signals
 ```bash
@@ -115,7 +115,7 @@ curl -X GET "http://localhost:8000/api/v1/momentum/osint/copyable-trades?risk_le
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
-## 📈 Performance Metrics
+##  Performance Metrics
 
 ### Signal Performance (Last 30 Days)
 - **Momentum Signals**: 71% win rate, 2.8x profit factor
@@ -130,7 +130,7 @@ curl -X GET "http://localhost:8000/api/v1/momentum/osint/copyable-trades?risk_le
 - **Max Drawdown**: -12%
 - **Return vs S&P 500**: +18.5%
 
-## 💡 Trading Strategy
+##  Trading Strategy
 
 ### Position Sizing
 - **High Conviction**: 5-7% of portfolio
@@ -151,7 +151,7 @@ curl -X GET "http://localhost:8000/api/v1/momentum/osint/copyable-trades?risk_le
 4. **Momentum Breakouts** (short-term gains)
 5. **Regulatory Catalysts** (predictable timing)
 
-## 🛠️ Technical Architecture
+## ️ Technical Architecture
 
 ### Data Flow
 ```
@@ -175,7 +175,7 @@ Social Feeds ───┘                              ↓
 - Parallel signal processing
 - Lazy news service initialization
 
-## 🚨 Risk Disclaimers
+##  Risk Disclaimers
 
 1. **Not Financial Advice** - All signals for educational purposes
 2. **Past Performance** - Does not guarantee future results
@@ -183,7 +183,7 @@ Social Feeds ───┘                              ↓
 4. **Execution Risk** - Timing and slippage affect returns
 5. **Data Risk** - Signals based on available data quality
 
-## 🔮 Upcoming Features
+##  Upcoming Features
 
 ### Next Sprint (Week 2)
 - [ ] WebSocket implementation for live updates
@@ -197,23 +197,23 @@ Social Feeds ───┘                              ↓
 - [ ] Automated trade execution
 - [ ] Multi-strategy portfolio optimization
 
-## 📞 Support
+##  Support
 
 For issues or questions about the signal detection system:
 - Check API health: `/api/v1/diagnostics/health`
 - View system status: `/api/v1/diagnostics/system`
 - Signal performance: `/api/v1/integrated/signal-performance`
 
-## 🎯 Success Metrics
+##  Success Metrics
 
 **Goal**: >30% annual returns through information asymmetry
 
 **Current Performance**: 
-- ✅ 93 signals generated
-- ✅ 75% win rate achieved
-- ✅ 18.5% outperformance vs S&P 500
-- ✅ 2.1 Sharpe ratio
-- ✅ System operational with 113 endpoints
+-  93 signals generated
+-  75% win rate achieved
+-  18.5% outperformance vs S&P 500
+-  2.1 Sharpe ratio
+-  System operational with 113 endpoints
 
 ---
 
@@ -221,4 +221,4 @@ For issues or questions about the signal detection system:
 
 **Last Updated**: January 22, 2025
 **Version**: 1.0.0
-**Status**: 🟢 OPERATIONAL
+**Status**:  OPERATIONAL

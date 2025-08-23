@@ -34,6 +34,7 @@ class SignalIntegrator:
         self.twelvedata = TwelveDataService()
         self.news_service = None  # Will be initialized with db when needed
         self.last_refresh = {}
+        self._cached_prices = {}  # Store cached price data
         self.cache_duration = timedelta(minutes=5)  # 5-minute cache for rate limiting
         
     def get_real_time_price(self, symbol: str) -> Dict:
@@ -50,22 +51,36 @@ class SignalIntegrator:
                 return self._get_cached_price(symbol)
         
         try:
-            # Fetch real-time data
+            # Check if API key is configured
+            if not os.getenv("TWELVEDATA_API_KEY"):
+                logger.warning("TWELVEDATA_API_KEY not configured, using placeholder data")
+                return self._get_placeholder_price(symbol)
+            
+            # Fetch real-time data from TwelveData API
             data = self.twelvedata.get_quote(symbol)
             if data:
                 self.last_refresh[cache_key] = datetime.now()
-                return {
-                    "symbol": symbol,
-                    "price": float(data.get("close", 0)),
+                # Store cached data for future use
+                self._cached_prices[symbol] = {
+                    "price": float(data.get("close", data.get("price", 0))),
                     "change": float(data.get("change", 0)),
-                    "percent_change": float(data.get("percent_change", 0)),
+                    "percent_change": float(data.get("percent_change", data.get("percent", 0))),
                     "volume": int(data.get("volume", 0)),
                     "timestamp": datetime.now().isoformat()
+                }
+                return {
+                    "symbol": symbol,
+                    "price": self._cached_prices[symbol]["price"],
+                    "change": self._cached_prices[symbol]["change"],
+                    "percent_change": self._cached_prices[symbol]["percent_change"],
+                    "volume": self._cached_prices[symbol]["volume"],
+                    "timestamp": self._cached_prices[symbol]["timestamp"]
                 }
         except Exception as e:
             logger.error(f"Error fetching real-time price for {symbol}: {e}")
         
         # Return placeholder if API fails
+        logger.info(f"Using placeholder price for {symbol}")
         return self._get_placeholder_price(symbol)
     
     def get_momentum_signals_with_prices(self, timeframe: str = "short") -> List[Dict]:
@@ -252,8 +267,13 @@ class SignalIntegrator:
         return actions[:5]  # Limit to 5 action items
     
     def _get_cached_price(self, symbol: str) -> Dict:
-        """Get cached price (placeholder for now)."""
-        # In production, implement proper caching
+        """Get cached price data."""
+        if symbol in self._cached_prices:
+            return {
+                "symbol": symbol,
+                **self._cached_prices[symbol]
+            }
+        # Fallback to placeholder if no cached data
         return self._get_placeholder_price(symbol)
     
     def _get_placeholder_price(self, symbol: str) -> Dict:

@@ -5,7 +5,7 @@
 
 This document presents a cost-optimized architecture for the AI Agents system that operates under $200/month by leveraging Azure free tiers, open-source solutions, and your existing Claude/OpenAI subscriptions. The system is designed for phased rollout with an MVP focus.
 
-## 💰 Budget Breakdown
+##  Budget Breakdown
 
 ### Target: $100-200/month Maximum
 
@@ -28,7 +28,7 @@ New Infrastructure Costs:
 Total New Costs: $85-155/month
 ```
 
-## 🏗️ Lean Architecture
+## ️ Lean Architecture
 
 ### Core Components
 
@@ -79,7 +79,7 @@ graph TB
     AF --> BLOB
 ```
 
-## 📦 MCP Server Implementation (Budget Version)
+##  MCP Server Implementation (Budget Version)
 
 ### 1. Lightweight MCP Servers as Azure Functions
 
@@ -309,7 +309,7 @@ properties:
 }
 ```
 
-## 🎯 MVP Phased Rollout Plan
+##  MVP Phased Rollout Plan
 
 ### Phase 1: Reddit Only (Weeks 1-2) - $50/month
 **Goal**: Prove concept with single source
@@ -387,7 +387,7 @@ Features:
   - Full credibility system
 ```
 
-## 🚀 Whisper Cost Optimization
+##  Whisper Cost Optimization
 
 ### Option 1: OpenAI Whisper API (Recommended for MVP)
 ```python
@@ -445,7 +445,7 @@ def local_whisper_transcribe(audio_file):
     pass
 ```
 
-## 📊 Legal Compliance System
+##  Legal Compliance System
 
 ### Monthly Legal Review Workflow
 
@@ -559,7 +559,7 @@ async def get_compliance_status():
     }
 ```
 
-## 🔧 Development Environment Setup
+##  Development Environment Setup
 
 ### Local Development (Zero Cost)
 
@@ -619,7 +619,7 @@ jobs:
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
 ```
 
-## 📈 Scaling Strategy
+##  Scaling Strategy
 
 ### When to Scale (Based on Success Metrics)
 
@@ -646,14 +646,14 @@ Scale Trigger 3 ($1,000+/month):
   - Full architecture from original plan
 ```
 
-## 🎯 MVP Success Criteria
+##  MVP Success Criteria
 
 ### Technical Metrics (Month 1)
-- Process 100+ Reddit posts/day ✓
-- Transcribe 10+ YouTube videos/day ✓
-- Generate 5+ validated insights/day ✓
-- <10 minute end-to-end latency ✓
-- <$100/month infrastructure cost ✓
+- Process 100+ Reddit posts/day 
+- Transcribe 10+ YouTube videos/day 
+- Generate 5+ validated insights/day 
+- <10 minute end-to-end latency 
+- <$100/month infrastructure cost 
 
 ### Business Metrics (Month 3)
 - 100+ beta users
@@ -668,7 +668,7 @@ Scale Trigger 3 ($1,000+/month):
 4. **Cost Efficiency**: Show <$100/month operation
 5. **Scalability**: Demonstrate path to 10,000 users
 
-## 🚨 Critical Path to MVP
+##  Critical Path to MVP
 
 ### Week 1: Azure Setup & Reddit
 - [ ] Create Azure account (free tier)
@@ -695,7 +695,7 @@ Scale Trigger 3 ($1,000+/month):
 - [ ] Document cost metrics
 - [ ] Practice presentation
 
-## 💡 Cost Optimization Tips
+##  Cost Optimization Tips
 
 1. **API Quotas**: YouTube allows 10,000 units/day free - use wisely
 2. **Caching**: Cache everything possible in Redis free tier (250MB)
@@ -705,7 +705,7 @@ Scale Trigger 3 ($1,000+/month):
 6. **Cleanup**: Auto-delete data older than 30 days
 7. **Monitoring**: Set up cost alerts at $150/month
 
-## 📊 Comparison: Original vs Budget Architecture
+##  Comparison: Original vs Budget Architecture
 
 | Component | Original Plan | Budget Plan | Savings |
 |-----------|--------------|-------------|---------|
@@ -716,7 +716,7 @@ Scale Trigger 3 ($1,000+/month):
 | Cache | Redis Cluster ($100) | Redis Free ($0) | 100% |
 | **Total** | **$3,675/month** | **$155/month** | **96%** |
 
-## ✅ Final Recommendations
+##  Final Recommendations
 
 ### Do Now
 1. Start with Reddit only (lowest cost, easiest)

@@ -26,7 +26,7 @@ const CONFIG = {
  * Generate API documentation from OpenAPI spec
  */
 async function generateApiDocs() {
-  console.log('📘 Generating API documentation...');
+  console.log(' Generating API documentation...');
   
   try {
     // Fetch OpenAPI spec
@@ -97,9 +97,9 @@ ${spec.info.version}
     fs.mkdirSync(path.dirname(outputPath), { recursive: true });
     fs.writeFileSync(outputPath, markdown);
     
-    console.log('✅ API documentation generated');
+    console.log(' API documentation generated');
   } catch (error) {
-    console.error('❌ Failed to generate API docs:', error.message);
+    console.error(' Failed to generate API docs:', error.message);
   }
 }
 
@@ -107,7 +107,7 @@ ${spec.info.version}
  * Generate environment variables documentation
  */
 function generateEnvVarsDocs() {
-  console.log('🔐 Generating environment variables documentation...');
+  console.log(' Generating environment variables documentation...');
   
   const envVars = [];
   
@@ -204,14 +204,14 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
   fs.writeFileSync(outputPath, markdown);
   
-  console.log('✅ Environment variables documentation generated');
+  console.log(' Environment variables documentation generated');
 }
 
 /**
  * Generate search index
  */
 function generateSearchIndex() {
-  console.log('🔍 Generating search index...');
+  console.log(' Generating search index...');
   
   const keywords = {};
   
@@ -269,7 +269,7 @@ generated: ${new Date().toISOString()}
   const outputPath = path.join(CONFIG.docsPath, CONFIG.outputPaths.search);
   fs.writeFileSync(outputPath, markdown);
   
-  console.log('✅ Search index generated');
+  console.log(' Search index generated');
 }
 
 /**
@@ -307,13 +307,13 @@ function generateExample(schema) {
  * Main execution
  */
 async function main() {
-  console.log('🚀 Starting documentation generation...\n');
+  console.log(' Starting documentation generation...\n');
   
   // Check if API is running
   try {
     await axios.get(`${CONFIG.apiUrl}/health`);
   } catch (error) {
-    console.warn('⚠️  API not running, skipping OpenAPI generation');
+    console.warn('️  API not running, skipping OpenAPI generation');
   }
   
   // Run generators
@@ -321,8 +321,8 @@ async function main() {
   generateEnvVarsDocs();
   generateSearchIndex();
   
-  console.log('\n✨ Documentation generation complete!');
-  console.log('📁 Generated files in:', CONFIG.docsPath);
+  console.log('\n Documentation generation complete!');
+  console.log(' Generated files in:', CONFIG.docsPath);
 }
 
 // Run if executed directly

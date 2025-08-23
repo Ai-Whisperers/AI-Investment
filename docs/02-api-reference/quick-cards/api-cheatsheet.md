@@ -7,9 +7,9 @@ last-updated: 2025-01-19
 owner: backend-team
 ---
 
-# 📘 API Quick Reference Cheatsheet
+#  API Quick Reference Cheatsheet
 
-## 🔐 Authentication
+##  Authentication
 ```bash
 # Register
 curl -X POST http://localhost:8000/api/v1/auth/register \
@@ -27,7 +27,7 @@ curl -H "Authorization: Bearer $TOKEN" \
   http://localhost:8000/api/v1/auth/me
 ```
 
-## 📊 Portfolio Management
+##  Portfolio Management
 ```bash
 # Get Index Values
 GET /api/v1/index/values?start_date=2024-01-01&limit=100
@@ -47,7 +47,7 @@ POST /api/v1/index/simulate
 GET /api/v1/index/performance?period=1Y
 ```
 
-## 📈 Market Data
+##  Market Data
 ```bash
 # Get Benchmark
 GET /api/v1/benchmark/sp500?start_date=2024-01-01
@@ -63,7 +63,7 @@ POST /api/v1/background/refresh-market-data
 }
 ```
 
-## ⚙️ Strategy Configuration
+## ️ Strategy Configuration
 ```bash
 # Get Current Strategy
 GET /api/v1/strategy/config
@@ -80,7 +80,7 @@ PUT /api/v1/strategy/config
 POST /api/v1/strategy/rebalance?force=true
 ```
 
-## 📰 News & Sentiment
+##  News & Sentiment
 ```bash
 # Get News Articles
 GET /api/v1/news/articles?symbols=AAPL,MSFT&limit=10
@@ -89,7 +89,7 @@ GET /api/v1/news/articles?symbols=AAPL,MSFT&limit=10
 GET /api/v1/news/sentiment?symbol=AAPL&period=7D
 ```
 
-## 🔧 System Operations
+##  System Operations
 ```bash
 # Health Check
 GET /health
@@ -104,7 +104,7 @@ GET /api/v1/diagnostics/database-status
 GET /api/v1/diagnostics/cache-status
 ```
 
-## 🎯 Response Formats
+##  Response Formats
 
 ### Success Response
 ```json
@@ -135,7 +135,7 @@ GET /api/v1/diagnostics/cache-status
 }
 ```
 
-## 🚀 JavaScript/TypeScript Client
+##  JavaScript/TypeScript Client
 ```typescript
 // Setup
 const api = axios.create({
@@ -155,7 +155,7 @@ const result = await api.put('/strategy/config', {
 });
 ```
 
-## 🐍 Python Client
+##  Python Client
 ```python
 import requests
 
@@ -179,14 +179,14 @@ response = requests.put(
 )
 ```
 
-## 📊 Rate Limits
+##  Rate Limits
 | User Type | Limit | Window |
 |-----------|-------|--------|
 | Anonymous | 60 | 1 hour |
 | Authenticated | 100 | 1 minute |
 | Admin | 200 | 1 minute |
 
-## 🔗 Useful Links
+##  Useful Links
 - [Full API Docs](http://localhost:8000/docs)
 - [OpenAPI Spec](http://localhost:8000/openapi.json)
 - [Authentication Guide](../authentication/README.md)

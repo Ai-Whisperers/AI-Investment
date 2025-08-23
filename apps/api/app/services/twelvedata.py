@@ -381,6 +381,20 @@ class TwelveDataService:
             'credits_per_minute': self.rate_limiter.credits_per_minute
         }
 
+    def get_quote(self, symbol: str) -> dict[str, Any]:
+        """
+        Get real-time quote for a single symbol.
+        Simplified interface for signal integrator.
+        
+        Args:
+            symbol: Stock symbol
+            
+        Returns:
+            Quote data dictionary
+        """
+        quotes = self.get_real_time_quote([symbol])
+        return quotes.get(symbol, {})
+
     def get_exchange_rate(self, from_currency: str, to_currency: str) -> float:
         """
         Get exchange rate between two currencies.

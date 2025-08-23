@@ -7,9 +7,9 @@ last-updated: 2025-01-19
 owner: development-team
 ---
 
-# ⚡ Developer Quick Start Card
+#  Developer Quick Start Card
 
-## 🚀 5-Minute Setup
+##  5-Minute Setup
 ```bash
 # 1. Clone & Install
 git clone https://github.com/waardhaven/autoindex.git
@@ -35,7 +35,7 @@ npm install
 npm run dev  # From root directory
 ```
 
-## 🔧 Essential Commands
+##  Essential Commands
 ```bash
 # Development
 npm run dev              # Start all services
@@ -59,7 +59,7 @@ npm run format           # Format code
 npm run typecheck        # TypeScript check
 ```
 
-## 📁 Key Files & Locations
+##  Key Files & Locations
 ```
 apps/api/
 ├── app/main.py          # FastAPI entry
@@ -74,7 +74,7 @@ apps/web/
 └── .env                 # Frontend config
 ```
 
-## 🔐 Environment Variables
+##  Environment Variables
 ```bash
 # Backend (.env)
 DATABASE_URL=postgresql://postgres:postgres@localhost/waardhaven
@@ -86,7 +86,7 @@ REDIS_URL=redis://localhost:6379
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
-## 🌐 Access Points
+##  Access Points
 | Service | URL | Purpose |
 |---------|-----|---------|
 | Frontend | http://localhost:3000 | Web application |
@@ -95,7 +95,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 | Redis | localhost:6379 | Cache |
 | PostgreSQL | localhost:5432 | Database |
 
-## 🐛 Common Issues
+##  Common Issues
 | Problem | Solution |
 |---------|----------|
 | Port in use | Change PORT in .env |
@@ -103,7 +103,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 | Missing dependencies | `pip install -r requirements.txt` |
 | TypeScript errors | `npm run typecheck` |
 
-## 📚 Next Steps
+##  Next Steps
 1. [Read Architecture](../../03-implementation/architecture/system-design.md)
 2. [Explore API](../../02-api-reference/README.md)
 3. [Check TODOs](../../05-roadmap/quick-cards/todo-summary.md)

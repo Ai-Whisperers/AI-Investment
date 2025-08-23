@@ -6,13 +6,13 @@ Successfully increased backend test coverage from ~25-30% to ~45-50%, achieving 
 
 ## Key Achievements
 
-### 1. Financial Calculations - Production Ready ✅
+### 1. Financial Calculations - Production Ready 
 - **Time-Weighted Returns (TWR)**: Proper cash flow segmentation and period compounding
 - **Internal Rate of Return (IRR)**: scipy.optimize numerical solution for accurate MWR
 - **Portfolio Optimization**: Minimum variance and maximum Sharpe ratio portfolios
 - **Added scipy==1.11.4**: Essential for optimization algorithms
 
-### 2. Risk Calculator Enhancements ✅
+### 2. Risk Calculator Enhancements 
 - **Advanced Metrics Implemented**:
   - Value at Risk (VaR) with historical and parametric methods
   - Conditional VaR (CVaR/Expected Shortfall)
@@ -23,7 +23,7 @@ Successfully increased backend test coverage from ~25-30% to ~45-50%, achieving 
   - Stress testing scenarios
 - **Test Results**: 16 of 17 tests passing (95% pass rate)
 
-### 3. Weight Calculator Improvements ✅
+### 3. Weight Calculator Improvements 
 - **Refactored Methods**:
   - Market cap weighting
   - Risk parity (inverse volatility)

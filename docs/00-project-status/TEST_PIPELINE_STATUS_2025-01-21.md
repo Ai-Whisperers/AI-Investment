@@ -14,7 +14,7 @@ The Waardhaven AutoIndex project's test infrastructure is **critically broken**.
 - **Actual Failures**: 0 (previously reported failures don't exist)
 - **Skipped Tests**: 1 (test_google_oauth_redirect)
 - **Test Coverage**: Cannot measure (suite doesn't complete)
-- **CI/CD Status**: ❌ All workflows failing
+- **CI/CD Status**:  All workflows failing
 
 ## GitHub Actions Pipeline Status
 
@@ -22,21 +22,21 @@ The Waardhaven AutoIndex project's test infrastructure is **critically broken**.
 
 | Workflow | Status | Actual Issue |
 |----------|--------|-------|
-| Backend Tests | ❌ Failed | Test suite timeout, not specific failures |
-| Build Deploy | ❌ Failed | Blocked by quality gates |
-| Security | ❌ Failed | Bandit configuration issues |
-| Quality Gates | ❌ Failed | Depends on backend tests |
-| Frontend Build | ❌ Not tested | 15 TypeScript errors |
+| Backend Tests |  Failed | Test suite timeout, not specific failures |
+| Build Deploy |  Failed | Blocked by quality gates |
+| Security |  Failed | Bandit configuration issues |
+| Quality Gates |  Failed | Depends on backend tests |
+| Frontend Build |  Not tested | 15 TypeScript errors |
 
 ## Actual Test Status (Individual Runs)
 
-### 1. test_apply_weight_constraints ✅ PASSES
+### 1. test_apply_weight_constraints  PASSES
 **Location**: `tests/unit/services/test_weight_calculator.py:105`
 **Status**: PASSES when run individually
 **Evidence**: `pytest test_weight_calculator.py::test_apply_weight_constraints -xvs`
 **Result**: `1 passed, 33 warnings in 0.17s`
 
-### 2. test_refresh_token ✅ PASSES
+### 2. test_refresh_token  PASSES
 **Location**: `tests/unit/routers/test_auth.py:171`
 **Status**: PASSES when run individually
 **Evidence**: `pytest test_auth.py::test_refresh_token -xvs`
@@ -118,27 +118,27 @@ cd apps/api && python -m pytest tests/unit/services/test_weight_calculator.py -v
 ## Real Action Items (Based on Actual Issues)
 
 ### Critical (Actually Blocking Deployment)
-1. ❌ Fix test suite timeout issues
-2. ❌ Fix database connection pool exhaustion
-3. ❌ Fix frontend TypeScript errors (15 errors)
-4. ❌ Restore GitHub Actions functionality
+1.  Fix test suite timeout issues
+2.  Fix database connection pool exhaustion
+3.  Fix frontend TypeScript errors (15 errors)
+4.  Restore GitHub Actions functionality
 
 ### High Priority
-1. ⚠️ Add proper test cleanup/teardown
-2. ⚠️ Fix test isolation issues
-3. ⚠️ Configure Bandit properly
-4. ⚠️ Fix import paths in frontend tests
+1. ️ Add proper test cleanup/teardown
+2. ️ Fix test isolation issues
+3. ️ Configure Bandit properly
+4. ️ Fix import paths in frontend tests
 
 ### Medium Priority
-1. 📝 Remove misleading documentation
-2. 📝 Consolidate duplicate status files
-3. 📝 Fix deprecation warnings
-4. 📝 Register pytest marks
+1.  Remove misleading documentation
+2.  Consolidate duplicate status files
+3.  Fix deprecation warnings
+4.  Register pytest marks
 
 ### Low Priority
-1. 💡 Improve test execution speed
-2. 💡 Add integration test coverage
-3. 💡 Update deprecated dependencies
+1.  Improve test execution speed
+2.  Add integration test coverage
+3.  Update deprecated dependencies
 
 ## Commands That Actually Show the Problem
 
@@ -185,7 +185,7 @@ gh run list --workflow=ci-cd-pipeline.yml  # ALL RED
 
 ## Real Success Criteria
 
-✅ When these actually work:
+ When these actually work:
 - [ ] Can run `pytest tests/unit` without timeout
 - [ ] Can run `npx tsc --noEmit` without errors
 - [ ] GitHub Actions actually pass (not fake success)

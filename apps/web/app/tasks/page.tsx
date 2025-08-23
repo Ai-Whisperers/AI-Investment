@@ -343,7 +343,7 @@ export default function TasksPage() {
                 }}
                 className="p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-all"
               >
-                <div className="text-2xl mb-2">🔄</div>
+                <div className="text-2xl mb-2"></div>
                 <p className="text-sm font-medium">Smart Refresh</p>
                 <p className="text-xs text-neutral-400 mt-1">Update market data</p>
               </motion.button>
@@ -361,7 +361,7 @@ export default function TasksPage() {
                 }}
                 className="p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-all"
               >
-                <div className="text-2xl mb-2">📊</div>
+                <div className="text-2xl mb-2"></div>
                 <p className="text-sm font-medium">Compute Index</p>
                 <p className="text-xs text-neutral-400 mt-1">Recalculate portfolio</p>
               </motion.button>
@@ -382,7 +382,7 @@ export default function TasksPage() {
                 }}
                 className="p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-all"
               >
-                <div className="text-2xl mb-2">📈</div>
+                <div className="text-2xl mb-2"></div>
                 <p className="text-sm font-medium">Generate Report</p>
                 <p className="text-xs text-neutral-400 mt-1">30-day performance</p>
               </motion.button>
@@ -402,7 +402,7 @@ export default function TasksPage() {
                 }}
                 className="p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-all"
               >
-                <div className="text-2xl mb-2">🧹</div>
+                <div className="text-2xl mb-2"></div>
                 <p className="text-sm font-medium">Cleanup Data</p>
                 <p className="text-xs text-neutral-400 mt-1">Remove old records</p>
               </motion.button>

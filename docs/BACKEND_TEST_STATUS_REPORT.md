@@ -14,21 +14,21 @@ The backend tests were initially failing at 93% failure rate due to mismatched m
 ### Module-by-Module Breakdown
 
 #### 1. ReturnCalculator (`tests/unit/services/test_return_calculator.py`)
-**Status**: ✅ Partially Fixed
+**Status**:  Partially Fixed
 - **Tests**: 21 total
 - **Passing**: ~9 tests (43%)
 - **Implemented Methods**:
-  - ✅ `calculate_simple_return()`
-  - ✅ `calculate_log_returns()`
-  - ✅ `calculate_cumulative_returns()`
-  - ✅ `calculate_annualized_return()`
-  - ✅ `calculate_daily_returns()`
-  - ✅ `calculate_monthly_returns()`
-  - ✅ `calculate_ytd_return()`
-  - ✅ `calculate_time_weighted_return()` (simplified)
-  - ✅ `calculate_money_weighted_return()` (simplified)
-  - ✅ `calculate_compound_return()`
-  - ✅ `calculate_return_distribution_metrics()`
+  -  `calculate_simple_return()`
+  -  `calculate_log_returns()`
+  -  `calculate_cumulative_returns()`
+  -  `calculate_annualized_return()`
+  -  `calculate_daily_returns()`
+  -  `calculate_monthly_returns()`
+  -  `calculate_ytd_return()`
+  -  `calculate_time_weighted_return()` (simplified)
+  -  `calculate_money_weighted_return()` (simplified)
+  -  `calculate_compound_return()`
+  -  `calculate_return_distribution_metrics()`
 
 **Remaining Issues**:
 - Some tests expect different return formats (pandas Series vs numpy arrays)
@@ -36,17 +36,17 @@ The backend tests were initially failing at 93% failure rate due to mismatched m
 - Period returns method needs implementation
 
 #### 2. RiskCalculator (`tests/unit/services/test_risk_calculator.py`)
-**Status**: ⚠️ Partially Fixed
+**Status**: ️ Partially Fixed
 - **Tests**: 17 total
 - **Passing**: ~4-6 tests (24-35%)
 - **Implemented Methods**:
-  - ✅ `calculate_sharpe_ratio()`
-  - ✅ `calculate_sortino_ratio()`
-  - ✅ `calculate_volatility()`
-  - ✅ `calculate_beta()`
-  - ✅ `calculate_correlation()`
-  - ✅ `calculate_var()` (Value at Risk)
-  - ✅ `calculate_cvar()` (Conditional VaR)
+  -  `calculate_sharpe_ratio()`
+  -  `calculate_sortino_ratio()`
+  -  `calculate_volatility()`
+  -  `calculate_beta()`
+  -  `calculate_correlation()`
+  -  `calculate_var()` (Value at Risk)
+  -  `calculate_cvar()` (Conditional VaR)
 
 **Remaining Issues**:
 - Max drawdown calculation needs date handling fixes
@@ -54,16 +54,16 @@ The backend tests were initially failing at 93% failure rate due to mismatched m
 - Some tests expect different parameter signatures
 
 #### 3. WeightCalculator (`tests/unit/services/test_weight_calculator.py`)
-**Status**: ⚠️ Partially Fixed
+**Status**: ️ Partially Fixed
 - **Tests**: 17 total
 - **Passing**: ~0-3 tests (0-18%)
 - **Implemented Methods**:
-  - ✅ `calculate_equal_weights()`
-  - ✅ `calculate_market_cap_weights()`
-  - ✅ `calculate_risk_parity_weights()`
-  - ✅ `calculate_minimum_variance_weights()` (simplified)
-  - ✅ `calculate_momentum_weights()`
-  - ✅ `apply_weight_constraints()`
+  -  `calculate_equal_weights()`
+  -  `calculate_market_cap_weights()`
+  -  `calculate_risk_parity_weights()`
+  -  `calculate_minimum_variance_weights()` (simplified)
+  -  `calculate_momentum_weights()`
+  -  `apply_weight_constraints()`
 
 **Remaining Issues**:
 - Tests expect different return types (Dict vs Series)
@@ -71,7 +71,7 @@ The backend tests were initially failing at 93% failure rate due to mismatched m
 - Need proper optimization for minimum variance
 
 #### 4. Auth Router (`tests/unit/routers/test_auth.py`)
-**Status**: ❌ Failing
+**Status**:  Failing
 - **Tests**: 23 total
 - **Passing**: 0 tests
 - **Issues**:
@@ -80,7 +80,7 @@ The backend tests were initially failing at 93% failure rate due to mismatched m
   - Schema validation issues
 
 #### 5. Integration Tests (`tests/integration/`)
-**Status**: ❌ Not Running
+**Status**:  Not Running
 - **Tests**: 10 total
 - **Issues**:
   - Database setup problems
@@ -88,7 +88,7 @@ The backend tests were initially failing at 93% failure rate due to mismatched m
   - Fixture configuration needed
 
 #### 6. Contract Tests (`tests/contract/`)
-**Status**: ❌ Collection Error
+**Status**:  Collection Error
 - **Tests**: Cannot collect
 - **Issues**:
   - Missing portfolio schemas
@@ -98,19 +98,19 @@ The backend tests were initially failing at 93% failure rate due to mismatched m
 
 ### Critical Financial Methods Added
 1. **Return Calculations**: 
-   - Simple, log, cumulative returns ✅
-   - Period-based returns (daily, monthly, YTD) ✅
-   - Time/money-weighted returns (simplified) ⚠️
+   - Simple, log, cumulative returns 
+   - Period-based returns (daily, monthly, YTD) 
+   - Time/money-weighted returns (simplified) ️
 
 2. **Risk Metrics**:
-   - Sharpe, Sortino ratios ✅
-   - VaR, CVaR ✅
-   - Beta, correlation ✅
+   - Sharpe, Sortino ratios 
+   - VaR, CVaR 
+   - Beta, correlation 
 
 3. **Weight Calculations**:
-   - Equal, market-cap, momentum weights ✅
-   - Risk parity (inverse volatility) ✅
-   - Constraint application ✅
+   - Equal, market-cap, momentum weights 
+   - Risk parity (inverse volatility) 
+   - Constraint application 
 
 ### Still Missing (Production-Critical)
 1. **Advanced Returns**:

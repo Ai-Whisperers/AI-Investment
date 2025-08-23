@@ -9,13 +9,13 @@ owner: frontend-team
 
 # Frontend Testing Documentation
 
-## 🎨 Testing Requirements
+##  Testing Requirements
 
 **Minimum Coverage: 90%** | **Critical Paths: 100%**
 
 ## Documents
 
-### 📋 [Testing Specification](FRONTEND_TESTING.md)
+###  [Testing Specification](FRONTEND_TESTING.md)
 Complete frontend testing strategy
 - React Testing Library
 - Playwright E2E
@@ -49,12 +49,12 @@ Complete frontend testing strategy
 
 | Component | Required Coverage | Current | Status |
 |-----------|------------------|---------|--------|
-| Portfolio Components | 95% | 0% | 🔴 Critical |
-| Trading Forms | 100% | 0% | 🔴 Critical |
-| Risk Displays | 95% | 0% | 🔴 Critical |
-| Dashboard | 90% | 0% | 🔴 Urgent |
-| Charts | 85% | 0% | 🟡 High |
-| Navigation | 80% | ~10% | 🟡 High |
+| Portfolio Components | 95% | 0% |  Critical |
+| Trading Forms | 100% | 0% |  Critical |
+| Risk Displays | 95% | 0% |  Critical |
+| Dashboard | 90% | 0% |  Urgent |
+| Charts | 85% | 0% |  High |
+| Navigation | 80% | ~10% |  High |
 
 ## Test Execution
 

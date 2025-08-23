@@ -1,7 +1,7 @@
-# 🚀 AI Agents MVP Quick Start Guide
+#  AI Agents MVP Quick Start Guide
 *From Zero to Demo in 4 Weeks - Under $100/month*
 
-## Week 1: Foundation Setup ✅
+## Week 1: Foundation Setup 
 
 ### Day 1-2: Azure Account & Basic Infrastructure
 
@@ -178,7 +178,7 @@ az container create \
 }
 ```
 
-## Week 2: YouTube Integration 📹
+## Week 2: YouTube Integration 
 
 ### Day 8-9: YouTube MCP Function
 
@@ -288,7 +288,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     )
 ```
 
-## Week 3: Intelligence Layer 🧠
+## Week 3: Intelligence Layer 
 
 ### Day 15-16: Cross-Source Validation
 
@@ -384,7 +384,7 @@ class MVPCredibilityScorer:
         return score
 ```
 
-## Week 4: MVP Demo & Polish 🎬
+## Week 4: MVP Demo & Polish 
 
 ### Day 22-23: Investor Dashboard
 
@@ -517,9 +517,9 @@ class DemoScenarios:
         ]
 ```
 
-## 🎯 MVP Checklist
+##  MVP Checklist
 
-### Technical Requirements ✅
+### Technical Requirements 
 - [ ] Reddit data ingestion (25 posts every 6 hours)
 - [ ] YouTube video discovery (5 videos daily)
 - [ ] Whisper transcription (3 videos daily max)
@@ -530,14 +530,14 @@ class DemoScenarios:
 - [ ] REST API endpoints
 - [ ] Dashboard UI
 
-### Cost Controls ✅
+### Cost Controls 
 - [ ] Azure cost alerts at $75 and $150
 - [ ] API quota monitoring
 - [ ] Whisper usage tracking (<$30/month)
 - [ ] Data retention policy (30 days)
 - [ ] Automatic scaling limits
 
-### Demo Preparation ✅
+### Demo Preparation 
 - [ ] 3 compelling use cases
 - [ ] Live data demonstration
 - [ ] Cost comparison slide
@@ -545,7 +545,7 @@ class DemoScenarios:
 - [ ] Technical architecture diagram
 - [ ] ROI calculations
 
-## 🚀 Launch Commands
+##  Launch Commands
 
 ```bash
 # Deploy everything
@@ -564,30 +564,30 @@ curl https://waardhaven-mcp-servers.azurewebsites.net/api/health
 npm run demo
 ```
 
-## 📊 Success Metrics for Investor
+##  Success Metrics for Investor
 
 ### Week 1 Target
-- ✅ Infrastructure deployed
-- ✅ Reddit analysis working
-- ✅ Cost under $25
+-  Infrastructure deployed
+-  Reddit analysis working
+-  Cost under $25
 
 ### Week 2 Target
-- ✅ YouTube integration live
-- ✅ 10+ videos transcribed
-- ✅ Cost under $50
+-  YouTube integration live
+-  10+ videos transcribed
+-  Cost under $50
 
 ### Week 3 Target
-- ✅ Cross-validation working
-- ✅ 50+ insights generated
-- ✅ Cost under $75
+-  Cross-validation working
+-  50+ insights generated
+-  Cost under $75
 
 ### Week 4 Target
-- ✅ Demo ready
-- ✅ 100+ insights in database
-- ✅ Total cost under $100
-- ✅ Investor deck complete
+-  Demo ready
+-  100+ insights in database
+-  Total cost under $100
+-  Investor deck complete
 
-## 💡 Pro Tips
+##  Pro Tips
 
 1. **Start Reddit-only** - Easiest to implement, immediate value
 2. **Transcribe selectively** - Only top videos to control costs
@@ -595,7 +595,7 @@ npm run demo
 4. **Show the numbers** - Investors love cost efficiency
 5. **Focus on insights** - Quality over quantity
 
-## 🎬 Demo Script
+##  Demo Script
 
 ```markdown
 # 5-Minute Investor Demo

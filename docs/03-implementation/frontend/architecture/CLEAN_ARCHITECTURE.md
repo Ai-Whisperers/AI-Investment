@@ -6,13 +6,13 @@ The Waardhaven AutoIndex frontend implements **Clean Architecture** (also known 
 
 ## Architecture Overview
 
-### ✅ Clean Architecture Pattern Implementation
+###  Clean Architecture Pattern Implementation
 
 **Architecture Pattern**: **Clean/Onion Architecture**
-- **✅ Domain Layer**: Pure business entities in `core/domain/entities/`
-- **✅ Application Layer**: Use cases in `core/application/usecases/`
-- **✅ Infrastructure Layer**: External APIs in `core/infrastructure/`
-- **✅ Presentation Layer**: React components in `core/presentation/`
+- ** Domain Layer**: Pure business entities in `core/domain/entities/`
+- ** Application Layer**: Use cases in `core/application/usecases/`
+- ** Infrastructure Layer**: External APIs in `core/infrastructure/`
+- ** Presentation Layer**: React components in `core/presentation/`
 
 **Dependency Flow**: Follows clean architecture - outer depends on inner, never reverse
 **Framework Independence**: Business logic isolated from React, easily testable
@@ -114,31 +114,31 @@ export const STYLES = {
 
 ## Benefits Achieved
 
-### ✅ Single Responsibility Principle
+###  Single Responsibility Principle
 - Each layer has one clear purpose
 - Components focused only on UI logic
 - Business logic isolated in use cases
 - External services abstracted behind interfaces
 
-### ✅ Testability
+###  Testability
 - Business logic testable without UI framework
 - Repository interfaces allow easy mocking
 - Use cases can be unit tested in isolation
 - Components can be tested with mocked dependencies
 
-### ✅ Maintainability
+###  Maintainability
 - Changes isolated to relevant layers
 - Clear boundaries between concerns
 - Framework-independent business logic
 - Easy to understand and modify
 
-### ✅ Type Safety
+###  Type Safety
 - Full TypeScript compliance across all layers
 - Interface-driven development
 - Compile-time error detection
 - IDE support with full autocomplete
 
-### ✅ Reusability
+###  Reusability
 - Business logic shared across components
 - Repository implementations can be swapped
 - Use cases reusable in different contexts

@@ -2,7 +2,7 @@
 
 A comprehensive investment portfolio management platform with automated index creation, strategy optimization, and real-time market data integration.
 
-## 🚀 Technology Stack
+##  Technology Stack
 
 - **Backend**: FastAPI (Python 3.11+), SQLAlchemy ORM, PostgreSQL, Redis, Celery
 - **Frontend**: Next.js 14 (App Router), React 18, TypeScript, TailwindCSS, Recharts
@@ -12,7 +12,7 @@ A comprehensive investment portfolio management platform with automated index cr
 - **Infrastructure**: Docker containers, Turborepo monorepo, GitHub Actions CI/CD
 - **Deployment**: Render.com (Docker-based with PostgreSQL)
 
-## ✨ Core Features
+##  Core Features
 
 ### Portfolio Management
 - **Automated Index Creation**: Dynamic portfolio construction with multiple weighting strategies
@@ -29,7 +29,7 @@ A comprehensive investment portfolio management platform with automated index cr
 - **Task Management**: Flower dashboard for background job monitoring
 - **Security**: JWT authentication, rate limiting, CORS, security headers
 
-## 🏗️ Architecture
+## ️ Architecture
 
 ### Backend Structure
 ```
@@ -57,7 +57,7 @@ apps/web/
 │   └── [pages]/           # Next.js pages (9 routes)
 ```
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 - Python 3.11+
@@ -127,7 +127,7 @@ cd apps/api
 ruff check .
 ```
 
-## 🚢 Production Deployment (Render.com)
+##  Production Deployment (Render.com)
 
 ### Deployment Configuration
 The project includes a `render.yaml` for automated deployment:
@@ -145,7 +145,7 @@ Configure these in Render dashboard:
 - `FRONTEND_URL`: CORS allowed origin
 - `REDIS_URL`: Redis connection (optional)
 
-## 📡 API Endpoints
+##  API Endpoints
 
 ### Authentication (`/api/v1/auth`)
 - `POST /register` - User registration
@@ -184,42 +184,42 @@ Configure these in Render dashboard:
 - `GET /` - Financial news feed
 - `GET /sentiment` - Market sentiment analysis
 
-## 🔄 Recent Updates
+##  Recent Updates
 
 ### 2025-01-19 - Clean Architecture Implementation
-- ✅ **Frontend Refactoring**: Complete separation of concerns following SOLID principles
-- ✅ **Domain Layer**: Pure business entities and rules
-- ✅ **Infrastructure Layer**: API clients with dependency injection
-- ✅ **Presentation Layer**: React-specific code with custom hooks
-- ✅ **Type Safety**: Full TypeScript compliance across all layers
+-  **Frontend Refactoring**: Complete separation of concerns following SOLID principles
+-  **Domain Layer**: Pure business entities and rules
+-  **Infrastructure Layer**: API clients with dependency injection
+-  **Presentation Layer**: React-specific code with custom hooks
+-  **Type Safety**: Full TypeScript compliance across all layers
 
 ### 2025-01-18 - Authentication & Deployment Fixes
-- ✅ **Auth Integration**: Fixed AuthProvider context issues
-- ✅ **JWT Implementation**: Complete token refresh mechanism
-- ✅ **Deployment Ready**: Render.com configuration verified
-- ✅ **CORS Configuration**: Production-ready security settings
+-  **Auth Integration**: Fixed AuthProvider context issues
+-  **JWT Implementation**: Complete token refresh mechanism
+-  **Deployment Ready**: Render.com configuration verified
+-  **CORS Configuration**: Production-ready security settings
 
 ### 2025-01-17 - Performance & Infrastructure
-- ✅ **Redis Caching**: Full caching layer implementation
-- ✅ **Background Tasks**: Celery integration with queues
-- ✅ **Database Indexes**: Composite indexes for 50%+ performance gain
-- ✅ **Test Suite**: 10 test files with comprehensive coverage
+-  **Redis Caching**: Full caching layer implementation
+-  **Background Tasks**: Celery integration with queues
+-  **Database Indexes**: Composite indexes for 50%+ performance gain
+-  **Test Suite**: 10 test files with comprehensive coverage
 
-## 📊 Project Status
+##  Project Status
 
 ### Implemented Features (90%+ Complete)
-- ✅ User authentication with JWT and OAuth
-- ✅ Portfolio index calculation and management
-- ✅ Strategy configuration and optimization
-- ✅ Market data integration (TwelveData)
-- ✅ Financial news aggregation (MarketAux)
-- ✅ Performance analytics and risk metrics
-- ✅ Background task processing
-- ✅ Redis caching layer
-- ✅ Clean architecture implementation
-- ✅ CI/CD pipeline with GitHub Actions
-- ✅ Docker containerization
-- ✅ Production deployment on Render
+-  User authentication with JWT and OAuth
+-  Portfolio index calculation and management
+-  Strategy configuration and optimization
+-  Market data integration (TwelveData)
+-  Financial news aggregation (MarketAux)
+-  Performance analytics and risk metrics
+-  Background task processing
+-  Redis caching layer
+-  Clean architecture implementation
+-  CI/CD pipeline with GitHub Actions
+-  Docker containerization
+-  Production deployment on Render
 
 ### Pending Enhancements
 - ⏳ WebSocket support for real-time updates
@@ -229,7 +229,7 @@ Configure these in Render dashboard:
 - ⏳ GraphQL API alternative
 - ⏳ Mobile application
 
-## 📚 Documentation
+##  Documentation
 
 Comprehensive documentation available in `/docs`:
 - Architecture guides
@@ -238,11 +238,11 @@ Comprehensive documentation available in `/docs`:
 - Development workflows
 - Testing strategies
 
-## 📝 License
+##  License
 
 Proprietary - All rights reserved
 
 ---
 
-Built with ❤️ by the Waardhaven team
+Built with ️ by the Waardhaven team
 Last updated: 2025-01-19

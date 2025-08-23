@@ -2,13 +2,13 @@
 
 ## Quick Navigation
 
-### 🚀 [Quick Start](QUICK_START.md)
+###  [Quick Start](QUICK_START.md)
 5-minute setup to run the application
 
-### 🛠️ [Development Setup](DEVELOPMENT_SETUP.md)
+### ️ [Development Setup](DEVELOPMENT_SETUP.md)
 Complete development environment setup
 
-### 🔐 [Environment Variables](ENVIRONMENT_VARIABLES.md)
+###  [Environment Variables](ENVIRONMENT_VARIABLES.md)
 Required configuration and secrets
 
 ## Prerequisites

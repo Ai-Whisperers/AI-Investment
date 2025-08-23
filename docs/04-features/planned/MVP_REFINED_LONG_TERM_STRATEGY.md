@@ -11,7 +11,7 @@ This MVP demonstrates a **long-term investment strategy** that outperforms tradi
 
 The system processes massive amounts of data without storing it, using LLM context windows to identify patterns and generate signals.
 
-## 🎯 Core Investment Philosophy
+##  Core Investment Philosophy
 
 ### 80/20 Strategy Split
 ```python
@@ -37,7 +37,7 @@ class InvestmentStrategy:
         }
 ```
 
-## 📊 Data Architecture (Process, Don't Store)
+##  Data Architecture (Process, Don't Store)
 
 ### MCP Agent Context Processing
 ```python
@@ -117,7 +117,7 @@ class MCPContextProcessor:
         return signals
 ```
 
-## 🔄 Data Source Integration
+##  Data Source Integration
 
 ### Priority-Based Collection (From Your Mermaid)
 ```python
@@ -192,7 +192,7 @@ class DataSourceOrchestrator:
         return signals
 ```
 
-## 📈 Backtesting System
+##  Backtesting System
 
 ### Historical Validation Framework
 ```python
@@ -307,7 +307,7 @@ class BacktestingEngine:
             return "Low (<60% positive periods)"
 ```
 
-## 🎯 Key Success Metrics
+##  Key Success Metrics
 
 ### Long-Term Performance (80% of Portfolio)
 ```yaml
@@ -340,7 +340,7 @@ Proven Results (Backtested):
   Best Trade: NVDA +47% (May 2023)
 ```
 
-## 🖥️ Dashboard Design
+## ️ Dashboard Design
 
 ### Main Dashboard Layout
 ```
@@ -368,7 +368,7 @@ Proven Results (Backtested):
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## 🚀 Implementation Phases
+##  Implementation Phases
 
 ### Phase 1: Backtesting Proof (Week 1)
 ```python
@@ -455,7 +455,7 @@ demo_points = [
 ]
 ```
 
-## 💡 Technical Innovation
+##  Technical Innovation
 
 ### Why This Works
 1. **Context Over Storage**: Process TB of data through LLM windows without storing
@@ -475,7 +475,7 @@ advantages = {
 }
 ```
 
-## 📊 Investor Talking Points
+##  Investor Talking Points
 
 ### The Pitch
 ```markdown
@@ -496,7 +496,7 @@ We're not competing with traditional platforms.
 We're finding alpha where they're not looking."
 ```
 
-## ✅ Success Criteria
+##  Success Criteria
 
 ### MVP Must Demonstrate
 1. **Backtested proof** of 15%+ annual returns

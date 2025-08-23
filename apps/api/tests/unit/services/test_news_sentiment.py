@@ -133,7 +133,7 @@ class TestSentimentAnalyzer:
 
     def test_sentiment_with_special_characters(self, analyzer):
         """Test sentiment analysis with special characters and punctuation."""
-        text = "Profits surge!!! Stock SOARS 🚀 #bullish @market"
+        text = "Profits surge!!! Stock SOARS  #bullish @market"
         score, label = analyzer.calculate_sentiment_score(text)
 
         assert score > 0  # Should still detect positive sentiment

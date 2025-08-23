@@ -1,4 +1,4 @@
-# 🚨 URGENT: Critical Issues Blocking Deployment
+#  URGENT: Critical Issues Blocking Deployment
 *Last Updated: 2025-08-21*
 *Status: ACTUAL issues verified, not theoretical*
 
@@ -9,7 +9,7 @@ The project has **multiple critical infrastructure failures** preventing deploym
 3. All GitHub Actions workflows failing
 4. Previously reported "failing" tests actually pass individually
 
-## Issue #1: Test Suite Timeout (Database Connection Exhaustion) 🔴
+## Issue #1: Test Suite Timeout (Database Connection Exhaustion) 
 
 ### Symptom
 - Individual tests pass when run separately
@@ -73,7 +73,7 @@ engine = create_engine(
 )
 ```
 
-## Issue #2: Frontend TypeScript Compilation Errors 🔴
+## Issue #2: Frontend TypeScript Compilation Errors 
 
 ### Errors Found
 ```bash
@@ -114,7 +114,7 @@ npm install --save-dev @types/jest @testing-library/jest-dom
 }
 ```
 
-## Issue #3: GitHub Actions CI/CD Pipeline Failures 🔴
+## Issue #3: GitHub Actions CI/CD Pipeline Failures 
 
 ### Current Status
 ```bash
@@ -156,7 +156,7 @@ echo 'skips = B101' >> .bandit  # Skip assert_used test
 # Remove continue-on-error: true
 ```
 
-## Issue #4: Misleading Test Status (Not Actually Failing) ⚠️
+## Issue #4: Misleading Test Status (Not Actually Failing) ️
 
 ### Reality Check
 - `test_apply_weight_constraints`: **PASSES** (not failing)
@@ -205,7 +205,7 @@ class TestNewsProcessor:
         assert result == {"articles": []}
 ```
 
-## Issue #5: Test Coverage Cannot Be Measured 🟡
+## Issue #5: Test Coverage Cannot Be Measured 
 
 ### Why Coverage Appears Low
 - Full test suite cannot complete
@@ -273,12 +273,12 @@ pytest --cov=app --cov-fail-under=50
 
 ## Real Success Criteria
 
-✅ Test suite runs to completion without timeout
-✅ Frontend TypeScript compilation passes
-✅ GitHub Actions workflows actually pass (not fake)
-✅ Can run `pytest tests/unit` successfully
-✅ Can run `npx tsc --noEmit` without errors
-✅ Documentation reflects actual state
+ Test suite runs to completion without timeout
+ Frontend TypeScript compilation passes
+ GitHub Actions workflows actually pass (not fake)
+ Can run `pytest tests/unit` successfully
+ Can run `npx tsc --noEmit` without errors
+ Documentation reflects actual state
 
 ## If Tests Still Fail
 

@@ -103,7 +103,7 @@ NEWS_REFRESH_INTERVAL=900  # 15 minutes
 
 ## Frontend Environment Variables (`apps/web/.env`)
 
-> **⚠️ IMPORTANT NOTE**: Currently, the frontend only actively uses `NEXT_PUBLIC_API_URL`. The other environment variables listed below are included as best practices for environment variable management and may be utilized in future implementations.
+> **️ IMPORTANT NOTE**: Currently, the frontend only actively uses `NEXT_PUBLIC_API_URL`. The other environment variables listed below are included as best practices for environment variable management and may be utilized in future implementations.
 
 ### API Configuration (ACTIVELY USED)
 ```env

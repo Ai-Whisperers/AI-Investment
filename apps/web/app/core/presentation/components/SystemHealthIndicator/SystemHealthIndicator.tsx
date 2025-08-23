@@ -106,7 +106,7 @@ export default function SystemHealthIndicator({
                   label="Database"
                   sublabel={`${health.database.recordCount.toLocaleString()} records`}
                   status={health.database.simulationReady ? HealthStatus.HEALTHY : HealthStatus.ERROR}
-                  statusText={health.database.simulationReady ? '✓ Ready' : '✗ Not Ready'}
+                  statusText={health.database.simulationReady ? ' Ready' : ' Not Ready'}
                 />
                 
                 <HealthMetric
@@ -126,7 +126,7 @@ export default function SystemHealthIndicator({
                     : health.dataFreshness.daysOld <= 3 
                     ? HealthStatus.WARNING 
                     : HealthStatus.ERROR}
-                  statusText={health.dataFreshness.needsUpdate ? '⚠ Needs Update' : '✓ Fresh'}
+                  statusText={health.dataFreshness.needsUpdate ? ' Needs Update' : ' Fresh'}
                 />
               </div>
 

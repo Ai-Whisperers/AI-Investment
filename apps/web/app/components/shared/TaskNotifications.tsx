@@ -136,8 +136,8 @@ export default function TaskNotifications({
 
   const getStatusIcon = (status: TaskStatus['status']): string => {
     switch (status) {
-      case 'SUCCESS': return '✓';
-      case 'FAILURE': return '✗';
+      case 'SUCCESS': return '';
+      case 'FAILURE': return '';
       case 'STARTED': return '●';
       case 'PENDING': return '○';
       case 'RETRY': return '↻';
@@ -190,7 +190,7 @@ export default function TaskNotifications({
               onClick={clearAllNotifications}
               className="p-1 text-gray-400 hover:text-white transition-colors"
             >
-              ✕
+              
             </button>
           </div>
         </div>
@@ -257,7 +257,7 @@ export default function TaskNotifications({
                       onClick={() => dismissNotification(notification.id)}
                       className="p-1 text-gray-400 hover:text-white transition-colors ml-2"
                     >
-                      ✕
+                      
                     </button>
                   </div>
                 </motion.div>

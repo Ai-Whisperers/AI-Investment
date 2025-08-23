@@ -1,4 +1,4 @@
-# 🔍 OSINT Resources & Open Finance APIs
+#  OSINT Resources & Open Finance APIs
 
 ## Core Resources
 

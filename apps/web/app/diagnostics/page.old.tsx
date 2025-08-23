@@ -118,13 +118,13 @@ export default function DiagnosticsPage() {
     switch (status) {
       case 'OK':
       case 'connected':
-        return '✓';
+        return '';
       case 'EMPTY':
       case 'disconnected':
-        return '⚠';
+        return '';
       case 'ERROR':
       case 'error':
-        return '✗';
+        return '';
       default:
         return '?';
     }
@@ -203,7 +203,7 @@ export default function DiagnosticsPage() {
                         ? 'text-green-400' 
                         : 'text-yellow-400'
                     }`}>
-                      {databaseStatus?.simulation_ready ? '✓' : '⚠'}
+                      {databaseStatus?.simulation_ready ? '' : ''}
                     </span>
                   </div>
                   <p className="text-sm text-neutral-400 mb-4">
@@ -275,7 +275,7 @@ export default function DiagnosticsPage() {
                         ? 'text-yellow-400' 
                         : 'text-green-400'
                     }`}>
-                      {refreshStatus?.prices.needs_update ? '⚠' : '✓'}
+                      {refreshStatus?.prices.needs_update ? '' : ''}
                     </span>
                   </div>
                   <p className="text-sm text-neutral-400 mb-4">
@@ -431,7 +431,7 @@ export default function DiagnosticsPage() {
                     disabled={testingRefresh}
                     className="p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-all"
                   >
-                    <div className="text-2xl mb-2">🧪</div>
+                    <div className="text-2xl mb-2"></div>
                     <p className="text-sm font-medium">Test Refresh</p>
                     <p className="text-xs text-neutral-400 mt-1">
                       {testingRefresh ? 'Testing...' : 'Validate refresh process'}
@@ -445,7 +445,7 @@ export default function DiagnosticsPage() {
                     disabled={recalculating}
                     className="p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-all"
                   >
-                    <div className="text-2xl mb-2">📊</div>
+                    <div className="text-2xl mb-2"></div>
                     <p className="text-sm font-medium">Recalculate Index</p>
                     <p className="text-xs text-neutral-400 mt-1">
                       {recalculating ? 'Recalculating...' : 'Fix normalization issues'}
@@ -458,7 +458,7 @@ export default function DiagnosticsPage() {
                     onClick={fetchAllStatuses}
                     className="p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-all"
                   >
-                    <div className="text-2xl mb-2">🔄</div>
+                    <div className="text-2xl mb-2"></div>
                     <p className="text-sm font-medium">Refresh All</p>
                     <p className="text-xs text-neutral-400 mt-1">Update all statistics</p>
                   </motion.button>

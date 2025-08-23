@@ -1,4 +1,4 @@
-# High Priority TODOs 🟡
+# High Priority TODOs 
 
 [← Back to TODO](README.md)
 

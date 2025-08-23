@@ -12,13 +12,13 @@ This document outlines the testing architecture decisions made for the Waardhave
 ### 1. Single Responsibility in Tests
 Each test file focuses on testing ONE component/module/function. We avoid creating massive test files that test everything.
 
-**✅ Good Example:**
+** Good Example:**
 ```
 tests/unit/services/test_return_calculator.py  # Only tests ReturnCalculator
 tests/unit/services/test_risk_calculator.py    # Only tests RiskCalculator
 ```
 
-**❌ Bad Example:**
+** Bad Example:**
 ```
 tests/test_everything.py  # God test file testing all services
 ```

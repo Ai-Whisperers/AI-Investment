@@ -14,25 +14,25 @@ const RefreshModeInfo = {
   auto: {
     name: "Auto",
     description: "Intelligently chooses the best strategy based on your API plan",
-    icon: "🤖",
+    icon: "",
     color: "blue"
   },
   minimal: {
     name: "Minimal",
     description: "Fetches only priority assets (optimized for free tier)",
-    icon: "⚡",
+    icon: "",
     color: "green"
   },
   cached: {
     name: "Cached",
     description: "Uses cached data only (no API calls)",
-    icon: "💾",
+    icon: "",
     color: "gray"
   },
   full: {
     name: "Full",
     description: "Complete refresh with rate limiting protection",
-    icon: "🔄",
+    icon: "",
     color: "purple"
   }
 };
@@ -136,7 +136,7 @@ export default function SmartRefresh({ onRefresh, onRefreshComplete, className }
           className="px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all"
           title="Show refresh options"
         >
-          ⚙️
+          ️
         </button>
       </div>
     );

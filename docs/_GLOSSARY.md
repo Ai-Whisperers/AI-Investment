@@ -7,7 +7,7 @@ last-updated: 2025-08-19
 owner: documentation-team
 ---
 
-# 📖 Technical Glossary
+#  Technical Glossary
 
 ## A
 
@@ -23,11 +23,11 @@ owner: documentation-team
 
 **Alembic**
 - Database migration tool for Python/SQLAlchemy
-- Status: 🔴 Not implemented (Critical Priority #1)
+- Status:  Not implemented (Critical Priority #1)
 
 **Architecture Pattern**
 - Hexagonal + Clean Architecture implementation
-- Status: ✅ COMPLETED (95%+ implementation achieved)
+- Status:  COMPLETED (95%+ implementation achieved)
 - All god files eliminated, modular structure ready
 
 ## B
@@ -51,7 +51,7 @@ owner: documentation-team
 **Clean Architecture**
 - Design pattern separating concerns into layers
 - Domain → Application → Infrastructure → Presentation
-- Status: ✅ FULLY IMPLEMENTED in `apps/web/app/core/`
+- Status:  FULLY IMPLEMENTED in `apps/web/app/core/`
 - Achieved 71% average line reduction across refactored files
 
 **CORS (Cross-Origin Resource Sharing)**
@@ -104,7 +104,7 @@ owner: documentation-team
 
 **MarketAux**
 - External API for news and sentiment data
-- Status: 🚧 Integration in progress
+- Status:  Integration in progress
 - Provider: `apps/api/app/providers/marketaux_provider.py`
 
 **Mermaid**
@@ -172,7 +172,7 @@ owner: documentation-team
 
 **Testing Infrastructure**
 - Unit, integration, and E2E test frameworks
-- Status: 🔴 CRITICAL ISSUE - 0% coverage found vs 95% target
+- Status:  CRITICAL ISSUE - 0% coverage found vs 95% target
 - Priority: Immediate implementation for financial regulatory compliance
 - Frameworks: pytest (backend), Jest (frontend planned)
 
@@ -200,7 +200,7 @@ owner: documentation-team
 
 **WebSocket**
 - Protocol for real-time communication
-- Status: 📝 Planned feature
+- Status:  Planned feature
 - Use case: Live portfolio updates
 
 ## Acronyms

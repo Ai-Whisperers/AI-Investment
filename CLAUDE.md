@@ -3,9 +3,9 @@
 ## Project Overview
 Waardhaven AutoIndex is an extreme-alpha investment platform targeting **>30% annual returns** through AI-powered social signal processing. The platform exploits information asymmetry by monitoring sources institutions ignore (4chan, TikTok, Discord) and detecting signals 6-48 hours before mainstream coverage. Built on **zero-budget architecture** using free tiers and existing subscriptions. Currently at **98.4% test pass rate** and ready for **Master Implementation**.
 
-🎯 **Key Innovation**: Process 1M+ social posts daily through AI context windows, extract <100 signals, achieve 30-40% returns with $1/month infrastructure cost.
+ **Key Innovation**: Process 1M+ social posts daily through AI context windows, extract <100 signals, achieve 30-40% returns with $1/month infrastructure cost.
 
-📋 **Master Plan**: See [MASTER_IMPLEMENTATION_PLAN.md](./docs/MASTER_IMPLEMENTATION_PLAN.md) for complete zero-budget implementation strategy.
+ **Master Plan**: See [MASTER_IMPLEMENTATION_PLAN.md](./docs/MASTER_IMPLEMENTATION_PLAN.md) for complete zero-budget implementation strategy.
 
 ## Tech Stack
 - **Backend**: FastAPI (Python 3.11+), SQLAlchemy, PostgreSQL, Redis, Celery
@@ -58,21 +58,21 @@ waardhaven-autoindex/
 
 ## Current Status (2025-01-21)
 
-### 🎯 Test Suite Performance
+###  Test Suite Performance
 - **Overall Pass Rate**: 98.4% (123 of 125 tests passing)
 - **Unit Tests**: 123/125 passing
-  - Portfolio Model: 9/9 ✅
+  - Portfolio Model: 9/9 
   - Auth Endpoints: 22/23 (1 OAuth redirect test needs fix)
-  - Schema Tests: 21/21 ✅
-  - Utils/Security: 17/17 ✅
-  - Return Calculator: 21/21 ✅
-  - Risk Calculator: 20/20 ✅
-  - Weight Calculator: 17/17 ✅ (constraint logic fixed)
+  - Schema Tests: 21/21 
+  - Utils/Security: 17/17 
+  - Return Calculator: 21/21 
+  - Risk Calculator: 20/20 
+  - Weight Calculator: 17/17  (constraint logic fixed)
 - **Integration Tests**: 8 tests configured
 - **Smoke Tests**: 12 production health checks
-- **Coverage**: 42% actual (below required 50% threshold) ⚠️
+- **Coverage**: 42% actual (below required 50% threshold) ️
 
-### ✅ Recent Achievements (Updated 2025-01-21)
+###  Recent Achievements (Updated 2025-01-21)
 
 #### 1. CI/CD Pipeline Overhaul
 - **Created**: Comprehensive `ci-cd-pipeline.yml` with parallel execution
@@ -186,13 +186,13 @@ factory-boy>=3.3.0
 Base URL: `/api/v1/`
 
 ### Authentication (`/auth/*`)
-- `POST /register` - User registration ✅
-- `POST /login` - User login ✅
-- `GET /google` - Google OAuth redirect ✅
-- `POST /google` - Google OAuth callback ✅
-- `GET /me` - Current user info ✅
-- `POST /refresh` - Refresh token ✅
-- `POST /logout` - User logout ✅
+- `POST /register` - User registration 
+- `POST /login` - User login 
+- `GET /google` - Google OAuth redirect 
+- `POST /google` - Google OAuth callback 
+- `GET /me` - Current user info 
+- `POST /refresh` - Refresh token 
+- `POST /logout` - User logout 
 
 ### Core Functionality
 - `/index/*` - Portfolio index operations
@@ -202,7 +202,7 @@ Base URL: `/api/v1/`
 - `/tasks/*` - Background task management
 - `/diagnostics/*` - System health checks
 
-### 🚀 Signal Detection System (NEW - 2025-01-22)
+###  Signal Detection System (NEW - 2025-01-22)
 - `/signals/*` - Agro-robotics, regulatory, supply chain signals (14 endpoints)
 - `/momentum/*` - Momentum and OSINT tracking (15 endpoints)
 - `/integrated/*` - Real-time integrated signals (9 endpoints)
@@ -249,12 +249,12 @@ NEXT_PUBLIC_API_URL=<api-url>
 ## CI/CD Pipeline
 
 ### GitHub Actions Workflows (Last Run: 2025-01-20)
-- **Backend Tests**: ❌ Failed (3 test failures + coverage 42% < 50%)
-- **Backend Security**: ❌ Failed (Bandit exit code 2)
-- **Backend Code Quality**: ❌ Failed (21 ruff violations remaining)
-- **Quality Gates**: ❌ Failed (Blocked by test failures)
-- **Deploy**: ❌ Failed (Blocked by quality gates)
-- **Dependency Review**: ✅ Passing
+- **Backend Tests**:  Failed (3 test failures + coverage 42% < 50%)
+- **Backend Security**:  Failed (Bandit exit code 2)
+- **Backend Code Quality**:  Failed (21 ruff violations remaining)
+- **Quality Gates**:  Failed (Blocked by test failures)
+- **Deploy**:  Failed (Blocked by quality gates)
+- **Dependency Review**:  Passing
 
 ### Pipeline Features
 - Dependency caching
@@ -265,7 +265,7 @@ NEXT_PUBLIC_API_URL=<api-url>
 
 ## Known Issues & Solutions
 
-### ✅ Resolved Issues
+###  Resolved Issues
 1. **Dependency conflicts** → pip-tools + Dependabot
 2. **Test failures** → Fixed auth, model, schema, utils, and most service tests
 3. **Migration warnings** → SQLite detection
@@ -275,27 +275,27 @@ NEXT_PUBLIC_API_URL=<api-url>
 7. **Security utils** → Fixed timezone issues in token tests
 8. **Return calculator** → Fixed cumulative return calculations
 
-### 🚨 Critical Issues (URGENT - Blocking Deployment)
+###  Critical Issues (URGENT - Blocking Deployment)
 
 #### Test Failures (1 remaining)
-1. ✅ **FIXED: test_apply_weight_constraints** 
+1.  **FIXED: test_apply_weight_constraints** 
    - Solution: Dynamic min_weight adjustment for mathematical feasibility
    
-2. ✅ **FIXED: test_refresh_token** 
+2.  **FIXED: test_refresh_token** 
    - Solution: Added UUID `jti` field to ensure token uniqueness
    
-3. ⚠️ **PARTIAL: test_google_oauth_redirect** 
+3. ️ **PARTIAL: test_google_oauth_redirect** 
    - Added `/google` endpoint with RedirectResponse
    - Test passes with fresh app instance but fails in test suite isolation
    - Needs test fixture adjustment
 
 #### Pipeline Issues (Mostly Resolved)
 - **Coverage**: 42% (need 50%) - 8% gap remaining
-- ✅ **Ruff**: Fixed 1232 violations automatically, 152 remain (mostly whitespace)
-- ✅ **Security**: Bandit configuration fixed with `.bandit` file
-- ✅ **CI/CD**: New comprehensive pipeline created
+-  **Ruff**: Fixed 1232 violations automatically, 152 remain (mostly whitespace)
+-  **Security**: Bandit configuration fixed with `.bandit` file
+-  **CI/CD**: New comprehensive pipeline created
 
-### ⚠️ Non-Critical Issues
+### ️ Non-Critical Issues
 1. **Admin endpoints** (Skipped) - Not implemented yet
 2. **Rate limiting tests** (Skipped) - Feature not built
 3. **Test report generation** - `test-results.xml` not created
@@ -335,7 +335,7 @@ NEXT_PUBLIC_API_URL=<api-url>
 ## Next Priority Tasks (48-Hour Sprint)
 
 ### Priority 1: Fix Last Test & Deploy (4 hours)
-1. ⚠️ Fix `test_google_oauth_redirect` test isolation issue
+1. ️ Fix `test_google_oauth_redirect` test isolation issue
 2. Deploy to Render.com staging environment
 3. Verify all endpoints work in production
 

@@ -1,9 +1,9 @@
-# 🚀 Deployment Configuration Guide
+#  Deployment Configuration Guide
 
 ## Overview
 This document contains all environment variables required for deploying the Waardhaven AutoIndex platform. Each service requires specific configuration to function properly. **DO NOT commit actual values to the repository**.
 
-## 🔐 Critical Security Variables
+##  Critical Security Variables
 
 ### Authentication & Security
 ```env
@@ -16,7 +16,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES=1440  # Default: 24 hours
 ADMIN_TOKEN=                   # Min 32 chars, for admin endpoints
 ```
 
-## 💾 Database Configuration
+##  Database Configuration
 
 ### PostgreSQL (REQUIRED)
 ```env
@@ -32,7 +32,7 @@ CACHE_TTL_SECONDS=300         # Default: 5 minutes
 CACHE_TTL_LONG_SECONDS=3600   # Default: 1 hour
 ```
 
-## 📊 Market Data APIs
+##  Market Data APIs
 
 ### TwelveData API (REQUIRED for market data)
 ```env
@@ -50,7 +50,7 @@ ENABLE_NEWS_CACHE=true        # Enable news caching
 NEWS_REFRESH_INTERVAL=900     # Refresh interval in seconds (15 min)
 ```
 
-## 🔍 OSINT & Alternative Data APIs
+##  OSINT & Alternative Data APIs
 
 ### Free Finance APIs (Optional - for enhanced data)
 ```env
@@ -73,7 +73,7 @@ NEWSAPI_KEY=                   # Get from: https://newsapi.org/account
 COINMARKETCAP_API_KEY=         # Get from: https://pro.coinmarketcap.com/account
 ```
 
-## 📱 Social Media Collection
+##  Social Media Collection
 
 ### Reddit API (For social signal collection)
 ```env
@@ -87,7 +87,7 @@ YOUTUBE_API_KEY=               # Get from: https://console.cloud.google.com/apis
                               # Enable YouTube Data API v3, 10,000 units/day free
 ```
 
-## 🤖 AI Services
+##  AI Services
 
 ### OpenAI (For signal processing)
 ```env
@@ -99,7 +99,7 @@ OPENAI_API_KEY=                # Get from: https://platform.openai.com/api-keys
 ANTHROPIC_API_KEY=             # Get from: https://console.anthropic.com/account/keys
 ```
 
-## 🔔 Alerting & Notifications
+##  Alerting & Notifications
 
 ### Webhooks (Optional)
 ```env
@@ -107,7 +107,7 @@ SLACK_WEBHOOK=                 # For Slack alerts: https://api.slack.com/messagi
 DISCORD_WEBHOOK=               # For Discord alerts: Server Settings > Integrations > Webhooks
 ```
 
-## 🌐 Frontend Configuration
+##  Frontend Configuration
 
 ### Next.js Frontend
 ```env
@@ -124,7 +124,7 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=  # Get from: https://console.cloud.google.com/apis
 NEXT_PUBLIC_GA_ID=             # Google Analytics ID (format: G-XXXXXXXXXX)
 ```
 
-## 🚀 Deployment Platform
+##  Deployment Platform
 
 ### Render.com Specific
 ```env
@@ -140,7 +140,7 @@ DEBUG=false                    # Disable debug mode in production
 NODE_ENV=production           # For frontend optimization
 ```
 
-## ⚙️ Application Settings
+## ️ Application Settings
 
 ### Performance & Behavior
 ```env
@@ -159,7 +159,7 @@ FRONTEND_URL=                  # Frontend URL for CORS
                               # Example: https://waardhaven.yourdomain.com
 ```
 
-## 📋 GitHub Actions Secrets
+##  GitHub Actions Secrets
 
 For automated signal collection, configure these in GitHub Settings > Secrets:
 
@@ -185,7 +185,7 @@ FINNHUB_API_KEY
 NEWSAPI_KEY
 ```
 
-## 🔧 Environment File Templates
+##  Environment File Templates
 
 ### Backend (.env)
 ```env
@@ -206,7 +206,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id
 ```
 
-## 🚨 Security Best Practices
+##  Security Best Practices
 
 1. **Never commit real values** - Use `.env` files locally, environment variables in production
 2. **Use strong secrets** - Minimum 32 characters for tokens/keys
@@ -217,7 +217,7 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id
 7. **Enable 2FA** - On all API provider accounts
 8. **Audit logs** - Monitor access to admin endpoints
 
-## 🎯 Deployment Checklist
+##  Deployment Checklist
 
 ### Essential (Platform will not work without these)
 - [ ] `SECRET_KEY` - Generated and secured
@@ -238,7 +238,7 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id
 - [ ] Google OAuth configured
 - [ ] Analytics tracking enabled
 
-## 📊 Resource Limits
+##  Resource Limits
 
 ### Free Tier Quotas (Daily)
 - **TwelveData**: 800 API credits (Free plan)
@@ -254,7 +254,7 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id
 - Implement exponential backoff for failures
 - Monitor quota usage in production
 
-## 🔗 Quick Links
+##  Quick Links
 
 ### API Key Registration
 - [TwelveData](https://twelvedata.com/register)
@@ -275,7 +275,7 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id
 - [Vercel](https://vercel.com/) (Alternative for frontend)
 - [Supabase](https://supabase.com/) (Alternative for database)
 
-## 📝 Notes
+##  Notes
 
 1. **Development vs Production**: Some variables have different requirements in development vs production
 2. **Free Tier Limits**: Most APIs have free tiers sufficient for MVP

@@ -34,13 +34,13 @@ The backend tests were written for a more comprehensive API that doesn't exist i
 #### Methods Actually Implemented:
 ```python
 # return_calculator.py actually has:
-1. calculate_returns(values) -> np.ndarray ✓
-2. total_return(values) -> float ✓
-3. annualized_return(values, days) -> float ✓ (different signature)
-4. cumulative_returns(values) -> np.ndarray ✓ (different signature)
-5. excess_returns(portfolio_returns, benchmark_returns) -> np.ndarray ✓
-6. active_returns(portfolio_returns, benchmark_returns) -> Tuple ✓
-7. rolling_returns(values, window) -> List[Tuple] ✓ (different return type)
+1. calculate_returns(values) -> np.ndarray 
+2. total_return(values) -> float 
+3. annualized_return(values, days) -> float  (different signature)
+4. cumulative_returns(values) -> np.ndarray  (different signature)
+5. excess_returns(portfolio_returns, benchmark_returns) -> np.ndarray 
+6. active_returns(portfolio_returns, benchmark_returns) -> Tuple 
+7. rolling_returns(values, window) -> List[Tuple]  (different return type)
 ```
 
 ### Coverage Analysis
@@ -210,14 +210,14 @@ def calculate_money_weighted_return(self, cash_flows):
 
 | Approach | Time | Completeness | Risk | Recommendation |
 |----------|------|--------------|------|----------------|
-| Fix Tests Only | 2 days | 40% | High - Missing functionality | ❌ Not recommended |
-| Full Implementation | 2 weeks | 100% | Low - Complete solution | ✅ Best long-term |
+| Fix Tests Only | 2 days | 40% | High - Missing functionality |  Not recommended |
+| Full Implementation | 2 weeks | 100% | Low - Complete solution |  Best long-term |
 | Hybrid Approach | 1 week | 70% | Medium - Partial solution | ⭐ Recommended for now |
 
 ## Next Steps
 
 ### Immediate Actions (Today):
-1. ✅ Document the method mismatch (this document)
+1.  Document the method mismatch (this document)
 2. ⏳ Update test imports to correct paths
 3. ⏳ Comment out tests for unimplemented methods
 4. ⏳ Get baseline tests passing
