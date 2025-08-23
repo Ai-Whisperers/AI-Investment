@@ -18,6 +18,7 @@ from .osint_tracker import OSINTTracker
 # Import data providers
 from .twelvedata import TwelveDataService
 from .news import NewsService
+from ..providers.marketaux_client import MarketAuxClient
 from ..core.database import get_db
 
 logger = logging.getLogger(__name__)
@@ -33,9 +34,12 @@ class SignalIntegrator:
         """Initialize with data services."""
         self.twelvedata = TwelveDataService()
         self.news_service = None  # Will be initialized with db when needed
+        self.marketaux = MarketAuxClient()  # Real news API
         self.last_refresh = {}
         self._cached_prices = {}  # Store cached price data
+        self._cached_news = {}  # Store cached news data
         self.cache_duration = timedelta(minutes=5)  # 5-minute cache for rate limiting
+        self.news_cache_duration = timedelta(minutes=15)  # 15-minute cache for news
         
     def get_real_time_price(self, symbol: str) -> Dict:
         """
@@ -111,33 +115,80 @@ class SignalIntegrator:
     def get_agro_opportunities_with_news(self, db) -> List[Dict]:
         """
         Get agro-robotics opportunities enriched with news sentiment.
-        Combines AgroRoboticsTracker with news analysis.
+        Combines AgroRoboticsTracker with real MarketAux news data.
         """
         opportunities = AgroRoboticsTracker.screen_for_opportunities(db, {})
         
-        # Initialize news service if needed
-        if self.news_service is None:
-            self.news_service = NewsService(db)
-        
-        # Enrich with news sentiment
-        for opp in opportunities[:5]:  # Limit API calls
+        # Enrich with real news sentiment from MarketAux
+        for opp in opportunities[:5]:  # Limit API calls to stay within free tier
             symbol = opp.get("symbol")
             if symbol:
+                # Check news cache first
+                cache_key = f"news_{symbol}_7d"
+                if cache_key in self._cached_news:
+                    cache_time, cached_data = self._cached_news[cache_key]
+                    if datetime.now() - cache_time < self.news_cache_duration:
+                        opp.update(cached_data)
+                        continue
+                
                 try:
-                    # Get recent news
-                    news = self.news_service.get_news_for_symbol(symbol, days=7)
-                    if news:
-                        # Calculate aggregate sentiment
-                        sentiments = [n.get("sentiment_score", 0) for n in news]
-                        avg_sentiment = sum(sentiments) / len(sentiments) if sentiments else 0
+                    # Get real news from MarketAux API
+                    if os.getenv("MARKETAUX_API_KEY"):
+                        articles = self.marketaux.get_news_by_symbol(symbol, days_back=7, limit=10)
                         
-                        opp["news_sentiment"] = avg_sentiment
-                        opp["news_count_7d"] = len(news)
-                        opp["latest_headline"] = news[0].get("title") if news else None
+                        if articles:
+                            # Calculate aggregate sentiment from real news
+                            sentiments = []
+                            headlines = []
+                            
+                            for article in articles:
+                                # MarketAux provides formatted articles
+                                formatted = self.marketaux.format_article(article)
+                                if formatted["sentiment_score"] != 0:
+                                    sentiments.append(formatted["sentiment_score"])
+                                headlines.append(formatted["title"])
+                            
+                            avg_sentiment = sum(sentiments) / len(sentiments) if sentiments else 0
+                            
+                            news_data = {
+                                "news_sentiment": avg_sentiment,
+                                "news_count_7d": len(articles),
+                                "latest_headline": headlines[0] if headlines else None,
+                                "news_source": "MarketAux"
+                            }
+                            
+                            # Cache the news data
+                            self._cached_news[cache_key] = (datetime.now(), news_data)
+                            opp.update(news_data)
+                        else:
+                            opp["news_sentiment"] = 0
+                            opp["news_count_7d"] = 0
+                            opp["latest_headline"] = None
+                            opp["news_source"] = "No news found"
+                    else:
+                        # Fallback to database news service if MarketAux not configured
+                        if self.news_service is None:
+                            self.news_service = NewsService(db)
+                        
+                        news = self.news_service.get_news_for_symbol(symbol, days=7)
+                        if news:
+                            sentiments = [n.get("sentiment_score", 0) for n in news]
+                            avg_sentiment = sum(sentiments) / len(sentiments) if sentiments else 0
+                            
+                            opp["news_sentiment"] = avg_sentiment
+                            opp["news_count_7d"] = len(news)
+                            opp["latest_headline"] = news[0].get("title") if news else None
+                            opp["news_source"] = "Database"
+                        else:
+                            opp["news_sentiment"] = 0
+                            opp["news_count_7d"] = 0
+                            opp["news_source"] = "Fallback"
+                            
                 except Exception as e:
                     logger.warning(f"Could not get news for {symbol}: {e}")
                     opp["news_sentiment"] = 0
                     opp["news_count_7d"] = 0
+                    opp["news_source"] = "Error"
         
         return opportunities
     
@@ -201,9 +252,15 @@ class SignalIntegrator:
                 sym for sym, count in symbol_mentions.items() if count >= 2
             ]
             
+            # Get real-time news insights
+            breaking_news = self.get_breaking_news_alerts()
+            trending_topics = self.get_trending_topics()
+            
             return {
                 "timestamp": datetime.now().isoformat(),
                 "market_status": self._get_market_status(),
+                "breaking_news": breaking_news[:3],  # Top 3 breaking stories
+                "trending_topics": trending_topics[:5],  # Top 5 trending topics
                 "momentum_signals": momentum,
                 "agro_opportunities": agro,
                 "smart_money_moves": smart_money,
@@ -215,7 +272,11 @@ class SignalIntegrator:
                     "rationale": "Multiple signal convergence",
                     "signals_aligned": len(consensus_plays)
                 },
-                "action_items": self._generate_action_items(momentum, smart_money, consensus_plays)
+                "action_items": self._generate_action_items(momentum, smart_money, consensus_plays),
+                "data_sources": {
+                    "prices": "TwelveData" if os.getenv("TWELVEDATA_API_KEY") else "Placeholder",
+                    "news": "MarketAux" if os.getenv("MARKETAUX_API_KEY") else "Database"
+                }
             }
             
         except Exception as e:
@@ -295,6 +356,71 @@ class SignalIntegrator:
             "volume": 1000000,
             "timestamp": datetime.now().isoformat()
         }
+    
+    def get_breaking_news_alerts(self) -> List[Dict]:
+        """
+        Get breaking news that could impact markets.
+        Uses MarketAux API for real-time news alerts.
+        """
+        if not os.getenv("MARKETAUX_API_KEY"):
+            logger.info("MarketAux API key not configured, no breaking news available")
+            return []
+        
+        try:
+            # Get breaking news from last 30 minutes
+            breaking = self.marketaux.get_breaking_news(minutes_back=30)
+            
+            # Get market sentiment for context
+            sentiment = self.marketaux.get_market_sentiment(hours_back=1)
+            
+            alerts = []
+            for article in breaking[:5]:  # Limit to top 5 breaking stories
+                # Create alert with urgency scoring
+                alert = {
+                    "type": "breaking_news",
+                    "headline": article["title"],
+                    "url": article["url"],
+                    "source": article["source"],
+                    "tickers": article["tickers"],
+                    "sentiment": article["sentiment_score"],
+                    "relevance": article["relevance_score"],
+                    "published": article["published_at"],
+                    "urgency": "high" if article.get("is_breaking") else "medium",
+                    "market_context": sentiment["sentiment"]
+                }
+                alerts.append(alert)
+            
+            return alerts
+            
+        except Exception as e:
+            logger.error(f"Error fetching breaking news: {e}")
+            return []
+    
+    def get_trending_topics(self) -> List[Dict]:
+        """
+        Get trending topics from news analysis.
+        Identifies what the market is talking about.
+        """
+        if not os.getenv("MARKETAUX_API_KEY"):
+            return []
+        
+        try:
+            # Get trending topics from last 24 hours
+            trending = self.marketaux.get_trending_topics(hours_back=24, min_mentions=3)
+            
+            # Enrich with current prices for mentioned symbols
+            for topic in trending[:10]:
+                symbol = topic.get("symbol")
+                if symbol:
+                    price_data = self.get_real_time_price(symbol)
+                    topic["current_price"] = price_data["price"]
+                    topic["price_change"] = price_data["percent_change"]
+            
+            return trending
+            
+        except Exception as e:
+            logger.error(f"Error fetching trending topics: {e}")
+            return []
     
     def _get_fallback_signals(self) -> Dict:
         """Fallback signals when integration fails."""
