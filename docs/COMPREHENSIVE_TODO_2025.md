@@ -37,21 +37,11 @@
   - Test WSB daily thread collection
   - Respect 60 req/min limit
 
-### 2. WebSocket Implementation (Day 2)
-- [ ] **FastAPI WebSocket endpoint** - Real-time updates
-  - Create /ws endpoint in main.py
-  - Implement connection manager
-  - Send signals as they're detected
-  - Handle reconnection logic
-
-- [ ] **Frontend WebSocket client** - Live dashboard
-  - Connect to WebSocket on mount
-  - Update charts in real-time
-  - Show notification for high-priority signals
-  - Auto-reconnect on disconnect
+### 2. ~~WebSocket Implementation~~ (REMOVED - NOT NEEDED)
+**IMPORTANT**: WebSockets are NOT required for an investment platform. We are building for **long-term investors**, not day traders. Daily/weekly data updates are sufficient for investment decisions.
 
 ##  WEEK 2 PRIORITIES (Core Functionality)
-*Making it actually useful for trading*
+*Making it actually useful for INVESTING (not trading)*
 
 ### 3. Portfolio Management
 - [ ] **Position sizing algorithms**
@@ -293,8 +283,8 @@ Following the "Don't Test Too Early" principle:
 3. Test real signal generation (1 hour)
 
 ### TOMORROW:
-1. WebSocket backend (2 hours)
-2. WebSocket frontend (2 hours)
+1. Portfolio management integration (3 hours)
+2. Position sizing algorithms (2 hours)
 3. Deploy to Render.com (1 hour)
 
 ### THIS WEEK:

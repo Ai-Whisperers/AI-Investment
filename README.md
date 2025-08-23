@@ -1,31 +1,33 @@
-# Waardhaven AutoIndex — Production-Ready Investment Portfolio Management System
+# Waardhaven AutoIndex — Long-Term Investment Platform
 
-A comprehensive investment portfolio management platform with automated index creation, strategy optimization, and real-time market data integration.
+A comprehensive **INVESTMENT PLATFORM** (NOT a trading platform) designed for long-term wealth building through intelligent portfolio construction and management. Built for investors with 3-12 month horizons, not day traders.
+
+**CRITICAL**: Read [PLATFORM_PHILOSOPHY.md](./docs/PLATFORM_PHILOSOPHY.md) to understand our investment-first approach.
 
 ##  Technology Stack
 
 - **Backend**: FastAPI (Python 3.11+), SQLAlchemy ORM, PostgreSQL, Redis, Celery
 - **Frontend**: Next.js 14 (App Router), React 18, TypeScript, TailwindCSS, Recharts
 - **Authentication**: JWT tokens with refresh mechanism, Google OAuth integration
-- **Market Data**: TwelveData API for professional-grade financial data
-- **News Integration**: MarketAux for financial news aggregation
+- **Market Data**: TwelveData API for daily investment data (NOT real-time trading)
+- **News Integration**: MarketAux for investment research and sentiment analysis
 - **Infrastructure**: Docker containers, Turborepo monorepo, GitHub Actions CI/CD
 - **Deployment**: Render.com (Docker-based with PostgreSQL)
 
 ##  Core Features
 
-### Portfolio Management
-- **Automated Index Creation**: Dynamic portfolio construction with multiple weighting strategies
-- **Strategy Optimization**: Configurable momentum, market cap, and risk parity weights
-- **Performance Analytics**: Real-time Sharpe ratio, Sortino ratio, maximum drawdown
-- **Multi-Currency Support**: Automatic exchange rate conversion for global portfolios
-- **Benchmark Comparison**: S&P 500 tracking and relative performance analysis
+### Investment Portfolio Management
+- **Automated Portfolio Construction**: Build diversified long-term investment portfolios
+- **Investment Strategy Optimization**: Focus on value investing and sector allocation
+- **Performance Analytics**: Long-term Sharpe ratio, annual returns, risk metrics
+- **Multi-Currency Support**: Global investment opportunities
+- **Benchmark Comparison**: Compare portfolio performance to S&P 500 over time
 
 ### Technical Capabilities
 - **Clean Architecture**: Domain-driven design with separation of concerns
 - **Background Processing**: Celery-based async tasks with Redis queue
 - **Caching Layer**: Redis caching with automatic invalidation
-- **Real-Time Monitoring**: System health indicators and data quality metrics
+- **Investment Monitoring**: Portfolio health indicators and investment metrics
 - **Task Management**: Flower dashboard for background job monitoring
 - **Security**: JWT authentication, rate limiting, CORS, security headers
 

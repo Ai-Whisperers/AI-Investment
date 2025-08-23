@@ -1,9 +1,11 @@
 # CLAUDE.md - AI Assistant Context
 
 ## Project Overview
-Waardhaven AutoIndex is an extreme-alpha investment platform targeting **>30% annual returns** through AI-powered social signal processing. The platform exploits information asymmetry by monitoring sources institutions ignore (4chan, TikTok, Discord) and detecting signals 6-48 hours before mainstream coverage. Built on **zero-budget architecture** using free tiers and existing subscriptions. Currently at **98.4% test pass rate** and ready for **Master Implementation**.
+Waardhaven AutoIndex is a **LONG-TERM INVESTMENT PLATFORM** targeting **>30% annual returns** through AI-powered information gathering and analysis. 
 
- **Key Innovation**: Process 1M+ social posts daily through AI context windows, extract <100 signals, achieve 30-40% returns with $1/month infrastructure cost.
+**CRITICAL: This is NOT a day-trading or signal-trading platform.** We focus on **mid to long-term investment opportunities** (weeks to months, not minutes or hours). The platform identifies undervalued assets and emerging trends by monitoring diverse information sources, providing **investment insights for portfolio construction, not trading signals**.
+
+**Key Innovation**: Process information from multiple sources to identify investment themes and opportunities before they become mainstream. Focus on fundamental value and long-term trends, not short-term price movements.
 
  **Master Plan**: See [MASTER_IMPLEMENTATION_PLAN.md](./docs/MASTER_IMPLEMENTATION_PLAN.md) for complete zero-budget implementation strategy.
 

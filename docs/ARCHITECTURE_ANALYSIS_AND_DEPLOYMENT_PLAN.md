@@ -52,7 +52,6 @@ app/
 - Static file serving
 - Environment variables
 - Auto-deploy from GitHub
-- WebSocket support (with some limitations)
 - Docker deployment option
 
 ### What We Need to Configure
@@ -60,8 +59,8 @@ app/
 2. **Database Connection Pooling** ✅ Already configured
 3. **Redis Graceful Degradation** ⚠️ Needs work
 4. **Static Files** ⚠️ Next.js needs configuration
-5. **WebSocket Support** ❌ Not implemented
-6. **Background Jobs** ⚠️ Celery needs setup
+5. ~~WebSocket Support~~ ✅ NOT NEEDED (Investment platform, not trading)
+6. **Background Jobs** ⚠️ Celery needs setup for daily data refresh
 
 ## Prioritized Implementation Plan
 
@@ -93,21 +92,8 @@ def get_redis_client():
         return FakeRedis()
 ```
 
-#### 3. WebSocket Foundation (2.5 hours)
-```python
-# apps/api/app/websocket/manager.py
-class ConnectionManager:
-    def __init__(self):
-        self.active_connections: List[WebSocket] = []
-    
-    async def connect(self, websocket: WebSocket):
-        await websocket.accept()
-        self.active_connections.append(websocket)
-    
-    async def broadcast_signal(self, signal: dict):
-        for connection in self.active_connections:
-            await connection.send_json(signal)
-```
+#### 3. ~~WebSocket Foundation~~ (REMOVED - NOT NEEDED)
+**CRITICAL CHANGE**: WebSockets are NOT required. This is an **INVESTMENT PLATFORM**, not a trading platform. Users make investment decisions based on daily/weekly analysis, not real-time price ticks. Resources better spent on portfolio management and backtesting.
 
 ### PHASE 2: Render Deployment Prep (TOMORROW - 3 hours)
 
