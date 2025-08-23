@@ -1,0 +1,173 @@
+name: Collect Trading Signals
+
+on:
+  schedule:
+    # Run 4 times daily (UTC times)
+    - cron: '0 6 * * *'   # 6:00 UTC - Overnight developments
+    - cron: '30 13 * * *' # 13:30 UTC - Market open momentum
+    - cron: '0 20 * * *'  # 20:00 UTC - After hours analysis
+    - cron: '0 3 * * *'   # 3:00 UTC - Asia market signals
+  workflow_dispatch:  # Allow manual trigger
+    inputs:
+      focus:
+        description: 'Collection focus'
+        required: false
+        default: 'general'
+        type: choice
+        options:
+          - general
+          - momentum
+          - research
+          - insider
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20  # Keep under 20 min per run
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+            ~/venv
+          key: ${{ runner.os }}-pip-${{ hashFiles('apps/api/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            
+      - name: Install dependencies
+        run: |
+          python -m venv ~/venv
+          source ~/venv/bin/activate
+          pip install --upgrade pip
+          cd apps/api
+          pip install -r requirements.txt
+          
+      - name: Set collection time
+        id: time
+        run: |
+          echo "hour=$(date -u +%H:00)" >> $GITHUB_OUTPUT
+          echo "timestamp=$(date -u +%Y%m%d_%H%M%S)" >> $GITHUB_OUTPUT
+          
+      - name: Run signal collection
+        env:
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+        run: |
+          source ~/venv/bin/activate
+          cd apps/api
+          python -m app.services.collectors.run_collection \
+            --hour "${{ steps.time.outputs.hour }}" \
+            --focus "${{ inputs.focus || 'auto' }}"
+          
+      - name: Process signals with AI
+        if: success()
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          source ~/venv/bin/activate
+          cd apps/api
+          python -m app.services.signal_processor \
+            --timestamp "${{ steps.time.outputs.timestamp }}"
+            
+      - name: Store results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: signals-${{ steps.time.outputs.timestamp }}
+          path: |
+            apps/api/signals_*.json
+            apps/api/logs/*.log
+          retention-days: 7
+          
+      - name: Update database
+        if: success()
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          source ~/venv/bin/activate
+          cd apps/api
+          python -m app.services.signal_storage \
+            --file "signals_${{ steps.time.outputs.timestamp }}.json"
+            
+      - name: Send high-priority alerts
+        if: success()
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          source ~/venv/bin/activate
+          cd apps/api
+          python -m app.services.alert_sender \
+            --min-confidence 0.8 \
+            --timestamp "${{ steps.time.outputs.timestamp }}"
+            
+      - name: Report status
+        if: always()
+        run: |
+          echo "Collection completed at ${{ steps.time.outputs.hour }}"
+          echo "Signals stored with timestamp: ${{ steps.time.outputs.timestamp }}"
+          
+  analyze:
+    needs: collect
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Download signals
+        uses: actions/download-artifact@v3
+        with:
+          name: signals-${{ needs.collect.outputs.timestamp }}
+          
+      - name: Generate daily report
+        run: |
+          echo "# Daily Signal Report" > report.md
+          echo "Generated: $(date -u)" >> report.md
+          echo "" >> report.md
+          
+          # Parse signals and create report
+          python3 -c "
+import json
+import glob
+
+files = glob.glob('signals_*.json')
+if files:
+    with open(files[0]) as f:
+        signals = json.load(f)
+    
+    print('## Top Signals')
+    for signal in signals[:5]:
+        print(f\"- **{signal['ticker']}**: {signal['action']} (confidence: {signal['confidence']:.2f})\")
+        print(f\"  Expected return: {signal['expected_return']:.1%}\")
+        print(f\"  Sources: {', '.join(signal['sources'])}\")
+        print()
+" >> report.md
+          
+      - name: Commit report
+        if: success()
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          mkdir -p docs/reports
+          cp report.md docs/reports/signal_report_$(date -u +%Y%m%d).md
+          
+          git add docs/reports/
+          git commit -m "📊 Daily signal report - $(date -u +%Y-%m-%d)" || true
+          git push || true
