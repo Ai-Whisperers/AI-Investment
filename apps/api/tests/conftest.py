@@ -19,6 +19,7 @@ os.environ["TESTING"] = "true"
 
 from app.core.database import Base
 from app.core.dependencies import get_db
+from app.core.database_pool import TestDatabaseManager, cleanup_connections
 from app.core.security import create_access_token, get_password_hash
 from app.main import app
 from app.models.asset import Asset, Price
@@ -30,6 +31,9 @@ from tests.factories import AssetFactory, PortfolioFactory, StrategyFactory, Use
 
 # Test database configuration
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
+
+# Cleanup any existing connections before tests
+cleanup_connections()
 
 
 @pytest.fixture(scope="session")
