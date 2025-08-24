@@ -6,12 +6,15 @@ SQLAlchemy database models organized by domain.
 from ..core.database import Base
 from .asset import Asset, Price
 from .index import Allocation, IndexValue
+from .portfolio import Portfolio
 from .strategy import MarketCapData, RiskMetrics, StrategyConfig
 from .user import User
+from .signals import Signal
 
 __all__ = [
     "Base",
     "User",
+    "Portfolio",
     "Asset",
     "Price",
     "IndexValue",
@@ -19,4 +22,5 @@ __all__ = [
     "StrategyConfig",
     "RiskMetrics",
     "MarketCapData",
+    "Signal",
 ]

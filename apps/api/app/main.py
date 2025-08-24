@@ -13,13 +13,16 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from .core.config import settings
 from .routers import (
+    analysis,
     assets,
     auth,
     background,
     benchmark,
     diagnostics,
+    extreme_signals,
     index,
     integrated_signals,
+    investment,
     manual_refresh,
     momentum,
     news,
@@ -243,6 +246,9 @@ app.include_router(background.router, prefix="/api/v1/background", tags=["backgr
 app.include_router(news.router, prefix="/api/v1", tags=["news"])
 app.include_router(portfolio_calculations.router, prefix="/api/v1/portfolio", tags=["portfolio"])
 app.include_router(assets.router, prefix="/api/v1/assets", tags=["assets"])
+app.include_router(analysis.router, prefix="/api/v1/analysis", tags=["analysis"])
+app.include_router(investment.router, prefix="/api/v1/investment", tags=["investment"])
 app.include_router(signals.router, prefix="/api/v1/signals", tags=["signals"])
 app.include_router(momentum.router, prefix="/api/v1/momentum", tags=["momentum"])
 app.include_router(integrated_signals.router, prefix="/api/v1/integrated", tags=["integrated"])
+app.include_router(extreme_signals.router, tags=["extreme_signals"])
