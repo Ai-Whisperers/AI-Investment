@@ -16,7 +16,7 @@ Faker>=19.0.0
 # Additional testing utilities
 factory-boy>=3.3.0
 responses>=0.23.0
-httpx==0.27.0  # Match main requirements version
+httpx==0.28.1  # Match main requirements version
 coverage>=7.3.0
 
 # For security testing
