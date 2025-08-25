@@ -69,6 +69,12 @@ pip-delete-this-directory.txt
 *.db
 *.sqlite
 *.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+instance/
+migrations/versions/*.py
+alembic.ini
 
 # Secrets and credentials
 *.pem
@@ -115,3 +121,104 @@ render-cache/
 # Local scripts
 install-render-cli.ps1
 run-local-no-docker.bat
+
+# Local data storage (market data)
+waardhaven_data/
+~/waardhaven_data/
+**/waardhaven_data/
+*.parquet
+*.feather
+data_cache/
+local_data/
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+*~
+
+# Test outputs
+test-results/
+test-reports/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.mypy_cache/
+.ruff_cache/
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+*.ipynb
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# VS Code
+.vscode/
+*.code-workspace
+.history/
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Logs and debugging
+*.log
+*.log.*
+logs/
+debug/
+*.dump
+*.core
+*.trace
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+.cache/
+cache/
+
+# Docker volumes (if using Docker locally)
+postgres-data/
+redis-data/
+celery-data/
+
+# Personal notes
+notes.txt
+notes.md
+TODO.txt
+personal/
+private/
