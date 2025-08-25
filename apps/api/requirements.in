@@ -27,6 +27,7 @@ yfinance>=0.2.28,<1.0.0  # For downloading free market data
 pandas>=2.0.0,<3.0.0
 numpy>=1.23.2,<1.28.0  # Compatible with scipy 1.11.x
 scipy>=1.11.0,<2.0.0
+pyarrow>=14.0.0,<15.0.0  # For parquet file support
 
 # HTTP & API
 requests>=2.31.0,<3.0.0

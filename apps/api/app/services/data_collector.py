@@ -98,12 +98,27 @@ class LocalDataCollector:
         data = {}
         
         for symbol in symbols:
-            cache_file = self.price_dir / f"{symbol}_{interval}_{start_date}_{end_date}.parquet"
+            # Use CSV if parquet not available
+            try:
+                cache_file = self.price_dir / f"{symbol}_{interval}_{start_date}_{end_date}.parquet"
+                use_parquet = True
+            except:
+                cache_file = self.price_dir / f"{symbol}_{interval}_{start_date}_{end_date}.csv"
+                use_parquet = False
             
             # Check cache first
             if cache_file.exists():
                 logger.info(f"Loading cached data for {symbol}")
-                data[symbol] = pd.read_parquet(cache_file)
+                if use_parquet:
+                    try:
+                        data[symbol] = pd.read_parquet(cache_file)
+                    except:
+                        # Fallback to CSV
+                        cache_file = cache_file.with_suffix('.csv')
+                        if cache_file.exists():
+                            data[symbol] = pd.read_csv(cache_file, index_col=0, parse_dates=True)
+                else:
+                    data[symbol] = pd.read_csv(cache_file, index_col=0, parse_dates=True)
             else:
                 logger.info(f"Downloading data for {symbol} from Yahoo Finance")
                 try:
@@ -112,7 +127,12 @@ class LocalDataCollector:
                     
                     if not df.empty:
                         # Save to cache
-                        df.to_parquet(cache_file)
+                        try:
+                            df.to_parquet(cache_file)
+                        except:
+                            # Fallback to CSV
+                            cache_file = cache_file.with_suffix('.csv')
+                            df.to_csv(cache_file)
                         data[symbol] = df
                         
                         # Update inventory
@@ -201,8 +221,15 @@ class LocalDataCollector:
             df['Volume'] = df['Volume'].astype(int)
             
             # Save synthetic data
-            cache_file = self.price_dir / f"{symbol}_synthetic_{start_date}_{end_date}.parquet"
-            df.to_parquet(cache_file)
+            cache_file = self.price_dir / f"{symbol}_synthetic_{start_date}_{end_date}.csv"
+            try:
+                # Try parquet first
+                cache_file = cache_file.with_suffix('.parquet')
+                df.to_parquet(cache_file)
+            except:
+                # Fallback to CSV
+                cache_file = cache_file.with_suffix('.csv')
+                df.to_csv(cache_file)
             
             data[symbol] = df
             
@@ -353,9 +380,11 @@ class LocalDataCollector:
         """
         Load price data from local storage.
         """
-        # Look for matching files
-        pattern = f"{symbol}_*.parquet"
-        files = list(self.price_dir.glob(pattern))
+        # Look for matching files (both parquet and csv)
+        patterns = [f"{symbol}_*.parquet", f"{symbol}_*.csv"]
+        files = []
+        for pattern in patterns:
+            files.extend(list(self.price_dir.glob(pattern)))
         
         if not files:
             logger.warning(f"No local data found for {symbol}")
@@ -363,7 +392,20 @@ class LocalDataCollector:
         
         # Load most recent file
         files.sort(key=lambda x: x.stat().st_mtime, reverse=True)
-        df = pd.read_parquet(files[0])
+        
+        # Load based on file extension
+        if files[0].suffix == '.parquet':
+            try:
+                df = pd.read_parquet(files[0])
+            except:
+                # Try CSV if parquet fails
+                csv_file = files[0].with_suffix('.csv')
+                if csv_file.exists():
+                    df = pd.read_csv(csv_file, index_col=0, parse_dates=True)
+                else:
+                    return None
+        else:
+            df = pd.read_csv(files[0], index_col=0, parse_dates=True)
         
         # Filter by date range if specified
         if start_date:
@@ -385,14 +427,15 @@ class LocalDataCollector:
             "last_updated": self.inventory.get("last_updated")
         }
         
-        # Count files and size
-        for file in self.price_dir.glob("*.parquet"):
-            stats["price_files"] += 1
-            stats["total_size_mb"] += file.stat().st_size / (1024 * 1024)
-            
-            # Extract symbol from filename
-            symbol = file.stem.split("_")[0]
-            stats["symbols"].add(symbol)
+        # Count files and size (both parquet and csv)
+        for pattern in ["*.parquet", "*.csv"]:
+            for file in self.price_dir.glob(pattern):
+                stats["price_files"] += 1
+                stats["total_size_mb"] += file.stat().st_size / (1024 * 1024)
+                
+                # Extract symbol from filename
+                symbol = file.stem.split("_")[0]
+                stats["symbols"].add(symbol)
         
         for file in self.news_dir.glob("*.json"):
             stats["news_files"] += 1
