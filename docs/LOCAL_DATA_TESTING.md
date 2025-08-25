@@ -172,6 +172,8 @@ print(f"Sharpe Ratio: {result.sharpe_ratio:.2f}")
 
 ### Free Data (No API Key)
 - **Yahoo Finance**: Historical prices via yfinance
+  - Documentation: https://ranaroussi.github.io/yfinance/
+  - Note: For personal/educational use only
 - **Synthetic Data**: Realistic generated data for testing
 
 ### With API Keys (Production)

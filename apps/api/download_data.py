@@ -2,6 +2,10 @@
 """
 Download Market Data for Local Testing
 Run this script to download real market data to your local disk for testing
+
+LEGAL NOTICE: yfinance is intended for personal/educational use only.
+Please review Yahoo's terms of use before extensive data usage.
+Documentation: https://ranaroussi.github.io/yfinance/
 """
 
 import argparse
@@ -111,6 +115,7 @@ def main():
     # Download price data
     if args.type in ["all", "prices"]:
         print("\n📈 Downloading price data...")
+        print("⚖️ Note: yfinance is for personal/educational use only")
         
         if args.synthetic:
             # Generate synthetic data
@@ -118,16 +123,25 @@ def main():
                 args.symbols, start_date, end_date
             )
         else:
-            # Try to download real data
-            price_data = collector.download_yahoo_data(
-                args.symbols, start_date, end_date
-            )
+            # Use batch download for multiple symbols (more efficient)
+            if len(args.symbols) > 3:
+                print(f"   Using batch download for {len(args.symbols)} symbols...")
+                price_data = collector.download_yahoo_batch(
+                    args.symbols, start_date, end_date
+                )
+            else:
+                # Use individual download for small batches
+                price_data = collector.download_yahoo_data(
+                    args.symbols, start_date, end_date
+                )
         
         for symbol, df in price_data.items():
             if df is not None and not df.empty:
                 print(f"  ✅ {symbol}: {len(df)} days of data")
-                print(f"     Latest close: ${df['Close'].iloc[-1]:.2f}")
-                print(f"     Volume: {df['Volume'].iloc[-1]:,.0f}")
+                if 'Close' in df.columns:
+                    print(f"     Latest close: ${df['Close'].iloc[-1]:.2f}")
+                if 'Volume' in df.columns:
+                    print(f"     Volume: {df['Volume'].iloc[-1]:,.0f}")
             else:
                 print(f"  ❌ {symbol}: No data")
     

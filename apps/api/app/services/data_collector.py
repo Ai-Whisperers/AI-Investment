@@ -2,11 +2,16 @@
 Local Market Data Collector
 Downloads and stores real market data locally for testing and backtesting
 Works without API keys using free data sources
+
+IMPORTANT: yfinance is intended for personal/educational use only.
+Review Yahoo's terms of use before extensive data usage.
+Documentation: https://ranaroussi.github.io/yfinance/
 """
 
 import os
 import json
 import logging
+import time
 from typing import Dict, List, Optional, Tuple
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -75,11 +80,14 @@ class LocalDataCollector:
         """
         Download historical price data from Yahoo Finance (free, no API key).
         
+        LEGAL: yfinance is for personal/educational use only.
+        See: https://ranaroussi.github.io/yfinance/
+        
         Args:
             symbols: List of stock symbols
             start_date: Start date (YYYY-MM-DD)
             end_date: End date (YYYY-MM-DD)
-            interval: Data interval (1d, 1h, 5m, etc.)
+            interval: Data interval (1d, 1wk, 1mo, etc.)
             
         Returns:
             Dictionary of symbol -> DataFrame
@@ -88,6 +96,7 @@ class LocalDataCollector:
             import yfinance as yf
         except ImportError:
             logger.warning("yfinance not installed. Install with: pip install yfinance")
+            logger.info("Using synthetic data as fallback")
             return self._generate_synthetic_data(symbols, start_date, end_date)
         
         if not start_date:
@@ -97,7 +106,10 @@ class LocalDataCollector:
         
         data = {}
         
+        # Process symbols individually to handle errors better
         for symbol in symbols:
+            # Add small delay to be respectful to Yahoo
+            time.sleep(0.5)
             # Use CSV if parquet not available
             try:
                 cache_file = self.price_dir / f"{symbol}_{interval}_{start_date}_{end_date}.parquet"
@@ -122,42 +134,182 @@ class LocalDataCollector:
             else:
                 logger.info(f"Downloading data for {symbol} from Yahoo Finance")
                 try:
+                    # Method 1: Try using Ticker.history() first
                     ticker = yf.Ticker(symbol)
                     df = ticker.history(start=start_date, end=end_date, interval=interval)
                     
-                    if not df.empty:
-                        # Save to cache
-                        try:
-                            df.to_parquet(cache_file)
-                        except:
-                            # Fallback to CSV
-                            cache_file = cache_file.with_suffix('.csv')
-                            df.to_csv(cache_file)
-                        data[symbol] = df
+                    # Validate the data
+                    if df is None or df.empty:
+                        # Method 2: Try yf.download() as fallback
+                        logger.info(f"Trying alternative download method for {symbol}")
+                        df = yf.download(symbol, start=start_date, end=end_date, 
+                                       interval=interval, progress=False, 
+                                       show_errors=False)
+                    
+                    if df is not None and not df.empty:
+                        # Clean the data
+                        df = df.dropna()  # Remove any NaN values
                         
-                        # Update inventory
-                        if symbol not in self.inventory["prices"]:
-                            self.inventory["prices"][symbol] = []
-                        
-                        self.inventory["prices"][symbol].append({
-                            "start": start_date,
-                            "end": end_date,
-                            "interval": interval,
-                            "file": str(cache_file.name),
-                            "rows": len(df),
-                            "downloaded": datetime.now().isoformat()
-                        })
-                        
-                        self._save_inventory()
+                        # Ensure we have the required columns
+                        required_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
+                        if all(col in df.columns for col in required_cols):
+                            # Save to cache
+                            try:
+                                df.to_parquet(cache_file)
+                            except:
+                                # Fallback to CSV
+                                cache_file = cache_file.with_suffix('.csv')
+                                df.to_csv(cache_file)
+                            
+                            data[symbol] = df
+                            
+                            # Update inventory
+                            if symbol not in self.inventory["prices"]:
+                                self.inventory["prices"][symbol] = []
+                            
+                            self.inventory["prices"][symbol].append({
+                                "start": start_date,
+                                "end": end_date,
+                                "interval": interval,
+                                "file": str(cache_file.name),
+                                "rows": len(df),
+                                "downloaded": datetime.now().isoformat()
+                            })
+                            
+                            self._save_inventory()
+                            logger.info(f"Successfully downloaded {len(df)} rows for {symbol}")
+                        else:
+                            logger.warning(f"Missing required columns for {symbol}: {df.columns.tolist()}")
+                            raise ValueError("Incomplete data")
                     else:
                         logger.warning(f"No data returned for {symbol}")
+                        raise ValueError("Empty data")
                         
                 except Exception as e:
                     logger.error(f"Error downloading {symbol}: {e}")
+                    logger.info(f"Generating synthetic data for {symbol} as fallback")
                     # Generate synthetic data as fallback
-                    data[symbol] = self._generate_synthetic_data([symbol], start_date, end_date)[symbol]
+                    synthetic = self._generate_synthetic_data([symbol], start_date, end_date)
+                    if symbol in synthetic:
+                        data[symbol] = synthetic[symbol]
         
         return data
+    
+    def download_yahoo_batch(
+        self,
+        symbols: List[str],
+        start_date: str = None,
+        end_date: str = None,
+        interval: str = "1d"
+    ) -> Dict[str, pd.DataFrame]:
+        """
+        Download multiple symbols efficiently using yf.download().
+        More efficient for large batches of symbols.
+        
+        Args:
+            symbols: List of stock symbols
+            start_date: Start date (YYYY-MM-DD)
+            end_date: End date (YYYY-MM-DD)
+            interval: Data interval (1d, 1wk, 1mo)
+            
+        Returns:
+            Dictionary of symbol -> DataFrame
+        """
+        try:
+            import yfinance as yf
+        except ImportError:
+            logger.warning("yfinance not installed. Install with: pip install yfinance")
+            return self._generate_synthetic_data(symbols, start_date, end_date)
+        
+        if not start_date:
+            start_date = (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d")
+        if not end_date:
+            end_date = datetime.now().strftime("%Y-%m-%d")
+        
+        data = {}
+        
+        try:
+            logger.info(f"Batch downloading {len(symbols)} symbols from Yahoo Finance")
+            
+            # Download all symbols at once
+            df_all = yf.download(
+                tickers=symbols,
+                start=start_date,
+                end=end_date,
+                interval=interval,
+                group_by='ticker',
+                auto_adjust=True,
+                prepost=False,
+                threads=True,
+                progress=False
+            )
+            
+            if df_all is not None and not df_all.empty:
+                # Handle single symbol case (returns DataFrame)
+                if len(symbols) == 1:
+                    data[symbols[0]] = df_all
+                    self._save_symbol_data(symbols[0], df_all, start_date, end_date, interval)
+                else:
+                    # Handle multiple symbols (returns multi-level columns)
+                    for symbol in symbols:
+                        try:
+                            if symbol in df_all.columns.levels[0]:
+                                df_symbol = df_all[symbol].dropna()
+                                if not df_symbol.empty:
+                                    data[symbol] = df_symbol
+                                    self._save_symbol_data(symbol, df_symbol, start_date, end_date, interval)
+                                else:
+                                    logger.warning(f"No data for {symbol}")
+                        except:
+                            # Try without multi-level columns
+                            if symbol in df_all.columns:
+                                df_symbol = df_all[[col for col in df_all.columns if symbol in str(col)]]
+                                if not df_symbol.empty:
+                                    data[symbol] = df_symbol
+                                    self._save_symbol_data(symbol, df_symbol, start_date, end_date, interval)
+                
+                logger.info(f"Successfully downloaded data for {len(data)} symbols")
+            else:
+                logger.warning("No data returned from batch download")
+                
+        except Exception as e:
+            logger.error(f"Batch download failed: {e}")
+            logger.info("Falling back to individual downloads")
+            # Fall back to individual downloads
+            return self.download_yahoo_data(symbols, start_date, end_date, interval)
+        
+        # Fill in any missing symbols with synthetic data
+        missing = set(symbols) - set(data.keys())
+        if missing:
+            logger.info(f"Generating synthetic data for missing symbols: {missing}")
+            synthetic = self._generate_synthetic_data(list(missing), start_date, end_date)
+            data.update(synthetic)
+        
+        return data
+    
+    def _save_symbol_data(self, symbol: str, df: pd.DataFrame, start_date: str, end_date: str, interval: str):
+        """Helper to save symbol data to cache."""
+        try:
+            cache_file = self.price_dir / f"{symbol}_{interval}_{start_date}_{end_date}.parquet"
+            df.to_parquet(cache_file)
+        except:
+            cache_file = self.price_dir / f"{symbol}_{interval}_{start_date}_{end_date}.csv"
+            df.to_csv(cache_file)
+        
+        # Update inventory
+        if symbol not in self.inventory["prices"]:
+            self.inventory["prices"][symbol] = []
+        
+        self.inventory["prices"][symbol].append({
+            "start": start_date,
+            "end": end_date,
+            "interval": interval,
+            "file": str(cache_file.name),
+            "rows": len(df),
+            "downloaded": datetime.now().isoformat()
+        })
+        
+        self._save_inventory()
     
     def _generate_synthetic_data(
         self,
