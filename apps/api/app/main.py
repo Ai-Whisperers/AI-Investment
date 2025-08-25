@@ -18,6 +18,7 @@ from .routers import (
     auth,
     background,
     benchmark,
+    chatbot,
     diagnostics,
     extreme_signals,
     index,
@@ -256,3 +257,4 @@ app.include_router(integrated_signals.router, prefix="/api/v1/integrated", tags=
 app.include_router(extreme_signals.router, tags=["extreme_signals"])
 app.include_router(websocket.router, tags=["websocket"])
 app.include_router(simulation.router, tags=["simulation"])
+app.include_router(chatbot.router, tags=["chatbot"])
