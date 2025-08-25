@@ -54,7 +54,9 @@
       "Bash(gh workflow:*)",
       "Bash(gh run view:*)",
       "Bash(git reset:*)",
-      "Bash(ruff check:*)"
+      "Bash(ruff check:*)",
+      "Bash(scripts/check-secrets.bat)",
+      "Bash(bash:*)"
     ],
     "deny": [],
     "ask": [],

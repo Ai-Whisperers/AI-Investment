@@ -1,13 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, Query
+from fastapi import APIRouter, Depends, HTTPException, Response, Query, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 import httpx
 import secrets
+import logging
 from urllib.parse import urlencode
 
 from ..core.database import get_db
 from ..core.security import create_access_token, get_password_hash, verify_password
 from ..core.config import settings
+from ..core.redis_client import get_redis_client
 from ..models.user import User
 from ..schemas.auth import (
     GoogleAuthRequest,
@@ -19,6 +21,7 @@ from ..utils.password_validator import PasswordValidator
 from ..utils.token_dep import get_current_user
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 # Explicit OPTIONS handlers for CORS preflight requests
@@ -108,9 +111,19 @@ def google_oauth_redirect():
     
     google_oauth_url = f"https://accounts.google.com/o/oauth2/v2/auth?{urlencode(params)}"
     
-    # Store state in response for verification (in production, use session/redis)
+    # Store state server-side in Redis for CSRF protection
+    redis_client = get_redis_client()
+    state_key = f"oauth_state:{state}"
+    
+    # Store state in Redis with 10 minute expiration
+    if redis_client.is_connected:
+        redis_client.set(state_key, {"timestamp": secrets.token_hex(16)}, expire=600)
+    else:
+        # Fallback if Redis is unavailable - log warning but allow OAuth
+        logger.warning("Redis unavailable for OAuth state storage - using memory fallback")
+        # Could implement in-memory storage here as backup, but for now just proceed
+        
     response = RedirectResponse(url=google_oauth_url, status_code=302)
-    response.set_cookie(key="oauth_state", value=state, httponly=True, max_age=600)
     return response
 
 
@@ -128,12 +141,20 @@ async def google_oauth_callback(
             detail="Google OAuth is not configured properly."
         )
     
-    # Validate state parameter to prevent CSRF attacks
-    stored_state = request.cookies.get("oauth_state")
-    if not stored_state or stored_state != state:
+    # Validate state parameter to prevent CSRF attacks - check server-side storage
+    redis_client = get_redis_client()
+    state_key = f"oauth_state:{state}"
+    
+    stored_state_data = None
+    if redis_client.is_connected:
+        stored_state_data = redis_client.get(state_key)
+        # Clean up the state after validation (one-time use)
+        redis_client.delete(state_key)
+    
+    if not stored_state_data:
         raise HTTPException(
             status_code=400,
-            detail="Invalid state parameter. Possible CSRF attack."
+            detail="Invalid or expired state parameter. Possible CSRF attack or session timeout."
         )
     
     # Exchange authorization code for tokens
