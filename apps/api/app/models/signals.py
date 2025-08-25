@@ -1,7 +1,7 @@
 """Enhanced signal model for extreme alpha generation."""
 from sqlalchemy import Column, Integer, String, Float, DateTime, JSON, Boolean
 from sqlalchemy.sql import func
-from app.database import Base
+from ..core.database import Base
 
 
 class Signal(Base):

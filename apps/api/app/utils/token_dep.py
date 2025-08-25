@@ -1,4 +1,5 @@
 import os
+import secrets
 
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -58,8 +59,8 @@ def require_admin(token: HTTPAuthorizationCredentials = Depends(bearer_scheme)) 
     if not token:
         raise HTTPException(status_code=401, detail="Admin token required")
 
-    # Check if it's the admin token
-    if token.credentials == settings.ADMIN_TOKEN:
+    # Use constant-time comparison to prevent timing attacks
+    if secrets.compare_digest(token.credentials, settings.ADMIN_TOKEN):
         return True
 
     # Otherwise, check if it's a valid user token with admin privileges

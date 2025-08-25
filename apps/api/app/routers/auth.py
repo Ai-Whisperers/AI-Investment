@@ -116,6 +116,7 @@ def google_oauth_redirect():
 
 @router.get("/google/callback")
 async def google_oauth_callback(
+    request: Request,
     code: str = Query(...),
     state: str = Query(...),
     db: Session = Depends(get_db)
@@ -125,6 +126,14 @@ async def google_oauth_callback(
         raise HTTPException(
             status_code=500,
             detail="Google OAuth is not configured properly."
+        )
+    
+    # Validate state parameter to prevent CSRF attacks
+    stored_state = request.cookies.get("oauth_state")
+    if not stored_state or stored_state != state:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid state parameter. Possible CSRF attack."
         )
     
     # Exchange authorization code for tokens
@@ -137,7 +146,7 @@ async def google_oauth_callback(
         "grant_type": "authorization_code"
     }
     
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=10.0) as client:  # Add 10 second timeout
         try:
             # Exchange code for tokens
             token_response = await client.post(token_url, data=token_data)
