@@ -1,8 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Response, Query
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
+import httpx
+import secrets
+from urllib.parse import urlencode
 
 from ..core.database import get_db
 from ..core.security import create_access_token, get_password_hash, verify_password
+from ..core.config import settings
 from ..models.user import User
 from ..schemas.auth import (
     GoogleAuthRequest,
@@ -81,22 +86,120 @@ async def options_google():
 @router.get("/google")
 def google_oauth_redirect():
     """Redirect to Google OAuth for authentication."""
-    # In a real implementation, this would build the Google OAuth URL
-    # with client_id, redirect_uri, scope, etc.
-    google_oauth_url = (
-        "https://accounts.google.com/o/oauth2/v2/auth"
-        "?client_id=YOUR_CLIENT_ID"
-        "&redirect_uri=YOUR_REDIRECT_URI"
-        "&response_type=code"
-        "&scope=email%20profile"
-    )
-    return Response(status_code=307, headers={"Location": google_oauth_url})
+    if not settings.GOOGLE_CLIENT_ID:
+        raise HTTPException(
+            status_code=500,
+            detail="Google OAuth is not configured. Please set GOOGLE_CLIENT_ID in environment variables."
+        )
+    
+    # Generate state for CSRF protection
+    state = secrets.token_urlsafe(32)
+    
+    # Build Google OAuth URL with proper parameters
+    params = {
+        "client_id": settings.GOOGLE_CLIENT_ID,
+        "redirect_uri": settings.GOOGLE_REDIRECT_URI or f"{settings.FRONTEND_URL}/api/v1/auth/google/callback",
+        "response_type": "code",
+        "scope": "email profile openid",
+        "state": state,
+        "access_type": "offline",
+        "prompt": "consent"
+    }
+    
+    google_oauth_url = f"https://accounts.google.com/o/oauth2/v2/auth?{urlencode(params)}"
+    
+    # Store state in response for verification (in production, use session/redis)
+    response = RedirectResponse(url=google_oauth_url, status_code=302)
+    response.set_cookie(key="oauth_state", value=state, httponly=True, max_age=600)
+    return response
+
+
+@router.get("/google/callback")
+async def google_oauth_callback(
+    code: str = Query(...),
+    state: str = Query(...),
+    db: Session = Depends(get_db)
+):
+    """Handle Google OAuth callback and exchange code for tokens."""
+    if not settings.GOOGLE_CLIENT_ID or not settings.GOOGLE_CLIENT_SECRET:
+        raise HTTPException(
+            status_code=500,
+            detail="Google OAuth is not configured properly."
+        )
+    
+    # Exchange authorization code for tokens
+    token_url = "https://oauth2.googleapis.com/token"
+    token_data = {
+        "code": code,
+        "client_id": settings.GOOGLE_CLIENT_ID,
+        "client_secret": settings.GOOGLE_CLIENT_SECRET,
+        "redirect_uri": settings.GOOGLE_REDIRECT_URI or f"{settings.FRONTEND_URL}/api/v1/auth/google/callback",
+        "grant_type": "authorization_code"
+    }
+    
+    async with httpx.AsyncClient() as client:
+        try:
+            # Exchange code for tokens
+            token_response = await client.post(token_url, data=token_data)
+            token_response.raise_for_status()
+            tokens = token_response.json()
+            
+            # Get user info from Google
+            userinfo_response = await client.get(
+                "https://www.googleapis.com/oauth2/v2/userinfo",
+                headers={"Authorization": f"Bearer {tokens['access_token']}"}
+            )
+            userinfo_response.raise_for_status()
+            userinfo = userinfo_response.json()
+            
+        except httpx.HTTPStatusError as e:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Failed to authenticate with Google: {e.response.text}"
+            )
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error during Google authentication: {str(e)}"
+            )
+    
+    # Check if user exists
+    email = userinfo.get("email")
+    if not email:
+        raise HTTPException(status_code=400, detail="No email found in Google account")
+    
+    user = db.query(User).filter(User.email == email).first()
+    
+    if not user:
+        # Create new user from Google account
+        random_password = secrets.token_urlsafe(32)
+        user = User(
+            email=email,
+            password_hash=get_password_hash(random_password),
+            is_google_user=True,
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    elif not getattr(user, "is_google_user", False):
+        # Link existing account with Google
+        user.is_google_user = True
+        db.commit()
+    
+    # Generate JWT token
+    access_token = create_access_token({"sub": str(user.id)})
+    
+    # Redirect to frontend with token
+    frontend_url = settings.FRONTEND_URL or "http://localhost:3000"
+    redirect_url = f"{frontend_url}/auth/callback?token={access_token}"
+    
+    return RedirectResponse(url=redirect_url, status_code=302)
 
 
 @router.post("/google", response_model=TokenResponse)
 def google_auth(req: GoogleAuthRequest, db: Session = Depends(get_db)):
     """
-    Authenticate or register user via Google OAuth.
+    Alternative Google authentication endpoint for frontend-handled OAuth.
     The frontend should verify the Google token before sending.
     """
     # Check if user exists
@@ -104,15 +207,12 @@ def google_auth(req: GoogleAuthRequest, db: Session = Depends(get_db)):
 
     if not user:
         # Create new user from Google account
-        # Google users don't have a password, so we generate a random one
-        import secrets
-
         random_password = secrets.token_urlsafe(32)
 
         user = User(
             email=req.email,
             password_hash=get_password_hash(random_password),
-            is_google_user=True,  # Mark as Google user
+            is_google_user=True,
         )
         db.add(user)
         db.commit()

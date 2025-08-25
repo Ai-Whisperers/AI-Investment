@@ -6,6 +6,7 @@ services:
     dockerContext: .
     plan: starter
     rootDir: apps/api
+    healthCheckPath: /health
     envVars:
       - key: PORT
         value: "10000"
@@ -17,12 +18,43 @@ services:
           property: connectionString
       - key: ADMIN_TOKEN
         sync: false
+      - key: JWT_ALGORITHM
+        value: "HS256"
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "1440"
       - key: DAILY_DROP_THRESHOLD
         value: "-0.01"
       - key: ASSET_DEFAULT_START
         value: "2018-01-01"
       - key: SP500_TICKER
         value: "^GSPC"
+      # Google OAuth
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
+      # API Keys for Data Sources
+      - key: TWELVEDATA_API_KEY
+        sync: false
+      - key: MARKETAUX_API_KEY
+        sync: false
+      - key: REDDIT_CLIENT_ID
+        sync: false
+      - key: REDDIT_CLIENT_SECRET
+        sync: false
+      - key: YOUTUBE_API_KEY
+        sync: false
+      # Discord Notifications
+      - key: DISCORD_WEBHOOK
+        sync: false
+      # Redis (optional)
+      - key: REDIS_URL
+        sync: false
+      # Frontend URL for CORS
+      - key: FRONTEND_URL
+        sync: false
 
   - type: web
     name: waardhaven-web

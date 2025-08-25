@@ -63,6 +63,11 @@ class Settings(BaseSettings):
 
     # Skip startup refresh
     SKIP_STARTUP_REFRESH: bool = Field(default=False, env="SKIP_STARTUP_REFRESH")
+    
+    # Google OAuth configuration
+    GOOGLE_CLIENT_ID: str = Field(default="", env="GOOGLE_CLIENT_ID")
+    GOOGLE_CLIENT_SECRET: str = Field(default="", env="GOOGLE_CLIENT_SECRET")
+    GOOGLE_REDIRECT_URI: str = Field(default="", env="GOOGLE_REDIRECT_URI")
 
     class Config:
         env_file = ".env"
