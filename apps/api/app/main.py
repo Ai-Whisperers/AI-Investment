@@ -29,8 +29,10 @@ from .routers import (
     portfolio_calculations,
     root,
     signals,
+    simulation,
     strategy,
     tasks,
+    websocket,
 )
 
 # Import models to ensure they're registered with SQLAlchemy
@@ -252,3 +254,5 @@ app.include_router(signals.router, prefix="/api/v1/signals", tags=["signals"])
 app.include_router(momentum.router, prefix="/api/v1/momentum", tags=["momentum"])
 app.include_router(integrated_signals.router, prefix="/api/v1/integrated", tags=["integrated"])
 app.include_router(extreme_signals.router, tags=["extreme_signals"])
+app.include_router(websocket.router, tags=["websocket"])
+app.include_router(simulation.router, tags=["simulation"])
