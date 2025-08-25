@@ -5,6 +5,17 @@
 
 This guide documents all environment variables and configuration required for production deployment on Render.com.
 
+## ⚠️ IMPORTANT: API Key Configuration
+
+**All API keys and sensitive configuration are set directly in the Render.com dashboard, NOT in code.**
+
+To configure:
+1. Log into [Render Dashboard](https://dashboard.render.com)
+2. Select your service
+3. Go to "Environment" tab
+4. Add each variable below
+5. Click "Save Changes"
+
 ---
 
 ## 🔐 Environment Variables
@@ -19,7 +30,7 @@ APP_VERSION=1.0.0
 DEBUG=false
 LOG_LEVEL=INFO
 
-# Security
+# Security (REQUIRED - Generate these!)
 SECRET_KEY=<generate-secure-random-key>  # Use: openssl rand -hex 32
 JWT_ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
