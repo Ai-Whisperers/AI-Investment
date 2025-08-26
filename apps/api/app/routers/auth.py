@@ -39,45 +39,82 @@ async def options_login():
 
 @router.post("/register", response_model=TokenResponse)
 def register(req: RegisterRequest, db: Session = Depends(get_db)):
-    # Validate password strength
-    is_valid, errors = PasswordValidator.validate(req.password)
-    if not is_valid:
+    """Register a new user.
+    
+    This endpoint is now a pure presentation layer following Clean Architecture.
+    All business logic has been moved to domain services and use cases.
+    """
+    from ..use_cases import (
+        RegisterUserUseCase,
+        EmailAlreadyExistsError,
+        ValidationError as DomainValidationError
+    )
+    
+    # Create and execute use case
+    use_case = RegisterUserUseCase(db)
+    
+    try:
+        # Execute use case - all business logic is encapsulated
+        result = use_case.execute(email=req.email, password=req.password)
+        
+        # Return token response
+        return TokenResponse(access_token=result.access_token)
+        
+    except DomainValidationError as e:
+        # Handle validation errors
         raise HTTPException(
             status_code=422,
             detail={
                 "message": "Password does not meet security requirements",
-                "errors": errors,
+                "errors": str(e),
             },
         )
-
-    # Check if email already exists
-    existing = db.query(User).filter(User.email == req.email).first()
-    if existing:
-        raise HTTPException(status_code=400, detail="Email already registered")
-
-    # Create user with hashed password
-    user = User(email=req.email, password_hash=get_password_hash(req.password))
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-
-    # Generate token
-    token = create_access_token({"sub": str(user.id)})
-    return TokenResponse(access_token=token)
+    except EmailAlreadyExistsError as e:
+        # Handle email already exists
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        # Handle unexpected errors
+        raise HTTPException(
+            status_code=500,
+            detail="An unexpected error occurred during registration"
+        )
 
 
 @router.post("/login", response_model=TokenResponse)
 def login(req: LoginRequest, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == req.email).first()
-    if not user or not verify_password(req.password, user.password_hash):
+    """Authenticate a user and return access token.
+    
+    This endpoint is now a pure presentation layer following Clean Architecture.
+    All business logic has been moved to domain services and use cases.
+    """
+    from ..use_cases import (
+        LoginUserUseCase,
+        InvalidCredentialsError,
+        UserInactiveError
+    )
+    
+    # Create and execute use case
+    use_case = LoginUserUseCase(db)
+    
+    try:
+        # Execute use case - all business logic is encapsulated
+        result = use_case.execute(email=req.email, password=req.password)
+        
+        # Return token response
+        return TokenResponse(access_token=result.access_token)
+        
+    except InvalidCredentialsError as e:
+        # Handle invalid credentials
         raise HTTPException(status_code=401, detail="Invalid credentials")
-
-    # Check if user is active
-    if not user.is_active:
+    except UserInactiveError as e:
+        # Handle inactive user
         raise HTTPException(status_code=401, detail="User account is inactive")
-
-    token = create_access_token({"sub": str(user.id)})
-    return TokenResponse(access_token=token)
+    except Exception as e:
+        # Handle unexpected errors
+        raise HTTPException(
+            status_code=500,
+            detail="An unexpected error occurred during login"
+        )
 
 
 @router.options("/google")

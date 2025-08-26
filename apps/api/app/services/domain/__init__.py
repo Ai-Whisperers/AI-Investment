@@ -10,9 +10,21 @@ from .technical_analysis_service import (
     PriceData,
     TechnicalAnalysisResult
 )
+from .auth_service import (
+    AuthenticationService,
+    UserRegistrationData,
+    UserCredentials,
+    AuthenticatedUser,
+    AuthenticationResult
+)
 
 __all__ = [
     'TechnicalAnalysisService',
     'PriceData',
-    'TechnicalAnalysisResult'
+    'TechnicalAnalysisResult',
+    'AuthenticationService',
+    'UserRegistrationData',
+    'UserCredentials',
+    'AuthenticatedUser',
+    'AuthenticationResult'
 ]

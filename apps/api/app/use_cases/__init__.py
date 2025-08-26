@@ -10,9 +10,23 @@ from .get_technical_analysis import (
     AssetNotFoundError,
     InsufficientPriceDataError
 )
+from .auth_use_cases import (
+    RegisterUserUseCase,
+    LoginUserUseCase,
+    EmailAlreadyExistsError,
+    InvalidCredentialsError,
+    UserInactiveError,
+    ValidationError
+)
 
 __all__ = [
     'GetTechnicalAnalysisUseCase',
     'AssetNotFoundError',
-    'InsufficientPriceDataError'
+    'InsufficientPriceDataError',
+    'RegisterUserUseCase',
+    'LoginUserUseCase',
+    'EmailAlreadyExistsError',
+    'InvalidCredentialsError',
+    'UserInactiveError',
+    'ValidationError'
 ]
