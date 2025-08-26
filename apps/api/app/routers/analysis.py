@@ -22,78 +22,59 @@ def get_technical_analysis(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ) -> Dict[str, Any]:
-    """Get comprehensive technical analysis for an asset."""
-    # Get asset
-    asset = db.query(Asset).filter(Asset.symbol == symbol.upper()).first()
-    if not asset:
+    """Get comprehensive technical analysis for an asset.
+    
+    This endpoint is now a pure presentation layer following Clean Architecture.
+    All business logic has been moved to domain services and use cases.
+    """
+    # Import use case
+    from ..use_cases import (
+        GetTechnicalAnalysisUseCase,
+        AssetNotFoundError,
+        InsufficientPriceDataError
+    )
+    
+    # Create and execute use case
+    use_case = GetTechnicalAnalysisUseCase(db)
+    
+    try:
+        # Execute use case - all business logic is encapsulated
+        result = use_case.execute(symbol=symbol, period=period)
+        
+        # Convert domain result to API response
+        return {
+            'symbol': result.symbol,
+            'period_days': result.period_days,
+            'latest_price': result.latest_price,
+            'indicators': result.indicators,
+            'signals': result.signals,
+            'dates': result.dates
+        }
+        
+    except AssetNotFoundError as e:
+        # Handle domain-specific exceptions
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Asset {symbol} not found"
+            detail=str(e)
         )
-    
-    # Get price history
-    end_date = datetime.now().date()
-    start_date = end_date - timedelta(days=period)
-    
-    prices = db.query(Price).filter(
-        Price.asset_id == asset.id,
-        Price.date >= start_date
-    ).order_by(Price.date).all()
-    
-    if not prices:
+    except InsufficientPriceDataError as e:
+        # Handle insufficient data error
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"No price data available for {symbol}"
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(e)
         )
-    
-    # Convert to DataFrame
-    price_data = pd.DataFrame([
-        {'date': p.date, 'close': p.close}
-        for p in prices
-    ])
-    price_data.set_index('date', inplace=True)
-    
-    # Calculate all indicators
-    indicators = {
-        'sma_20': TechnicalIndicators.calculate_sma(price_data['close'], 20).to_list(),
-        'sma_50': TechnicalIndicators.calculate_sma(price_data['close'], 50).to_list(),
-        'ema_20': TechnicalIndicators.calculate_ema(price_data['close'], 20).to_list(),
-        'rsi': TechnicalIndicators.calculate_rsi(price_data['close']).to_list(),
-    }
-    
-    # Calculate MACD
-    macd_data = TechnicalIndicators.calculate_macd(price_data['close'])
-    indicators['macd'] = {
-        'line': macd_data['macd'].to_list(),
-        'signal': macd_data['signal'].to_list(),
-        'histogram': macd_data['histogram'].to_list()
-    }
-    
-    # Calculate Bollinger Bands
-    bb_data = TechnicalIndicators.calculate_bollinger_bands(price_data['close'])
-    indicators['bollinger_bands'] = {
-        'upper': bb_data['upper'].to_list(),
-        'middle': bb_data['middle'].to_list(),
-        'lower': bb_data['lower'].to_list(),
-        'bandwidth': bb_data['bandwidth'].to_list()
-    }
-    
-    # Generate signals
-    signals = TechnicalIndicators.generate_signals({
-        'rsi': pd.Series(indicators['rsi']),
-        'macd': macd_data,
-        'bollinger': bb_data,
-        'close': price_data['close']
-    })
-    
-    return {
-        'symbol': symbol.upper(),
-        'period_days': period,
-        'latest_price': float(price_data['close'].iloc[-1]),
-        'indicators': indicators,
-        'signals': signals,
-        'dates': price_data.index.strftime('%Y-%m-%d').to_list()
-    }
+    except ValueError as e:
+        # Handle validation errors
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except Exception as e:
+        # Handle unexpected errors
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred during technical analysis"
+        )
 
 
 @router.get("/technical/{symbol}/rsi")
