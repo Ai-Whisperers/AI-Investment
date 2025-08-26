@@ -13,7 +13,8 @@ from ..services.domain.technical_analysis_service import (
     PriceData,
     TechnicalAnalysisResult
 )
-from ..models import Asset, Price
+from ..repositories import IAssetRepository, IPriceRepository
+from ..repositories import SQLAssetRepository, SQLPriceRepository
 
 
 class AssetNotFoundError(Exception):
@@ -38,13 +39,16 @@ class GetTechnicalAnalysisUseCase:
         Args:
             db: Database session for repository access
         """
-        self.db = db
+        self.asset_repo: IAssetRepository = SQLAssetRepository(db)
+        self.price_repo: IPriceRepository = SQLPriceRepository(db)
         self.analysis_service = TechnicalAnalysisService()
     
     def execute(
         self,
         symbol: str,
-        period: int = 100
+        period: int = 100,
+        offset: int = 0,
+        limit: Optional[int] = None
     ) -> TechnicalAnalysisResult:
         """Execute the use case to get technical analysis.
         
@@ -67,7 +71,9 @@ class GetTechnicalAnalysisUseCase:
             raise ValueError("Period cannot exceed 365 days")
         
         # Get asset from repository
-        asset = self._get_asset(symbol)
+        asset = self.asset_repo.get_by_symbol(symbol)
+        if not asset:
+            raise AssetNotFoundError(f"Asset {symbol} not found")
         
         # Get price history from repository
         price_data = self._get_price_history(asset.id, period)
@@ -81,19 +87,6 @@ class GetTechnicalAnalysisUseCase:
         
         return result
     
-    def _get_asset(self, symbol: str) -> Asset:
-        """Get asset from repository.
-        
-        Private method for repository access.
-        """
-        asset = self.db.query(Asset).filter(
-            Asset.symbol == symbol.upper()
-        ).first()
-        
-        if not asset:
-            raise AssetNotFoundError(f"Asset {symbol} not found")
-        
-        return asset
     
     def _get_price_history(self, asset_id: int, period: int) -> list[PriceData]:
         """Get price history from repository.
@@ -103,10 +96,11 @@ class GetTechnicalAnalysisUseCase:
         end_date = datetime.now().date()
         start_date = end_date - timedelta(days=period)
         
-        prices = self.db.query(Price).filter(
-            Price.asset_id == asset_id,
-            Price.date >= start_date
-        ).order_by(Price.date).all()
+        prices = self.price_repo.get_history(
+            asset_id=asset_id,
+            start_date=start_date,
+            end_date=end_date
+        )
         
         if not prices:
             raise InsufficientPriceDataError(

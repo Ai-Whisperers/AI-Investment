@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional, Dict
 from datetime import datetime, timedelta
 
-from app.database import get_db
+from app.core.database import get_db
 from app.models.signals import Signal
 from app.services.alpha_detection import (
     MultiLayerAlphaDetection,

@@ -13,6 +13,7 @@ from datetime import datetime
 from ..core.websocket_manager import manager, WSMessage
 from ..core.security import decode_access_token
 from ..core.database import get_db
+from ..utils.admin_auth import require_admin_token
 from sqlalchemy.orm import Session
 from ..models.user import User
 
@@ -252,9 +253,11 @@ async def websocket_signals(
 
 
 @router.get("/ws/stats")
-async def get_websocket_stats():
+async def get_websocket_stats(is_admin: bool = Depends(require_admin_token)):
     """
     Get WebSocket connection statistics.
+    
+    Requires admin authentication via Bearer token.
     
     Returns:
         Current statistics about WebSocket connections
@@ -265,25 +268,28 @@ async def get_websocket_stats():
     return {
         "stats": stats,
         "health": health,
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.utcnow().isoformat(),
+        "authenticated": is_admin
     }
 
 
 @router.post("/ws/broadcast/system")
 async def broadcast_system_message(
     message: str,
-    severity: str = "info"
+    severity: str = "info",
+    is_admin: bool = Depends(require_admin_token)
 ):
     """
     Broadcast a system message to all connected clients.
     Admin endpoint for system announcements.
     
+    Requires admin authentication via Bearer token.
+    
     Args:
         message: The message to broadcast
         severity: Message severity (info, warning, error, success)
+        is_admin: Admin authentication verification (injected)
     """
-    # TODO: Add admin authentication
-    
     from ..core.websocket_manager import broadcast_system_message as broadcast
     await broadcast(message, severity)
     
@@ -291,7 +297,8 @@ async def broadcast_system_message(
         "status": "broadcasted",
         "message": message,
         "severity": severity,
-        "recipients": len(manager.active_connections)
+        "recipients": len(manager.active_connections),
+        "authenticated": is_admin
     }
 
 

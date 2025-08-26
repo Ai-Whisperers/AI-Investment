@@ -19,6 +19,8 @@ router = APIRouter()
 def get_technical_analysis(
     symbol: str,
     period: int = Query(100, description="Number of days of price history to analyze"),
+    limit: Optional[int] = Query(None, description="Maximum number of results to return"),
+    offset: int = Query(0, description="Number of results to skip"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ) -> Dict[str, Any]:
@@ -39,7 +41,12 @@ def get_technical_analysis(
     
     try:
         # Execute use case - all business logic is encapsulated
-        result = use_case.execute(symbol=symbol, period=period)
+        result = use_case.execute(
+            symbol=symbol, 
+            period=period,
+            limit=limit,
+            offset=offset
+        )
         
         # Convert domain result to API response
         return {
@@ -48,7 +55,12 @@ def get_technical_analysis(
             'latest_price': result.latest_price,
             'indicators': result.indicators,
             'signals': result.signals,
-            'dates': result.dates
+            'dates': result.dates,
+            'pagination': {
+                'limit': limit,
+                'offset': offset,
+                'total': len(result.dates) if hasattr(result, 'dates') else 0
+            }
         }
         
     except AssetNotFoundError as e:
@@ -85,48 +97,40 @@ def get_rsi(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ) -> Dict[str, Any]:
-    """Get Relative Strength Index for an asset."""
-    # Get asset
-    asset = db.query(Asset).filter(Asset.symbol == symbol.upper()).first()
-    if not asset:
+    """Get Relative Strength Index for an asset.
+    
+    This endpoint is now a pure presentation layer following Clean Architecture.
+    All business logic has been moved to domain services and use cases.
+    """
+    from ..use_cases.technical_indicators_use_cases import (
+        GetRSIUseCase,
+        AssetNotFoundError as RSIAssetNotFoundError,
+        InsufficientDataError
+    )
+    
+    # Create and execute use case
+    use_case = GetRSIUseCase(db)
+    
+    try:
+        # Execute use case - all business logic is encapsulated
+        result = use_case.execute(symbol=symbol, period=period, days=days)
+        return result
+        
+    except RSIAssetNotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Asset {symbol} not found"
+            detail=str(e)
         )
-    
-    # Get price history
-    end_date = datetime.now().date()
-    start_date = end_date - timedelta(days=days)
-    
-    prices = db.query(Price).filter(
-        Price.asset_id == asset.id,
-        Price.date >= start_date
-    ).order_by(Price.date).all()
-    
-    if not prices:
+    except InsufficientDataError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"No price data available for {symbol}"
+            detail=str(e)
         )
-    
-    # Calculate RSI
-    price_series = pd.Series([p.close for p in prices])
-    rsi_values = TechnicalIndicators.calculate_rsi(price_series, period)
-    
-    # Determine signal
-    latest_rsi = rsi_values.iloc[-1]
-    if latest_rsi > 70:
-        signal = 'overbought'
-    elif latest_rsi < 30:
-        signal = 'oversold'
-    else:
-        signal = 'neutral'
-    
-    return {
-        'symbol': symbol.upper(),
-        'period': period,
-        'current_rsi': float(latest_rsi),
-        'signal': signal,
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error calculating RSI: {str(e)}"
+        )
         'rsi_values': rsi_values.to_list(),
         'dates': [p.date.strftime('%Y-%m-%d') for p in prices]
     }

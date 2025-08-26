@@ -3,7 +3,7 @@ from typing import Dict, List, Optional
 from datetime import datetime
 from sqlalchemy.orm import Session
 from app.models.signals import Signal
-from app.database import get_db
+from app.core.database import get_db
 import logging
 
 logger = logging.getLogger(__name__)

@@ -18,6 +18,13 @@ from .auth_use_cases import (
     UserInactiveError,
     ValidationError
 )
+from .google_auth_use_case import (
+    GoogleAuthUseCase,
+    GoogleAuthError,
+    GoogleTokenExchangeError,
+    GoogleUserInfoError,
+    NoEmailInGoogleAccountError
+)
 
 __all__ = [
     'GetTechnicalAnalysisUseCase',
@@ -28,5 +35,10 @@ __all__ = [
     'EmailAlreadyExistsError',
     'InvalidCredentialsError',
     'UserInactiveError',
-    'ValidationError'
+    'ValidationError',
+    'GoogleAuthUseCase',
+    'GoogleAuthError',
+    'GoogleTokenExchangeError',
+    'GoogleUserInfoError',
+    'NoEmailInGoogleAccountError'
 ]

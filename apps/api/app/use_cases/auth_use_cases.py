@@ -12,7 +12,7 @@ from ..services.domain.auth_service import (
     UserCredentials,
     AuthenticationResult
 )
-from ..models import User
+from ..repositories import IUserRepository, SQLUserRepository
 
 
 class EmailAlreadyExistsError(Exception):
@@ -47,7 +47,7 @@ class RegisterUserUseCase:
         Args:
             db: Database session for repository access
         """
-        self.db = db
+        self.user_repo: IUserRepository = SQLUserRepository(db)
         self.auth_service = AuthenticationService()
     
     def execute(self, email: str, password: str) -> AuthenticationResult:
@@ -73,14 +73,14 @@ class RegisterUserUseCase:
             raise ValidationError(f"Registration validation failed: {'; '.join(errors)}")
         
         # Check if email already exists
-        if self._email_exists(email):
+        if self.user_repo.exists_by_email(email):
             raise EmailAlreadyExistsError(f"Email {email} is already registered")
         
         # Hash password using domain service
         password_hash = self.auth_service.hash_password(password)
         
         # Create user in repository
-        user = self._create_user(email, password_hash)
+        user = self.user_repo.create(email=email, password_hash=password_hash)
         
         # Generate authentication result
         result = self.auth_service.create_authentication_result(
@@ -92,24 +92,6 @@ class RegisterUserUseCase:
         
         return result
     
-    def _email_exists(self, email: str) -> bool:
-        """Check if email already exists in repository.
-        
-        Private method for repository access.
-        """
-        existing = self.db.query(User).filter(User.email == email).first()
-        return existing is not None
-    
-    def _create_user(self, email: str, password_hash: str) -> User:
-        """Create user in repository.
-        
-        Private method for repository access.
-        """
-        user = User(email=email, password_hash=password_hash)
-        self.db.add(user)
-        self.db.commit()
-        self.db.refresh(user)
-        return user
 
 
 class LoginUserUseCase:
@@ -124,7 +106,7 @@ class LoginUserUseCase:
         Args:
             db: Database session for repository access
         """
-        self.db = db
+        self.user_repo: IUserRepository = SQLUserRepository(db)
         self.auth_service = AuthenticationService()
     
     def execute(self, email: str, password: str) -> AuthenticationResult:
@@ -142,13 +124,13 @@ class LoginUserUseCase:
             UserInactiveError: If user account is inactive
         """
         # Get user from repository
-        user = self._get_user_by_email(email)
+        user = self.user_repo.get_by_email(email)
         
         if not user:
             raise InvalidCredentialsError("Invalid email or password")
         
         # Verify credentials using domain service
-        is_valid = self.auth_service.verify_credentials(password, user.password_hash)
+        is_valid = self.auth_service.verify_credentials(password, user.password)
         if not is_valid:
             raise InvalidCredentialsError("Invalid email or password")
         
@@ -166,9 +148,3 @@ class LoginUserUseCase:
         
         return result
     
-    def _get_user_by_email(self, email: str) -> User:
-        """Get user by email from repository.
-        
-        Private method for repository access.
-        """
-        return self.db.query(User).filter(User.email == email).first()

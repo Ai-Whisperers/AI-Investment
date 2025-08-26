@@ -6,7 +6,7 @@ import logging
 from datetime import datetime
 
 import pandas as pd
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from ..core.config import settings
 from ..models.asset import Asset, Price
@@ -93,19 +93,26 @@ class StrategyService:
         }
 
     def _load_price_data(self) -> pd.DataFrame:
-        """Load price data from database into DataFrame."""
-        prices = self.db.query(Price).all()
+        """Load price data from database into DataFrame.
+        
+        Uses eager loading to avoid N+1 queries.
+        """
+        # Use eager loading with joinedload to fetch prices with their assets in one query
+        prices = (
+            self.db.query(Price)
+            .options(joinedload(Price.asset))  # Eager load the related asset
+            .join(Asset)
+            .filter(Asset.symbol != "^GSPC")  # Exclude S&P 500 benchmark
+            .all()
+        )
+        
         if not prices:
             return pd.DataFrame()
 
-        # Map asset_id -> symbol
-        assets = {a.id: a for a in self.db.query(Asset).all()}
-
-        # Create DataFrame
+        # Create DataFrame - asset is already loaded, no additional queries
         records = [
-            (p.date, assets[p.asset_id].symbol, p.close)
+            (p.date, p.asset.symbol, p.close)
             for p in prices
-            if p.asset_id in assets and assets[p.asset_id].symbol != "^GSPC"
         ]
 
         df = pd.DataFrame(records, columns=["date", "symbol", "close"])

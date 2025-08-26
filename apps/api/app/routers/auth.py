@@ -171,7 +171,18 @@ async def google_oauth_callback(
     state: str = Query(...),
     db: Session = Depends(get_db)
 ):
-    """Handle Google OAuth callback and exchange code for tokens."""
+    """Handle Google OAuth callback and exchange code for tokens.
+    
+    This endpoint is now a pure presentation layer following Clean Architecture.
+    All business logic has been moved to domain services and use cases.
+    """
+    from ..use_cases import (
+        GoogleAuthUseCase,
+        GoogleTokenExchangeError,
+        GoogleUserInfoError,
+        NoEmailInGoogleAccountError
+    )
+    
     if not settings.GOOGLE_CLIENT_ID or not settings.GOOGLE_CLIENT_SECRET:
         raise HTTPException(
             status_code=500,
@@ -194,104 +205,60 @@ async def google_oauth_callback(
             detail="Invalid or expired state parameter. Possible CSRF attack or session timeout."
         )
     
-    # Exchange authorization code for tokens
-    token_url = "https://oauth2.googleapis.com/token"
-    token_data = {
-        "code": code,
-        "client_id": settings.GOOGLE_CLIENT_ID,
-        "client_secret": settings.GOOGLE_CLIENT_SECRET,
-        "redirect_uri": settings.GOOGLE_REDIRECT_URI or f"{settings.FRONTEND_URL}/api/v1/auth/google/callback",
-        "grant_type": "authorization_code"
-    }
+    # Create and execute use case
+    use_case = GoogleAuthUseCase(db)
     
-    async with httpx.AsyncClient(timeout=10.0) as client:  # Add 10 second timeout
-        try:
-            # Exchange code for tokens
-            token_response = await client.post(token_url, data=token_data)
-            token_response.raise_for_status()
-            tokens = token_response.json()
-            
-            # Get user info from Google
-            userinfo_response = await client.get(
-                "https://www.googleapis.com/oauth2/v2/userinfo",
-                headers={"Authorization": f"Bearer {tokens['access_token']}"}
-            )
-            userinfo_response.raise_for_status()
-            userinfo = userinfo_response.json()
-            
-        except httpx.HTTPStatusError as e:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Failed to authenticate with Google: {e.response.text}"
-            )
-        except Exception as e:
-            raise HTTPException(
-                status_code=500,
-                detail=f"Error during Google authentication: {str(e)}"
-            )
-    
-    # Check if user exists
-    email = userinfo.get("email")
-    if not email:
-        raise HTTPException(status_code=400, detail="No email found in Google account")
-    
-    user = db.query(User).filter(User.email == email).first()
-    
-    if not user:
-        # Create new user from Google account
-        random_password = secrets.token_urlsafe(32)
-        user = User(
-            email=email,
-            password_hash=get_password_hash(random_password),
-            is_google_user=True,
+    try:
+        # Execute use case - all business logic is encapsulated
+        result = await use_case.handle_oauth_callback(code=code, state=state)
+        
+        # Generate JWT token from result
+        access_token = result.access_token
+        
+        # Redirect to frontend with token
+        frontend_url = settings.FRONTEND_URL or "http://localhost:3000"
+        redirect_url = f"{frontend_url}/auth/callback?token={access_token}"
+        
+        return RedirectResponse(url=redirect_url, status_code=302)
+        
+    except GoogleTokenExchangeError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except GoogleUserInfoError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except NoEmailInGoogleAccountError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Unexpected error during Google authentication: {str(e)}"
         )
-        db.add(user)
-        db.commit()
-        db.refresh(user)
-    elif not getattr(user, "is_google_user", False):
-        # Link existing account with Google
-        user.is_google_user = True
-        db.commit()
-    
-    # Generate JWT token
-    access_token = create_access_token({"sub": str(user.id)})
-    
-    # Redirect to frontend with token
-    frontend_url = settings.FRONTEND_URL or "http://localhost:3000"
-    redirect_url = f"{frontend_url}/auth/callback?token={access_token}"
-    
-    return RedirectResponse(url=redirect_url, status_code=302)
 
 
 @router.post("/google", response_model=TokenResponse)
 def google_auth(req: GoogleAuthRequest, db: Session = Depends(get_db)):
-    """
-    Alternative Google authentication endpoint for frontend-handled OAuth.
+    """Alternative Google authentication endpoint for frontend-handled OAuth.
+    
     The frontend should verify the Google token before sending.
+    This endpoint is now a pure presentation layer following Clean Architecture.
+    All business logic has been moved to domain services and use cases.
     """
-    # Check if user exists
-    user = db.query(User).filter(User.email == req.email).first()
-
-    if not user:
-        # Create new user from Google account
-        random_password = secrets.token_urlsafe(32)
-
-        user = User(
-            email=req.email,
-            password_hash=get_password_hash(random_password),
-            is_google_user=True,
+    from ..use_cases import GoogleAuthUseCase
+    
+    # Create and execute use case
+    use_case = GoogleAuthUseCase(db)
+    
+    try:
+        # Execute use case - all business logic is encapsulated
+        result = use_case.authenticate_google_user(email=req.email)
+        
+        # Return token response
+        return TokenResponse(access_token=result.access_token)
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Unexpected error during Google authentication: {str(e)}"
         )
-        db.add(user)
-        db.commit()
-        db.refresh(user)
-    elif not getattr(user, "is_google_user", False):
-        # Existing user but not a Google user - link the account
-        user.is_google_user = True
-        db.commit()
-
-    # Generate token
-    token = create_access_token({"sub": str(user.id)})
-    return TokenResponse(access_token=token)
 
 
 @router.get("/me")
