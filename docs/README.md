@@ -54,7 +54,8 @@ An **AI-powered investment platform** targeting **>30% annual returns** through 
 ### 🚨 URGENT: Technical Debt (READ FIRST)
 1. **[Technical Debt Audit](TECHNICAL_DEBT_AUDIT.md)** - Comprehensive architecture analysis
 2. **[Urgent Fixes Required](URGENT_FIXES_REQUIRED.md)** - Priority action items  
-3. **[Updated Index](INDEX.md)** - Complete navigation with technical debt sections
+3. **[Technical Debt TODO List](TECHNICAL_DEBT_TODO_LIST.md)** - **IMPLEMENTATION PLAN** - Step-by-step resolution guide
+4. **[Updated Index](INDEX.md)** - Complete navigation with technical debt sections
 
 ### 🔥 For Immediate Action
 1. **[Current Status](CURRENT_STATUS_2025-01-25.md)** - Real-time project state

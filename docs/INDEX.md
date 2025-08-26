@@ -24,6 +24,7 @@
 - **[Current Status](CURRENT_STATUS_2025-01-25.md)** - Real-time project state and todos
 - **[Technical Debt Audit](TECHNICAL_DEBT_AUDIT.md)** - 🚨 **CRITICAL** - Architecture analysis report  
 - **[Urgent Fixes Required](URGENT_FIXES_REQUIRED.md)** - 🚨 **CRITICAL** - Priority action items
+- **[Technical Debt TODO List](TECHNICAL_DEBT_TODO_LIST.md)** - 📋 **IMPLEMENTATION PLAN** - Exhaustive step-by-step resolution plan
 - **[Deployment Configuration](DEPLOYMENT_CONFIGURATION.md)** - All environment variables
 - **[Master Plan](MASTER_IMPLEMENTATION_PLAN.md)** - Zero-budget extreme returns strategy
 - **[API Reference](COMPLETE_API_REFERENCE_V2.md)** - 150+ endpoints documented
