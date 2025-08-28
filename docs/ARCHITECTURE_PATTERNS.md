@@ -1,4 +1,5 @@
 # Architecture Patterns Documentation
+**Last Updated**: January 28, 2025 - Added Service Orchestration Pattern
 
 ## Clean Architecture Implementation
 
@@ -230,6 +231,82 @@ class InvestmentEngine:
 3. **Extract Services**: Create focused service classes
 4. **Define Interfaces**: Create clear interfaces between services
 5. **Orchestrate**: Create an orchestrator that coordinates services
+
+## Service Orchestration Pattern
+
+### Overview
+The Service Orchestration Pattern coordinates multiple specialized services to accomplish complex tasks. An orchestrator acts as the conductor, delegating work to focused services while maintaining backward compatibility.
+
+### Implementation Example: Return Calculator
+
+#### ❌ BAD: Monolithic Calculator (673 lines)
+```python
+class ReturnCalculator:
+    """Single class handling all return calculations"""
+    def calculate_returns(self, values): ...
+    def total_return(self, values): ...
+    def annualized_return(self, values, days): ...
+    def calculate_daily_returns(self, prices): ...
+    def calculate_monthly_returns(self, prices): ...
+    def excess_returns(self, portfolio, benchmark): ...
+    def active_returns(self, portfolio, benchmark): ...
+    def calculate_time_weighted_return(self, values, dates, cash_flows): ...
+    def calculate_money_weighted_return(self, cash_flows): ...
+    # ... 30+ more methods in one class
+```
+
+#### ✅ GOOD: Orchestrated Services
+```python
+# 1. Basic Returns Service (145 lines)
+class BasicReturnCalculator:
+    """Handles simple and compound returns"""
+    def calculate_returns(self, values): ...
+    def total_return(self, values): ...
+    def calculate_log_returns(self, prices): ...
+
+# 2. Period Returns Service (214 lines)
+class PeriodReturnCalculator:
+    """Handles time-period specific calculations"""
+    def annualized_return(self, values, days): ...
+    def calculate_daily_returns(self, prices): ...
+    def calculate_ytd_return(self, prices): ...
+
+# 3. Benchmark Returns Service (137 lines)
+class BenchmarkReturnCalculator:
+    """Handles benchmark comparisons"""
+    def excess_returns(self, portfolio, benchmark): ...
+    def calculate_tracking_error(self, portfolio, benchmark): ...
+
+# 4. Advanced Returns Service (287 lines)
+class AdvancedReturnCalculator:
+    """Handles cash flows and complex metrics"""
+    def calculate_time_weighted_return(self, values, dates, cash_flows): ...
+    def calculate_money_weighted_return(self, cash_flows): ...
+
+# 5. Orchestrator (198 lines)
+class ReturnCalculator:
+    """Orchestrates specialized calculators"""
+    def __init__(self):
+        self.basic = BasicReturnCalculator()
+        self.period = PeriodReturnCalculator()
+        self.benchmark = BenchmarkReturnCalculator()
+        self.advanced = AdvancedReturnCalculator()
+    
+    # Delegate to appropriate service
+    def calculate_returns(self, values):
+        return self.basic.calculate_returns(values)
+    
+    def excess_returns(self, portfolio, benchmark):
+        return self.benchmark.excess_returns(portfolio, benchmark)
+```
+
+### Benefits of Service Orchestration
+
+1. **Separation of Concerns**: Each service handles one domain
+2. **Maintainability**: Focused services are easier to understand
+3. **Testability**: Services can be mocked independently
+4. **Backward Compatibility**: Orchestrator maintains existing API
+5. **Flexible Composition**: Services can be mixed and matched
 
 ## Benefits of Clean Architecture
 
