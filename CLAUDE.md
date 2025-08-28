@@ -1,5 +1,8 @@
 # CLAUDE.md - AI Assistant Context
 
+## 🔐 Security Configuration
+**CRITICAL**: See [SECURITY_CONFIGURATION.md](./docs/SECURITY_CONFIGURATION.md) for credential management guidelines. **NEVER commit secrets to version control.**
+
 ## Project Overview
 Waardhaven AutoIndex is a **LONG-TERM INVESTMENT PLATFORM** targeting **>30% annual returns** through AI-powered information gathering and analysis. 
 
