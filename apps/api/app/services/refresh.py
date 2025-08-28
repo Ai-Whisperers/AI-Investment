@@ -34,13 +34,26 @@ DEFAULT_ASSETS = [
 
 
 def ensure_assets(db: Session):
+    # Batch query: Get all existing symbols at once to avoid N+1 queries
+    all_symbols = [sym for sym, _, _ in DEFAULT_ASSETS + [
+        (settings.SP500_TICKER, "S&P 500", "Benchmark")
+    ]]
+    
+    # Single query to get all existing assets
+    existing_assets = db.query(Asset.symbol).filter(Asset.symbol.in_(all_symbols)).all()
+    existing_symbols = {asset.symbol for asset in existing_assets}
+    
+    # Bulk insert for missing assets
+    new_assets = []
     for sym, name, sector in DEFAULT_ASSETS + [
         (settings.SP500_TICKER, "S&P 500", "Benchmark")
     ]:
-        exists = db.query(Asset).filter(Asset.symbol == sym).first()
-        if not exists:
-            db.add(Asset(symbol=sym, name=name, sector=sector))
-    db.commit()
+        if sym not in existing_symbols:
+            new_assets.append(Asset(symbol=sym, name=name, sector=sector))
+    
+    if new_assets:
+        db.bulk_save_objects(new_assets)
+        db.commit()
 
 
 def refresh_all(db: Session, smart_mode: bool = True):
@@ -122,9 +135,16 @@ def refresh_all(db: Session, smart_mode: bool = True):
 
         # Prepare batch data for efficient upsert
         price_data = []
+        
+        # Batch query: Get all assets at once to avoid N+1 queries
+        symbols_in_df = list(price_df.columns.levels[0])
+        assets_dict = {
+            asset.symbol: asset 
+            for asset in db.query(Asset).filter(Asset.symbol.in_(symbols_in_df)).all()
+        }
 
-        for sym in price_df.columns.levels[0]:
-            asset = db.query(Asset).filter(Asset.symbol == sym).first()
+        for sym in symbols_in_df:
+            asset = assets_dict.get(sym)
             if not asset:
                 logger.warning(f"Asset {sym} not found in database")
                 continue

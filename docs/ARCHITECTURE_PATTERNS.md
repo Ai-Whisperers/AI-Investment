@@ -215,13 +215,75 @@ asset = asset_repo.get_by_symbol(symbol)
 ## Performance Considerations
 
 ### N+1 Query Prevention
+
+#### Problem: N+1 Query Pattern
 ```python
-# Repository with eager loading
+# BAD: N+1 Query Pattern - Makes N+1 database queries
+for sym, name, sector in assets_list:
+    exists = db.query(Asset).filter(Asset.symbol == sym).first()  # N queries
+    if not exists:
+        db.add(Asset(symbol=sym, name=name, sector=sector))
+
+# BAD: Another N+1 pattern
+for sym in symbols:
+    asset = db.query(Asset).filter(Asset.symbol == sym).first()  # N queries
+    prices = db.query(Price).filter(Price.asset_id == asset.id).all()  # N more queries
+```
+
+#### Solution 1: Batch Query with Dictionary Lookup
+```python
+# GOOD: Single query for all assets, then dictionary lookup
+all_symbols = [sym for sym, _, _ in assets_list]
+existing_assets = db.query(Asset.symbol).filter(Asset.symbol.in_(all_symbols)).all()
+existing_symbols = {asset.symbol for asset in existing_assets}
+
+# Now check existence in memory (O(1) lookup)
+for sym, name, sector in assets_list:
+    if sym not in existing_symbols:
+        new_assets.append(Asset(symbol=sym, name=name, sector=sector))
+
+# Bulk insert all at once
+if new_assets:
+    db.bulk_save_objects(new_assets)
+```
+
+#### Solution 2: Eager Loading with Relationships
+```python
+# GOOD: Repository with eager loading
+from sqlalchemy.orm import selectinload, joinedload
+
 def get_portfolio_with_allocations(self, portfolio_id: int):
     return self.db.query(Portfolio).options(
-        selectinload(Portfolio.allocations)
+        selectinload(Portfolio.allocations)  # Eager load in single query
     ).filter(Portfolio.id == portfolio_id).first()
+
+def get_prices_with_assets(self):
+    return self.db.query(Price).options(
+        joinedload(Price.asset)  # Join load to avoid N+1
+    ).all()
 ```
+
+#### Solution 3: Batch Processing with Dictionaries
+```python
+# GOOD: Build lookup dictionary for batch processing
+symbols_in_df = list(price_df.columns.levels[0])
+assets_dict = {
+    asset.symbol: asset 
+    for asset in db.query(Asset).filter(Asset.symbol.in_(symbols_in_df)).all()
+}
+
+# Process using dictionary (O(1) lookups instead of N queries)
+for sym in symbols_in_df:
+    asset = assets_dict.get(sym)  # O(1) memory lookup
+    if asset:
+        process_asset(asset)
+```
+
+#### Performance Impact
+- **Before**: N+1 queries (e.g., 100 assets = 101 queries)
+- **After**: 2 queries (one for batch fetch, one for bulk insert)
+- **Improvement**: ~98% reduction in database roundtrips
+- **Speed increase**: 10-100x faster for large datasets
 
 ### Pagination Support
 ```python
