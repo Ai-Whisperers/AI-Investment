@@ -146,6 +146,91 @@ def get_asset(
     # ...
 ```
 
+## Service Decomposition Pattern
+
+### Problem: Monolithic Service Classes
+Large service classes violating Single Responsibility Principle make code hard to maintain, test, and extend.
+
+#### Example of Monolithic Service (Anti-pattern)
+```python
+# BAD: 700+ line class with multiple responsibilities
+class InvestmentDecisionEngine:
+    def analyze_fundamentals(self, asset): ...
+    def analyze_technicals(self, asset): ...
+    def analyze_sentiment(self, asset): ...
+    def analyze_momentum(self, asset): ...
+    def analyze_risk(self, asset): ...
+    def aggregate_signals(self, signals): ...
+    def generate_recommendation(self, aggregated): ...
+    def identify_risks(self, asset): ...
+    def identify_catalysts(self, asset): ...
+    def screen_opportunities(self, symbols): ...
+    # ... many more methods
+```
+
+### Solution: Focused Service Classes
+Break down monolithic services into focused, composable services following Single Responsibility Principle.
+
+#### Decomposed Services (Best Practice)
+```python
+# GOOD: Focused services with single responsibilities
+
+# 1. Signal Analysis Service
+class SignalAnalyzer:
+    """Responsible ONLY for analyzing individual signals"""
+    def analyze_fundamentals(self, asset): ...
+    def analyze_technicals(self, asset): ...
+    def analyze_momentum(self, asset): ...
+    def analyze_risk(self, asset): ...
+
+# 2. Signal Aggregation Service  
+class SignalAggregator:
+    """Responsible ONLY for combining signals"""
+    def aggregate_signals(self, signals, horizon): ...
+    def calculate_position_size(self, signal, confidence): ...
+    def calculate_entry_exit_targets(self, price, signal): ...
+
+# 3. Recommendation Generation Service
+class RecommendationGenerator:
+    """Responsible ONLY for generating recommendations"""
+    def generate_recommendation(self, asset, signals): ...
+    def generate_rationale(self, signal_breakdown): ...
+    def identify_risks(self, asset): ...
+    def identify_catalysts(self, asset): ...
+
+# 4. Orchestration Service
+class InvestmentEngine:
+    """Orchestrates the specialized services"""
+    def __init__(self, db):
+        self.signal_analyzer = SignalAnalyzer(db)
+        self.signal_aggregator = SignalAggregator()
+        self.recommendation_generator = RecommendationGenerator()
+    
+    def analyze_investment(self, symbol):
+        # Orchestrate the services
+        signals = self.signal_analyzer.collect_signals(asset)
+        aggregated = self.signal_aggregator.aggregate(signals)
+        recommendation = self.recommendation_generator.generate(aggregated)
+        return recommendation
+```
+
+### Benefits of Service Decomposition
+
+1. **Single Responsibility**: Each service has one clear purpose
+2. **Testability**: Services can be tested in isolation
+3. **Maintainability**: Changes are localized to specific services
+4. **Reusability**: Services can be reused in different contexts
+5. **Scalability**: Services can be scaled independently
+6. **Team Collaboration**: Different team members can work on different services
+
+### Refactoring Strategy
+
+1. **Identify Responsibilities**: List all responsibilities of the monolithic class
+2. **Group Related Methods**: Group methods by responsibility
+3. **Extract Services**: Create focused service classes
+4. **Define Interfaces**: Create clear interfaces between services
+5. **Orchestrate**: Create an orchestrator that coordinates services
+
 ## Benefits of Clean Architecture
 
 ### 1. Testability

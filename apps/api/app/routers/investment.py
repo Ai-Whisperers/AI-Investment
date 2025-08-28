@@ -9,8 +9,8 @@ from pydantic import BaseModel, Field
 from ..core.database import get_db
 from ..models import User
 from ..utils.token_dep import get_current_user
-from ..services.investment_engine import (
-    InvestmentDecisionEngine,
+from ..services.investment import (
+    InvestmentEngine,
     InvestmentHorizon,
     SignalStrength
 )
@@ -61,7 +61,7 @@ def analyze_investment(
     - Risk assessment
     - Investment rationale
     """
-    engine = InvestmentDecisionEngine(db)
+    engine = InvestmentEngine(db)
     
     # Convert horizon string to enum
     horizon_map = {
@@ -72,7 +72,7 @@ def analyze_investment(
     horizon = horizon_map.get(request.horizon, InvestmentHorizon.LONG)
     
     try:
-        recommendation = engine.analyze_investment_opportunity(
+        recommendation = engine.analyze_investment(
             request.symbol,
             horizon
         )
@@ -130,7 +130,7 @@ def screen_opportunities(
     
     Returns top opportunities ranked by investment score.
     """
-    engine = InvestmentDecisionEngine(db)
+    engine = InvestmentEngine(db)
     
     filters = {
         'sectors': request.sectors,
@@ -263,7 +263,7 @@ def get_portfolio_recommendations(
     
     Returns diversified portfolio allocation suggestions.
     """
-    engine = InvestmentDecisionEngine(db)
+    engine = InvestmentEngine(db)
     
     # Define risk-based filters
     risk_filters = {
@@ -348,11 +348,11 @@ def get_investment_signals(
     
     Returns signals from technical, fundamental, and other sources.
     """
-    engine = InvestmentDecisionEngine(db)
+    engine = InvestmentEngine(db)
     
     try:
         # Get full analysis
-        recommendation = engine.analyze_investment_opportunity(
+        recommendation = engine.analyze_investment(
             symbol,
             InvestmentHorizon.LONG
         )
