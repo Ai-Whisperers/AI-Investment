@@ -9,7 +9,7 @@ from .index import Allocation, IndexValue
 from .portfolio import Portfolio
 from .strategy import MarketCapData, RiskMetrics, StrategyConfig
 from .user import User
-from .signals import Signal
+from .signals import Signal, ExtremeEvent, MemeVelocity, PatternDetection, InformationAsymmetry
 
 __all__ = [
     "Base",
@@ -23,4 +23,8 @@ __all__ = [
     "RiskMetrics",
     "MarketCapData",
     "Signal",
+    "ExtremeEvent",
+    "MemeVelocity",
+    "PatternDetection",
+    "InformationAsymmetry",
 ]

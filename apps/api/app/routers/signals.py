@@ -273,3 +273,192 @@ def get_daily_signal_brief(
             "Monitor Ukraine spring planting season impact"
         ]
     }
+
+
+# ============= EXTREME SIGNAL DETECTION ENDPOINTS =============
+
+@router.get("/extreme/active")
+async def get_active_extreme_signals(
+    limit: int = Query(20, le=100),
+    min_confidence: float = Query(0.7, ge=0, le=1),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get active extreme signals with >30% expected returns."""
+    from ..models import Signal
+    from ..services.signal_processor import SignalProcessor
+    
+    processor = SignalProcessor(db)
+    signals = processor.get_active_signals(limit)
+    
+    # Filter for high confidence extreme signals
+    extreme_signals = [
+        s for s in signals 
+        if s.get('confidence', 0) >= min_confidence 
+        and s.get('expected_return', 0) >= 0.30
+    ]
+    
+    return {
+        "signals": extreme_signals,
+        "count": len(extreme_signals),
+        "avg_expected_return": sum(s['expected_return'] for s in extreme_signals) / len(extreme_signals) if extreme_signals else 0,
+        "thesis": "Multi-layer pattern detection targeting >30% returns"
+    }
+
+
+@router.post("/extreme/scan")
+async def scan_for_extreme_signals(
+    data: Dict,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Scan data sources for extreme alpha opportunities."""
+    from ..services.signal_processor import SignalProcessor
+    
+    processor = SignalProcessor(db)
+    signals = await processor.scan_all_sources(data)
+    
+    return {
+        "signals_detected": len(signals),
+        "extreme_count": sum(1 for s in signals if s.signal_type == 'extreme'),
+        "meme_count": sum(1 for s in signals if s.signal_type == 'meme'),
+        "divergence_count": sum(1 for s in signals if s.signal_type == 'divergence'),
+        "top_signals": [s.to_dict() for s in signals[:5]]
+    }
+
+
+@router.get("/extreme/performance")
+async def get_extreme_signal_performance(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get performance metrics for extreme signals."""
+    from ..services.signal_processor import SignalProcessor
+    
+    processor = SignalProcessor(db)
+    performance = processor.get_signal_performance()
+    
+    return {
+        **performance,
+        "target_annual_return": "35%",
+        "strategy": "Compound small wins + extreme events"
+    }
+
+
+@router.get("/extreme/meme-velocity/{ticker}")
+async def get_meme_velocity_data(
+    ticker: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Track meme velocity for potential 50-400% returns."""
+    from ..models import MemeVelocity
+    from datetime import datetime, timedelta
+    
+    velocities = db.query(MemeVelocity).filter_by(
+        ticker=ticker.upper()
+    ).order_by(MemeVelocity.timestamp.desc()).limit(24).all()
+    
+    if not velocities:
+        return {
+            "ticker": ticker.upper(),
+            "status": "not_tracking",
+            "message": "No velocity data available"
+        }
+    
+    current = velocities[0]
+    
+    return {
+        "ticker": ticker.upper(),
+        "current_velocity": current.velocity,
+        "acceleration": current.acceleration,
+        "signal": "BUY" if current.acceleration > 5 else "WATCH",
+        "expected_return": "50-400%" if current.acceleration > 5 else "Monitor",
+        "platforms": {
+            "reddit": current.reddit_score,
+            "twitter": current.twitter_score,
+            "tiktok": current.tiktok_score,
+            "discord": current.discord_score,
+            "youtube": current.youtube_score
+        }
+    }
+
+
+@router.get("/extreme/forty-eight-hour")
+async def get_forty_eight_hour_signals(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get signals detected 48 hours before mainstream."""
+    from ..models import Signal
+    from datetime import datetime, timedelta
+    
+    signals = db.query(Signal).filter(
+        Signal.pattern_type == 'forty_eight_hour',
+        Signal.executed == False,
+        Signal.created_at > datetime.utcnow() - timedelta(hours=48)
+    ).order_by(Signal.confidence.desc()).all()
+    
+    return {
+        "signals": [
+            {
+                "ticker": s.ticker,
+                "confidence": s.confidence,
+                "expected_return": s.expected_return,
+                "hours_until_mainstream": max(0, 48 - (datetime.utcnow() - s.created_at).total_seconds() / 3600),
+                "sources": s.sources
+            } for s in signals
+        ],
+        "count": len(signals),
+        "strategy": "Early detection from 4chan, Discord, small subreddits"
+    }
+
+
+@router.get("/extreme/divergence")
+async def get_smart_money_divergence(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Find divergence between institutional and retail sentiment."""
+    from ..models import InformationAsymmetry
+    from datetime import datetime, timedelta
+    
+    asymmetries = db.query(InformationAsymmetry).filter(
+        InformationAsymmetry.resolved_at == None,
+        InformationAsymmetry.divergence_score > 0.4
+    ).order_by(InformationAsymmetry.divergence_score.desc()).limit(10).all()
+    
+    return {
+        "opportunities": [
+            {
+                "ticker": a.ticker,
+                "retail_sentiment": a.retail_sentiment,
+                "institutional_sentiment": a.institutional_sentiment,
+                "divergence": a.divergence_score,
+                "action": "BUY" if a.institutional_sentiment > a.retail_sentiment else "SHORT",
+                "entry_window": a.entry_window
+            } for a in asymmetries
+        ],
+        "count": len(asymmetries),
+        "thesis": "Follow smart money when retail disagrees"
+    }
+
+
+@router.get("/extreme/strategy-returns")
+async def calculate_strategy_returns(
+    initial_capital: float = Query(100000, description="Starting capital")
+):
+    """Calculate expected returns from extreme signal strategy."""
+    from ..services.signal_processor import ExtremeReturnsStrategy
+    
+    strategy = ExtremeReturnsStrategy()
+    
+    compound = strategy.compound_small_wins(initial_capital)
+    extreme = strategy.extreme_event_strategy(initial_capital)
+    
+    return {
+        "compound_strategy": compound,
+        "extreme_strategy": extreme,
+        "recommendation": "Mix both strategies for optimal risk-adjusted returns",
+        "target": "35%+ annual returns"
+    }
