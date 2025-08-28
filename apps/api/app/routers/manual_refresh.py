@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from ..core.database import get_db
 from ..models.asset import Price
 from ..models.index import IndexValue
+from ..utils.admin_auth import require_admin_token
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -16,11 +17,14 @@ router = APIRouter()
 
 @router.post("/trigger-refresh")
 def trigger_manual_refresh(
-    background_tasks: BackgroundTasks, db: Session = Depends(get_db)
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    is_admin: bool = Depends(require_admin_token)
 ):
     """
-    Trigger a manual refresh without requiring admin token (for debugging).
-    This endpoint should be removed or secured in production.
+    Trigger a manual refresh of all data.
+    
+    Requires admin authentication via Bearer token.
     """
     try:
         # Check current state
@@ -43,10 +47,15 @@ def trigger_manual_refresh(
 
 @router.post("/smart-refresh")
 def trigger_smart_refresh(
-    background_tasks: BackgroundTasks, mode: str = "auto", db: Session = Depends(get_db)
+    background_tasks: BackgroundTasks,
+    mode: str = "auto",
+    db: Session = Depends(get_db),
+    is_admin: bool = Depends(require_admin_token)
 ):
     """
     Trigger smart refresh with rate limiting protection.
+    
+    Requires admin authentication via Bearer token.
 
     Modes: auto, full, minimal, cached
     """
@@ -130,9 +139,14 @@ def run_smart_refresh_with_logging(db: Session, mode: str = "auto"):
 
 
 @router.post("/minimal-refresh")
-def minimal_data_refresh(db: Session = Depends(get_db)):
+def minimal_data_refresh(
+    db: Session = Depends(get_db),
+    is_admin: bool = Depends(require_admin_token)
+):
     """
     Perform a minimal refresh with just a few days of data for testing.
+    
+    Requires admin authentication via Bearer token.
     """
     try:
         from datetime import date, timedelta

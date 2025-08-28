@@ -77,17 +77,40 @@ echo ".env.*" >> .gitignore
 4. Notify team and users if data was compromised
 5. Document incident and prevention measures
 
+## Admin Endpoint Security
+
+### Protected Admin Endpoints
+All administrative endpoints require Bearer token authentication:
+
+- `/api/v1/manual-refresh/trigger-refresh` - Full data refresh
+- `/api/v1/manual-refresh/smart-refresh` - Rate-limited refresh
+- `/api/v1/manual-refresh/minimal-refresh` - Test data refresh
+- `/api/v1/ws/stats` - WebSocket statistics
+- `/api/v1/ws/broadcast/system` - System announcements
+- `/api/v1/metrics/clear-market-cache` - Cache management
+- `/api/v1/tasks/refresh` - Task-based refresh
+
+### Admin Authentication
+```python
+# Required header format
+Authorization: Bearer <ADMIN_TOKEN>
+
+# Example curl command
+curl -X POST https://api.example.com/api/v1/manual-refresh/trigger-refresh \
+  -H "Authorization: Bearer your-admin-token-here"
+```
+
 ## Compliance Checklist
 
-- [ ] All `.env` files in `.gitignore`
-- [ ] No hardcoded secrets in code
-- [ ] Production credentials in environment variables only
+- [x] All `.env` files in `.gitignore`
+- [x] No hardcoded secrets in code
+- [x] Production credentials in environment variables only
 - [ ] Regular credential rotation schedule
 - [ ] Monitoring for exposed secrets (GitHub scanning)
 - [ ] Encrypted database connections
-- [ ] HTTPS enforced for all endpoints
-- [ ] Rate limiting implemented
-- [ ] Admin endpoints properly authenticated
+- [x] HTTPS enforced for all endpoints
+- [x] Rate limiting implemented
+- [x] Admin endpoints properly authenticated
 
 ## Tools for Secret Scanning
 

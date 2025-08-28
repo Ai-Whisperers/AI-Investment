@@ -95,6 +95,50 @@ class TestAdminAuth:
             assert await verify_admin_websocket("any_token") is False
 
 
+class TestManualRefreshEndpoints:
+    """Test admin-protected manual refresh endpoints."""
+    
+    def test_trigger_refresh_without_auth(self):
+        """Test trigger-refresh endpoint requires authentication."""
+        client = TestClient(app)
+        
+        response = client.post("/api/v1/manual-refresh/trigger-refresh")
+        assert response.status_code in [401, 503]  # 401 if configured, 503 if not
+    
+    def test_smart_refresh_without_auth(self):
+        """Test smart-refresh endpoint requires authentication."""
+        client = TestClient(app)
+        
+        response = client.post("/api/v1/manual-refresh/smart-refresh")
+        assert response.status_code in [401, 503]
+    
+    def test_minimal_refresh_without_auth(self):
+        """Test minimal-refresh endpoint requires authentication."""
+        client = TestClient(app)
+        
+        response = client.post("/api/v1/manual-refresh/minimal-refresh")
+        assert response.status_code in [401, 503]
+    
+    def test_refresh_with_invalid_token(self):
+        """Test refresh endpoints reject invalid token."""
+        client = TestClient(app)
+        
+        with patch('app.utils.admin_auth.settings') as mock_settings:
+            mock_settings.ADMIN_TOKEN = "test_admin_token"
+            
+            response = client.post(
+                "/api/v1/manual-refresh/trigger-refresh",
+                headers={"Authorization": "Bearer wrong_token"}
+            )
+            assert response.status_code == 403
+            
+            response = client.post(
+                "/api/v1/manual-refresh/smart-refresh",
+                headers={"Authorization": "Bearer wrong_token"}
+            )
+            assert response.status_code == 403
+
+
 class TestWebSocketAdminEndpoints:
     """Test admin-protected WebSocket endpoints."""
     
