@@ -1,5 +1,5 @@
 # Architecture Patterns Documentation
-**Last Updated**: January 28, 2025 - Added Service Orchestration Pattern
+**Last Updated**: January 28, 2025 - Enhanced Service Orchestration Pattern with Weight Calculator Example
 
 ## Clean Architecture Implementation
 
@@ -307,6 +307,58 @@ class ReturnCalculator:
 3. **Testability**: Services can be mocked independently
 4. **Backward Compatibility**: Orchestrator maintains existing API
 5. **Flexible Composition**: Services can be mixed and matched
+
+### Weight Calculator Refactoring Example
+
+#### Before: Monolithic Weight Calculator (663 lines)
+```python
+class WeightCalculator:
+    """Single class handling all weight calculation strategies"""
+    def equal_weights(self, assets): ...
+    def market_cap_weights(self, market_caps): ...
+    def momentum_weights(self, returns, lookback): ...
+    def risk_parity_weights(self, returns): ...
+    def minimum_variance_weights(self, returns): ...
+    def calculate_maximum_sharpe_weights(self, assets, returns): ...
+    def apply_constraints(self, weights, constraints): ...
+    def combine_weights(self, momentum_w, market_cap_w, risk_parity_w): ...
+    # ... 20+ more methods in one class
+```
+
+#### After: Orchestrated Weight Services
+```python
+# 1. Basic Weights (173 lines)
+class BasicWeightCalculator:
+    """Equal weights, market cap weights, position sizing"""
+    
+# 2. Momentum Weights (176 lines)  
+class MomentumWeightCalculator:
+    """Momentum and trend-following strategies"""
+    
+# 3. Risk Weights (251 lines)
+class RiskWeightCalculator:
+    """Risk parity, minimum variance, diversification"""
+    
+# 4. Optimization Weights (220 lines)
+class OptimizationWeightCalculator:
+    """Sharpe ratio, mean-variance, Kelly criterion"""
+    
+# 5. Constraint Manager (249 lines)
+class ConstraintWeightManager:
+    """Apply constraints, combine strategies, filter positions"""
+    
+# 6. Weight Calculator Orchestrator (212 lines)
+class WeightCalculator:
+    """Orchestrates all weight calculation services"""
+    def __init__(self):
+        self.basic = BasicWeightCalculator()
+        self.momentum = MomentumWeightCalculator()
+        self.risk = RiskWeightCalculator()
+        self.optimization = OptimizationWeightCalculator()
+        self.constraints = ConstraintWeightManager()
+```
+
+This refactoring improved maintainability by separating different weighting strategies into focused services.
 
 ## Benefits of Clean Architecture
 
