@@ -8,6 +8,8 @@ from datetime import datetime, timedelta
 
 from ..core.database import get_db
 from ..models import Asset, Price, User
+from ..repositories.asset_repository import SQLAssetRepository
+from ..repositories.price_repository import SQLPriceRepository
 from ..utils.token_dep import get_current_user
 from ..services.technical_indicators import TechnicalIndicators
 from ..services.fundamental_analysis import FundamentalAnalysis
@@ -131,9 +133,6 @@ def get_rsi(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error calculating RSI: {str(e)}"
         )
-        'rsi_values': rsi_values.to_list(),
-        'dates': [p.date.strftime('%Y-%m-%d') for p in prices]
-    }
 
 
 @router.get("/technical/{symbol}/macd")
@@ -147,22 +146,27 @@ def get_macd(
     current_user: User = Depends(get_current_user)
 ) -> Dict[str, Any]:
     """Get MACD indicator for an asset."""
-    # Get asset
-    asset = db.query(Asset).filter(Asset.symbol == symbol.upper()).first()
+    # Initialize repositories
+    asset_repo = SQLAssetRepository(db)
+    price_repo = SQLPriceRepository(db)
+    
+    # Get asset using repository
+    asset = asset_repo.get_by_symbol(symbol)
     if not asset:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Asset {symbol} not found"
         )
     
-    # Get price history
+    # Get price history using repository
     end_date = datetime.now().date()
     start_date = end_date - timedelta(days=days)
     
-    prices = db.query(Price).filter(
-        Price.asset_id == asset.id,
-        Price.date >= start_date
-    ).order_by(Price.date).all()
+    prices = price_repo.get_history(
+        asset_id=asset.id,
+        start_date=start_date,
+        end_date=end_date
+    )
     
     if not prices:
         raise HTTPException(
@@ -208,8 +212,12 @@ def get_bollinger_bands(
     current_user: User = Depends(get_current_user)
 ) -> Dict[str, Any]:
     """Get Bollinger Bands for an asset."""
-    # Get asset
-    asset = db.query(Asset).filter(Asset.symbol == symbol.upper()).first()
+    # Initialize repositories
+    asset_repo = SQLAssetRepository(db)
+    price_repo = SQLPriceRepository(db)
+    
+    # Get asset using repository
+    asset = asset_repo.get_by_symbol(symbol)
     if not asset:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -220,10 +228,11 @@ def get_bollinger_bands(
     end_date = datetime.now().date()
     start_date = end_date - timedelta(days=days)
     
-    prices = db.query(Price).filter(
-        Price.asset_id == asset.id,
-        Price.date >= start_date
-    ).order_by(Price.date).all()
+    prices = price_repo.get_history(
+        asset_id=asset.id,
+        start_date=start_date,
+        end_date=end_date
+    )
     
     if not prices:
         raise HTTPException(
@@ -270,8 +279,12 @@ def get_support_resistance(
     current_user: User = Depends(get_current_user)
 ) -> Dict[str, Any]:
     """Identify support and resistance levels for an asset."""
-    # Get asset
-    asset = db.query(Asset).filter(Asset.symbol == symbol.upper()).first()
+    # Initialize repositories
+    asset_repo = SQLAssetRepository(db)
+    price_repo = SQLPriceRepository(db)
+    
+    # Get asset using repository
+    asset = asset_repo.get_by_symbol(symbol)
     if not asset:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -282,10 +295,11 @@ def get_support_resistance(
     end_date = datetime.now().date()
     start_date = end_date - timedelta(days=days)
     
-    prices = db.query(Price).filter(
-        Price.asset_id == asset.id,
-        Price.date >= start_date
-    ).order_by(Price.date).all()
+    prices = price_repo.get_history(
+        asset_id=asset.id,
+        start_date=start_date,
+        end_date=end_date
+    )
     
     if not prices:
         raise HTTPException(
@@ -342,18 +356,20 @@ def get_valuation_metrics(
     current_user: User = Depends(get_current_user)
 ) -> Dict[str, Any]:
     """Get valuation metrics for an asset."""
-    # Get asset
-    asset = db.query(Asset).filter(Asset.symbol == symbol.upper()).first()
+    # Initialize repositories
+    asset_repo = SQLAssetRepository(db)
+    price_repo = SQLPriceRepository(db)
+    
+    # Get asset using repository
+    asset = asset_repo.get_by_symbol(symbol)
     if not asset:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Asset {symbol} not found"
         )
     
-    # Get latest price
-    latest_price = db.query(Price).filter(
-        Price.asset_id == asset.id
-    ).order_by(Price.date.desc()).first()
+    # Get latest price using repository
+    latest_price = price_repo.get_latest(asset_id=asset.id)
     
     if not latest_price:
         raise HTTPException(
@@ -389,8 +405,12 @@ def get_growth_metrics(
     current_user: User = Depends(get_current_user)
 ) -> Dict[str, Any]:
     """Get growth metrics for an asset."""
-    # Get asset
-    asset = db.query(Asset).filter(Asset.symbol == symbol.upper()).first()
+    # Initialize repositories
+    asset_repo = SQLAssetRepository(db)
+    price_repo = SQLPriceRepository(db)
+    
+    # Get asset using repository
+    asset = asset_repo.get_by_symbol(symbol)
     if not asset:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -425,8 +445,12 @@ def get_financial_health(
     current_user: User = Depends(get_current_user)
 ) -> Dict[str, Any]:
     """Get financial health assessment for an asset."""
-    # Get asset
-    asset = db.query(Asset).filter(Asset.symbol == symbol.upper()).first()
+    # Initialize repositories
+    asset_repo = SQLAssetRepository(db)
+    price_repo = SQLPriceRepository(db)
+    
+    # Get asset using repository
+    asset = asset_repo.get_by_symbol(symbol)
     if not asset:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -465,15 +489,23 @@ def screen_technical(
     current_user: User = Depends(get_current_user)
 ) -> List[Dict[str, Any]]:
     """Screen assets based on technical indicators."""
+    # Initialize repositories
+    asset_repo = SQLAssetRepository(db)
+    price_repo = SQLPriceRepository(db)
+    
     # Get all assets with recent price data
-    assets = db.query(Asset).filter(Asset.symbol.isnot(None)).limit(limit).all()
+    assets = asset_repo.get_all(limit=limit)
     
     results = []
     for asset in assets:
-        # Get recent prices
-        prices = db.query(Price).filter(
-            Price.asset_id == asset.id
-        ).order_by(Price.date.desc()).limit(200).all()
+        if not asset.symbol:  # Skip assets without symbols
+            continue
+        # Get recent prices using repository
+        prices = price_repo.get_history(
+            asset_id=asset.id,
+            limit=200
+        )
+        prices = list(reversed(prices))  # Repository returns in ascending order
         
         if len(prices) < 14:  # Need at least 14 days for RSI
             continue
@@ -522,19 +554,27 @@ def screen_value_stocks(
     current_user: User = Depends(get_current_user)
 ) -> List[Dict[str, Any]]:
     """Screen for value stocks based on fundamental metrics."""
-    query = db.query(Asset)
+    # Initialize repository
+    asset_repo = SQLAssetRepository(db)
     
-    # Apply filters
+    # Note: For complex filtering, we'll get all assets and filter in memory
+    # In production, this should be moved to a dedicated screening repository method
+    all_assets = asset_repo.get_all()
+    
+    # Apply filters in memory
+    filtered_assets = all_assets
+    
     if max_pe:
-        query = query.filter(Asset.pe_ratio <= max_pe)
+        filtered_assets = [a for a in filtered_assets if a.pe_ratio and a.pe_ratio <= max_pe]
     
     if min_dividend_yield:
-        query = query.filter(Asset.dividend_yield >= min_dividend_yield)
+        filtered_assets = [a for a in filtered_assets if a.dividend_yield and a.dividend_yield >= min_dividend_yield]
     
     if sectors:
-        query = query.filter(Asset.sector.in_(sectors))
+        filtered_assets = [a for a in filtered_assets if a.sector in sectors]
     
-    assets = query.limit(limit).all()
+    # Limit results
+    assets = filtered_assets[:limit]
     
     results = []
     for asset in assets:
