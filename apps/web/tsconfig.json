@@ -21,7 +21,7 @@
     "types": ["jest", "@testing-library/jest-dom"],
     "paths": {
       "@/*": [
-        "./*"
+        "./app/*"
       ]
     },
     "plugins": [

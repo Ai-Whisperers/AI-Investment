@@ -193,9 +193,18 @@ class InvestmentEngine:
         """
         recommendations = []
         
+        # PERFORMANCE OPTIMIZATION: Batch load all assets at once (fixes N+1 query)
+        assets_dict = self._get_assets_batch(symbols)
+        
         for symbol in symbols:
             try:
-                analysis = self.analyze_investment(symbol, horizon, risk_tolerance)
+                asset = assets_dict.get(symbol.upper())
+                if not asset:
+                    logger.warning(f"Asset {symbol} not found in batch query")
+                    continue
+                
+                # Use pre-loaded asset data instead of individual query
+                analysis = self._analyze_investment_with_asset(asset, horizon, risk_tolerance)
                 
                 if "error" not in analysis and analysis.get("recommendation"):
                     rec_dict = analysis["recommendation"]
@@ -296,3 +305,108 @@ class InvestmentEngine:
         except Exception as e:
             logger.error(f"Error calculating volatility for {asset.symbol}: {e}")
             return 0.25  # Default volatility
+    
+    def _get_assets_batch(self, symbols: List[str]) -> Dict[str, Asset]:
+        """
+        PERFORMANCE OPTIMIZATION: Batch load multiple assets at once.
+        Prevents N+1 queries by loading all assets in a single query.
+        
+        Args:
+            symbols: List of symbols to load
+            
+        Returns:
+            Dictionary mapping uppercase symbol to Asset object
+        """
+        try:
+            # Single query to load all assets - prevents N+1 problem
+            normalized_symbols = [symbol.upper() for symbol in symbols]
+            assets = self.db.query(Asset).filter(
+                Asset.symbol.in_(normalized_symbols)
+            ).all()
+            
+            # Return as dictionary for O(1) lookups
+            return {asset.symbol: asset for asset in assets}
+            
+        except Exception as e:
+            logger.error(f"Error batch loading assets {symbols}: {e}")
+            return {}
+    
+    def _analyze_investment_with_asset(
+        self,
+        asset: Asset,
+        horizon: InvestmentHorizon = InvestmentHorizon.LONG,
+        risk_tolerance: str = "moderate"
+    ) -> Dict[str, Any]:
+        """
+        Analyze investment using pre-loaded asset data.
+        This method avoids the N+1 query by accepting the asset directly.
+        
+        Args:
+            asset: Pre-loaded Asset object
+            horizon: Investment time horizon
+            risk_tolerance: Risk tolerance level
+            
+        Returns:
+            Complete investment analysis and recommendation
+        """
+        try:
+            symbol = asset.symbol
+            
+            # Collect all signals
+            signals = self._collect_signals(asset)
+            
+            if not signals:
+                return {
+                    "error": "Insufficient data for analysis",
+                    "recommendation": None
+                }
+            
+            # Aggregate signals
+            aggregated = self.signal_aggregator.aggregate_signals(signals, horizon)
+            
+            # Calculate position sizing
+            position_size = self.signal_aggregator.calculate_position_size(
+                aggregated["overall_signal"],
+                aggregated["confidence"],
+                risk_tolerance
+            )
+            
+            # Calculate price targets
+            current_price = self._get_current_price(asset)
+            volatility = self._calculate_volatility(asset)
+            
+            price_targets = self.signal_aggregator.calculate_entry_exit_targets(
+                current_price,
+                aggregated["overall_signal"],
+                volatility,
+                horizon
+            )
+            
+            # Generate recommendation
+            recommendation = self.recommendation_generator.generate_recommendation(
+                asset,
+                aggregated,
+                price_targets,
+                position_size
+            )
+            
+            return {
+                "symbol": symbol,
+                "current_price": current_price,
+                "analysis": {
+                    "signals": {s.signal_type: s.strength.value for s in signals},
+                    "aggregated": aggregated,
+                    "price_targets": price_targets,
+                    "position_size": position_size,
+                    "risk_tolerance": risk_tolerance
+                },
+                "recommendation": recommendation.to_dict(),
+                "timestamp": datetime.utcnow().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"Error analyzing investment for {asset.symbol}: {e}")
+            return {
+                "error": str(e),
+                "recommendation": None
+            }

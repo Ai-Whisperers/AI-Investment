@@ -113,7 +113,7 @@ export default function ExtremeSignalsPage() {
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-2">🚀 Extreme Alpha Signals</h1>
         <p className="text-gray-600">
-          Targeting >30% returns through information asymmetry exploitation
+          Targeting {'>'}30% returns through information asymmetry exploitation
         </p>
       </div>
 
