@@ -1,10 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from ..core.database import get_db
-from ..models.asset import Asset, Price
-from ..models.index import Allocation, IndexValue
+from ..repositories.index_repository import IndexRepository
 from ..models.user import User
 from ..schemas.index import (
     AllocationItem,
@@ -26,18 +24,14 @@ router = APIRouter()
 def get_current_index(
     db: Session = Depends(get_db), user: User = Depends(get_current_user)
 ):
-    # Latest allocation date
-    latest_date = db.query(func.max(Allocation.date)).scalar()
+    # Use repository for allocation queries
+    repo = IndexRepository(db)
+    latest_date = repo.get_latest_allocation_date()
     if latest_date is None:
         raise HTTPException(
             status_code=404, detail="No allocations computed yet. Run tasks/refresh."
         )
-    allocations = (
-        db.query(Allocation, Asset)
-        .join(Asset, Allocation.asset_id == Asset.id)
-        .filter(Allocation.date == latest_date)
-        .all()
-    )
+    allocations = repo.get_current_allocations()
     items = []
     for alloc, asset in allocations:
         items.append(
@@ -55,7 +49,9 @@ def get_current_index(
 @router.get("/history", response_model=IndexHistoryResponse)
 @cache_for_1hour(CacheManager.CACHE_PREFIXES["index_history"])
 def get_history(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    rows = db.query(IndexValue).order_by(IndexValue.date.asc()).all()
+    # Use repository for index history
+    repo = IndexRepository(db)
+    rows = repo.get_index_history()
     if not rows:
         raise HTTPException(
             status_code=404, detail="No index history. Run tasks/refresh."
@@ -71,9 +67,9 @@ def simulate(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    # Get index series
-    q = db.query(IndexValue).order_by(IndexValue.date.asc())
-    series = q.all()
+    # Get index series using repository
+    repo = IndexRepository(db)
+    series = repo.get_index_history()
     if not series:
         raise HTTPException(
             status_code=404, detail="No index history. Run tasks/refresh."
@@ -137,16 +133,15 @@ def get_asset_history(
     symbol: str, db: Session = Depends(get_db), user: User = Depends(get_current_user)
 ):
     """Get price history for a specific asset, normalized to base 100."""
-    asset = db.query(Asset).filter(Asset.symbol == symbol).first()
+    # Use repository for asset and price queries
+    repo = IndexRepository(db)
+    asset = repo.get_asset_by_symbol(symbol)
     if not asset:
         raise HTTPException(status_code=404, detail=f"Asset {symbol} not found")
 
-    rows = (
-        db.query(Price)
-        .filter(Price.asset_id == asset.id)
-        .order_by(Price.date.asc())
-        .all()
-    )
+    # For asset prices, we need all historical data, so use a simple date filter
+    from datetime import date
+    rows = repo.get_asset_prices_since_date(asset.id, date(2020, 1, 1))
     if not rows:
         raise HTTPException(status_code=404, detail=f"No price history for {symbol}")
 

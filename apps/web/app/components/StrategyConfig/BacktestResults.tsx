@@ -65,7 +65,7 @@ export default function BacktestResults({ metrics }: BacktestResultsProps) {
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
         <MetricCard
           label="Volatility"
-          value={`${(latestMetric.volatility * 100).toFixed(1)}%`}
+          value={`${((latestMetric.volatility ?? 0) * 100).toFixed(1)}%`}
           description="Annualized std dev"
           delay={0.5}
           colorClass="text-neutral-300"
@@ -74,7 +74,7 @@ export default function BacktestResults({ metrics }: BacktestResultsProps) {
         
         <MetricCard
           label="Beta (S&P 500)"
-          value={latestMetric.beta_sp500.toFixed(2)}
+          value={(latestMetric.beta_sp500 ?? 0).toFixed(2)}
           description="Market correlation"
           delay={0.6}
           colorClass="text-neutral-300"
@@ -83,7 +83,7 @@ export default function BacktestResults({ metrics }: BacktestResultsProps) {
         
         <MetricCard
           label="Correlation"
-          value={latestMetric.correlation_sp500.toFixed(2)}
+          value={(latestMetric.correlation_sp500 ?? 0).toFixed(2)}
           description="S&P 500 correlation"
           delay={0.7}
           colorClass="text-neutral-300"

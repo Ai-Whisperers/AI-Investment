@@ -3,12 +3,10 @@ import traceback
 from datetime import datetime
 
 from fastapi import APIRouter, BackgroundTasks, Depends
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from ..core.database import get_db
-from ..models.asset import Price
-from ..models.index import IndexValue
+from ..repositories.system_status_repository import SystemStatusRepository
 from ..utils.admin_auth import require_admin_token
 
 logger = logging.getLogger(__name__)
@@ -27,9 +25,9 @@ def trigger_manual_refresh(
     Requires admin authentication via Bearer token.
     """
     try:
-        # Check current state
-        index_count = db.query(func.count()).select_from(IndexValue).scalar()
-        price_count = db.query(func.count()).select_from(Price).scalar()
+        # Use repository for status queries
+        repo = SystemStatusRepository(db)
+        current_counts = repo.get_refresh_status_counts()
 
         # Add refresh to background tasks
         background_tasks.add_task(run_refresh_with_logging, db)
@@ -37,7 +35,7 @@ def trigger_manual_refresh(
         return {
             "status": "REFRESH_STARTED",
             "message": "Refresh has been triggered in the background",
-            "current_state": {"index_values": index_count, "prices": price_count},
+            "current_state": current_counts,
             "note": "Check /api/v1/diagnostics/database-status in 30-60 seconds to see results",
         }
     except Exception as e:
@@ -95,12 +93,12 @@ def run_refresh_with_logging(db: Session):
 
         refresh_all(db)
 
-        # Verify results
-        index_count = db.query(func.count()).select_from(IndexValue).scalar()
-        price_count = db.query(func.count()).select_from(Price).scalar()
+        # Verify results using repository
+        repo = SystemStatusRepository(db)
+        final_counts = repo.get_refresh_status_counts()
 
         logger.info(
-            f"Refresh completed. Index values: {index_count}, Prices: {price_count}"
+            f"Refresh completed. Index values: {final_counts['index_values']}, Prices: {final_counts['prices']}"
         )
 
     except Exception as e:
@@ -125,12 +123,12 @@ def run_smart_refresh_with_logging(db: Session, mode: str = "auto"):
             refresh_all(db)
             result = {"success": True, "mode": "fallback"}
 
-        # Verify results
-        index_count = db.query(func.count()).select_from(IndexValue).scalar()
-        price_count = db.query(func.count()).select_from(Price).scalar()
+        # Verify results using repository
+        repo = SystemStatusRepository(db)
+        final_counts = repo.get_refresh_status_counts()
 
         logger.info(
-            f"Smart refresh result - Index values: {index_count}, Prices: {price_count}"
+            f"Smart refresh result - Index values: {final_counts['index_values']}, Prices: {final_counts['prices']}"
         )
 
     except Exception as e:
@@ -248,8 +246,10 @@ def minimal_data_refresh(
 
             db.commit()
 
-            index_count = db.query(func.count()).select_from(IndexValue).scalar()
-            results["steps"].append({"step": "index_values", "created": index_count})
+            # Use repository for count query
+            repo = SystemStatusRepository(db)
+            counts = repo.get_refresh_status_counts()
+            results["steps"].append({"step": "index_values", "created": counts["index_values"]})
 
             results["status"] = "SUCCESS"
             results["message"] = "Minimal data refresh completed"
