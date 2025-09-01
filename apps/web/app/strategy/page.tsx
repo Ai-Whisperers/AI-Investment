@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { strategyService } from '../services/api/strategy';
-import { Card } from '../components/shared/Card';
-import { Button } from '../components/shared/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { LoadingSkeleton } from '../components/shared/LoadingSkeleton';
 
 interface StrategyConfig {

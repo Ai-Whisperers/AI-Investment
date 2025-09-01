@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect } from 'react';
 import { useDashboardData } from '../hooks/useDashboardData';
-import { useSimulation } from '../hooks/useSimulation';
+import { useSimulation } from '../../hooks/useSimulation';
 import { useChartControls } from '../hooks/useChartControls';
 
 interface DashboardContextType {
