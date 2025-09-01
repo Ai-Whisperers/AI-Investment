@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -9,7 +9,7 @@ import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 // Disable static generation for this dynamic OAuth callback page
 export const dynamic = 'force-dynamic';
 
-export default function AuthCallbackPage() {
+function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams?.get("token") ?? null;
@@ -101,5 +101,26 @@ export default function AuthCallbackPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="text-center">Processing Authentication...</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <Loader2 className="h-16 w-16 animate-spin text-primary mx-auto" />
+            </CardContent>
+          </Card>
+        </div>
+      }
+    >
+      <AuthCallbackContent />
+    </Suspense>
   );
 }
