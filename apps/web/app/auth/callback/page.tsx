@@ -6,11 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 
+// Disable static generation for this dynamic OAuth callback page
+export const dynamic = 'force-dynamic';
+
 export default function AuthCallbackPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const token = searchParams.get("token");
-  const error = searchParams.get("error");
+  const token = searchParams?.get("token") ?? null;
+  const error = searchParams?.get("error") ?? null;
 
   useEffect(() => {
     const handleCallback = async () => {

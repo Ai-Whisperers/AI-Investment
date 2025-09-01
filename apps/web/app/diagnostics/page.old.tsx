@@ -289,8 +289,8 @@ export default function DiagnosticsPage() {
                     <div className="flex justify-between text-xs">
                       <span className="text-neutral-400">Latest Update</span>
                       <span className="text-white">
-                        {refreshStatus?.prices.days_old !== null 
-                          ? `${refreshStatus.prices.days_old} days ago`
+                        {refreshStatus?.prices?.days_old !== null 
+                          ? `${refreshStatus?.prices?.days_old} days ago`
                           : 'Never'}
                       </span>
                     </div>

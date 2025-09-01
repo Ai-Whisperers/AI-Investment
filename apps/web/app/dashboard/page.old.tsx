@@ -375,18 +375,18 @@ export default function Dashboard() {
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
               <div className="text-center">
                 <p className="text-gray-400 text-sm">Total Return</p>
-                <p className={`text-lg font-bold ${riskMetrics.total_return >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  {(riskMetrics.total_return * 100).toFixed(2)}%
+                <p className={`text-lg font-bold ${(riskMetrics.total_return ?? 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {((riskMetrics.total_return ?? 0) * 100).toFixed(2)}%
                 </p>
               </div>
               <div className="text-center">
                 <p className="text-gray-400 text-sm">Sharpe Ratio</p>
-                <p className="text-lg font-bold text-white">{riskMetrics.sharpe_ratio.toFixed(3)}</p>
+                <p className="text-lg font-bold text-white">{(riskMetrics.sharpe_ratio ?? 0).toFixed(3)}</p>
               </div>
               <div className="text-center">
                 <p className="text-gray-400 text-sm">Max Drawdown</p>
                 <p className="text-lg font-bold text-red-400">
-                  {(riskMetrics.max_drawdown * 100).toFixed(2)}%
+                  {((riskMetrics.max_drawdown ?? 0) * 100).toFixed(2)}%
                 </p>
               </div>
               {riskMetrics.volatility && (

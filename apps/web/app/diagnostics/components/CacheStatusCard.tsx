@@ -32,8 +32,8 @@ export const CacheStatusCard: React.FC<CacheStatusCardProps> = ({
     );
   }
 
-  const hitRate = status.total_requests > 0 
-    ? ((status.hits / status.total_requests) * 100).toFixed(1)
+  const hitRate = (status.total_requests ?? 0) > 0 
+    ? (((status.hits ?? 0) / (status.total_requests ?? 1)) * 100).toFixed(1)
     : '0.0';
 
   return (
@@ -69,15 +69,15 @@ export const CacheStatusCard: React.FC<CacheStatusCardProps> = ({
           <div className="space-y-2">
             <div className="flex justify-between items-center p-2 bg-white/5 rounded">
               <span className="text-white/60">Total Requests</span>
-              <span className="text-white">{status.total_requests.toLocaleString()}</span>
+              <span className="text-white">{(status.total_requests ?? 0).toLocaleString()}</span>
             </div>
             <div className="flex justify-between items-center p-2 bg-white/5 rounded">
               <span className="text-white/60">Cache Hits</span>
-              <span className="text-green-400">{status.hits.toLocaleString()}</span>
+              <span className="text-green-400">{(status.hits ?? 0).toLocaleString()}</span>
             </div>
             <div className="flex justify-between items-center p-2 bg-white/5 rounded">
               <span className="text-white/60">Cache Misses</span>
-              <span className="text-orange-400">{status.misses.toLocaleString()}</span>
+              <span className="text-orange-400">{(status.misses ?? 0).toLocaleString()}</span>
             </div>
             {status.memory_usage && (
               <div className="flex justify-between items-center p-2 bg-white/5 rounded">
@@ -91,7 +91,7 @@ export const CacheStatusCard: React.FC<CacheStatusCardProps> = ({
         <div>
           <h3 className="text-sm font-medium text-white/80 mb-2">Cache By Type</h3>
           <div className="space-y-2">
-            {Object.entries(status.cache_by_type).map(([type, count]) => (
+            {Object.entries(status.cache_by_type ?? {}).map(([type, count]) => (
               <div key={type} className="flex justify-between items-center p-2 bg-white/5 rounded">
                 <span className="text-white/60 capitalize">{type.replace(/_/g, ' ')}</span>
                 <span className="text-white">{count}</span>
