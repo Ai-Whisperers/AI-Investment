@@ -1,0 +1,22 @@
+# Mathematical Engine Core Dependencies
+# Minimal dependencies for pure mathematical operations
+# WebAssembly compilation compatible
+
+# Core mathematical libraries
+numpy>=1.24.0,<2.0.0
+scipy>=1.11.0,<2.0.0
+
+# Development dependencies (optional)
+# pytest>=7.4.0
+# pytest-cov>=4.1.0
+# pytest-benchmark>=4.0.0
+# black>=23.0.0
+# ruff>=0.1.0
+# mypy>=1.5.0
+
+# WebAssembly compilation (optional)
+# pyodide-build>=0.24.0
+
+# Visualization for examples (optional)
+# matplotlib>=3.7.0
+# plotly>=5.15.0

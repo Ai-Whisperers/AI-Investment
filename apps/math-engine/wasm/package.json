@@ -1,0 +1,41 @@
+{
+  "name": "@waardhaven/math-engine",
+  "version": "0.1.0",
+  "description": "High-performance mathematical engine for investment intelligence",
+  "main": "dist/math-engine.js",
+  "types": "dist/math-engine.d.ts",
+  "files": [
+    "dist/",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "python build.py",
+    "test": "node test/test-wasm.js",
+    "benchmark": "node benchmark/bench-wasm.js"
+  },
+  "keywords": [
+    "finance",
+    "mathematics", 
+    "webassembly",
+    "wasm",
+    "investment",
+    "prediction",
+    "portfolio-optimization"
+  ],
+  "author": "Waardhaven AI",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ai-Whisperers/AI-Investment.git",
+    "directory": "apps/math-engine"
+  },
+  "bugs": {
+    "url": "https://github.com/Ai-Whisperers/AI-Investment/issues"
+  },
+  "homepage": "https://github.com/Ai-Whisperers/AI-Investment#readme"
+}
